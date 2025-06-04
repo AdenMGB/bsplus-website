@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     },
   },
   app: {
-    baseURL: '/desqta-website/',
+    baseURL: '/',
     head: {
       title: 'DesQTA - SEQTA Learn Desktop',
       meta: [
