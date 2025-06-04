@@ -1,0 +1,40 @@
+{
+  "name": "desqta-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
+    "@nuxt/fonts": "0.11.1",
+    "@nuxt/image": "1.10.0",
+    "@nuxtjs/seo": "3.0.3",
+    "@nuxtjs/tailwindcss": "6.13.1",
+    "nuxt": "^3.16.2",
+    "vite": "6.3.2",
+    "vue": "latest",
+    "vue-router": "latest",
+    "vue3-carousel-nuxt": "^1.1.5"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "devDependencies": {
+    "@nuxt/icon": "^1.12.0",
+    "sass-embedded": "^1.83.4",
+    "serve": "^14.2.4",
+    "typescript": "^5.8.3",
+    "unstorage": "1.15.0",
+    "vue-tsc": "^2.2.8"
+  },
+  "overrides": {
+    "vue3-carousel-nuxt": {
+      "vue3-carousel": "^0.15.0"
+    }
+  }
+}
