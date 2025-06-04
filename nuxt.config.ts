@@ -2,8 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   site: {
-    url: "https://adenmgb.github.io/",
-    name: "DesQTA - SEQTA Learn Desktop",
+    url: "https://betterseqta.org/",
+    name: "BetterSEQTA Plus - SEQTA Learn Enhanced",
   },
   devtools: {
     enabled: true,
@@ -15,11 +15,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/',
     head: {
-      title: 'DesQTA - SEQTA Learn Desktop',
+      title: 'BetterSEQTA Plus - SEQTA Learn Enhanced',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A powerful desktop application for SEQTA Learn' }
+        { name: 'description', content: 'A powerful browser extension that enhances your SEQTA Learn experience' }
       ]
     }
   },

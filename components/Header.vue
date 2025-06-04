@@ -58,7 +58,7 @@
                   >
                     <component
                       :is="item.icon"
-                      class="transition size-6 text-blue-600 group-hover:text-blue-500"
+                      class="transition size-6 text-zinc-600 group-hover:text-zinc-500"
                       aria-hidden="true"
                     />
                   </div>

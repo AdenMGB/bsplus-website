@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="text-blue-400"
+    class="text-zinc-400"
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

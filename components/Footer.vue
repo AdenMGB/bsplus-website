@@ -25,7 +25,7 @@
         </NuxtLink>
       </div>
       <p class="mt-10 text-center text-sm/6 text-zinc-400">
-        &copy; {{ new Date().getFullYear() }} DesQTA. Licensed under MIT License.
+        &copy; {{ new Date().getFullYear() }} BetterSEQTA Plus. Licensed under MIT License.
       </p>
     </div>
   </footer>

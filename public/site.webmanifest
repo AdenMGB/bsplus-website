@@ -1,7 +1,7 @@
 {
-  "name": "DesQTA - SEQTA Learn Desktop",
-  "short_name": "DesQTA",
-  "description": "A powerful desktop application for SEQTA Learn",
+  "name": "BetterSEQTA Plus - SEQTA Learn Enhanced",
+  "short_name": "BetterSEQTA Plus",
+  "description": "A powerful browser extension that enhances your SEQTA Learn experience",
   "start_url": "/desqta-website/",
   "display": "standalone",
   "background_color": "#18181b",
