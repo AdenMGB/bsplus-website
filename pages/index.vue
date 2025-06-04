@@ -88,6 +88,7 @@
     </div>
 
     <!-- Screenshots Section -->
+    <!-- Temporarily commented out until we have actual images
     <div class="py-24 sm:py-32 animate-fade-in delay-200">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl lg:text-center">
@@ -145,6 +146,7 @@
         </div>
       </div>
     </div>
+    -->
 
     <!-- CTA Section -->
     <div class="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8 animate-fade-in delay-300">
