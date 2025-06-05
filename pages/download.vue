@@ -15,8 +15,12 @@
         <!-- Chrome Card -->
         <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
           <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C8.21 0 5 2.54 5 5.68c0 2.12 1.21 3.97 3.03 5.08C5.99 12.62 4 15.23 4 18.32c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.09-1.99-5.7-5.03-6.56 1.82-1.11 3.03-2.96 3.03-5.08C19 2.54 15.79 0 12 0zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="20" fill="#fff"/>
+              <path d="M24 4a20 20 0 0 1 17.32 10H24v8h20c0 3.6-1.04 7.02-2.98 9.9l-9.98-17.3A20 20 0 0 1 24 4z" fill="#EA4335"/>
+              <path d="M44 24c0 3.6-1.04 7.02-2.98 9.9l-9.98-17.3A20 20 0 0 1 44 24z" fill="#FBBC05"/>
+              <path d="M24 44a20 20 0 0 1-17.32-10H24v-8H4c0-3.6 1.04-7.02 2.98-9.9l9.98 17.3A20 20 0 0 1 24 44z" fill="#34A853"/>
+              <circle cx="24" cy="24" r="8" fill="#4285F4"/>
             </svg>
             <span class="ml-2">Chrome</span>
           </dt>
@@ -32,8 +36,10 @@
         <!-- Edge Card -->
         <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-100">
           <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C8.21 0 5 2.54 5 5.68c0 2.12 1.21 3.97 3.03 5.08C5.99 12.62 4 15.23 4 18.32c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.09-1.99-5.7-5.03-6.56 1.82-1.11 3.03-2.96 3.03-5.08C19 2.54 15.79 0 12 0zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4c11.05 0 20 8.95 20 20 0 11.05-8.95 20-20 20C12.95 44 4 35.05 4 24 4 12.95 12.95 4 24 4z" fill="#0078D4"/>
+              <path d="M24 44c-8.84 0-16-7.16-16-16 0-2.21.45-4.32 1.26-6.24C13.1 25.1 18.1 28 24 28c5.9 0 10.9-2.9 14.74-6.24C39.55 23.68 40 25.79 40 28c0 8.84-7.16 16-16 16z" fill="#41CD52"/>
+              <path d="M24 8c8.84 0 16 7.16 16 16 0 2.21-.45 4.32-1.26 6.24C34.9 22.9 29.9 20 24 20c-5.9 0-10.9 2.9-14.74 6.24C8.45 27.68 8 25.57 8 24c0-8.84 7.16-16 16-16z" fill="#2D7DDF"/>
             </svg>
             <span class="ml-2">Edge</span>
           </dt>
@@ -49,8 +55,10 @@
         <!-- Firefox Card -->
         <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
           <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C8.21 0 5 2.54 5 5.68c0 2.12 1.21 3.97 3.03 5.08C5.99 12.62 4 15.23 4 18.32c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.09-1.99-5.7-5.03-6.56 1.82-1.11 3.03-2.96 3.03-5.08C19 2.54 15.79 0 12 0zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+            <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4c11.05 0 20 8.95 20 20 0 11.05-8.95 20-20 20C12.95 44 4 35.05 4 24 4 12.95 12.95 4 24 4z" fill="#FF7139"/>
+              <path d="M24 44c-8.84 0-16-7.16-16-16 0-2.21.45-4.32 1.26-6.24C13.1 25.1 18.1 28 24 28c5.9 0 10.9-2.9 14.74-6.24C39.55 23.68 40 25.79 40 28c0 8.84-7.16 16-16 16z" fill="#FFB356"/>
+              <path d="M24 8c8.84 0 16 7.16 16 16 0 2.21-.45 4.32-1.26 6.24C34.9 22.9 29.9 20 24 20c-5.9 0-10.9-2.9-14.74 6.24C8.45 27.68 8 25.57 8 24c0-8.84 7.16-16 16-16z" fill="#FFD43B"/>
             </svg>
             <span class="ml-2">Firefox</span>
           </dt>

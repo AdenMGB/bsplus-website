@@ -9,11 +9,11 @@
     <!-- shadows -->
     <div class="fixed w-screen h-screen -z-10">
       <div
-        class="absolute inset-x-0 transform-gpu overflow-hidden blur-3xl top-[10rem]"
+        class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
         aria-hidden="true"
       >
         <div
-          class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-cyan-500 to-blue-600 opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+          class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-white/40 via-zinc-400/15 to-zinc-600/5 opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
           style="
             clip-path: polygon(
               74.1% 44.1%,
@@ -34,14 +34,14 @@
               74.1% 44.1%
             );
           "
-        />
+        ></div>
       </div>
       <div
-        class="absolute inset-x-0 transform-gpu overflow-hidden blur-3xl -top-[15rem]"
+        class="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
         aria-hidden="true"
       >
         <div
-          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-blue-600 to-blue-100 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-zinc-300/15 via-white/35 to-zinc-500/10 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style="
             clip-path: polygon(
               74.1% 44.1%,
@@ -62,14 +62,14 @@
               74.1% 44.1%
             );
           "
-        />
+        ></div>
       </div>
       <div
-        class="absolute left-[10%] inset-x-0 transform-gpu overflow-hidden blur-3xl top-[50vh]"
+        class="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
         aria-hidden="true"
       >
         <div
-          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[60deg] bg-gradient-to-tr from-blue-600 to-blue-100 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[60deg] bg-gradient-to-tr from-zinc-500/15 via-white/40 to-zinc-300/5 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style="
             clip-path: polygon(
               74.1% 44.1%,
@@ -90,7 +90,7 @@
               74.1% 44.1%
             );
           "
-        />
+        ></div>
       </div>
     </div>
   </div>

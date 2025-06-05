@@ -90,7 +90,7 @@
       <div class="hidden lg:flex" />
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
         <NuxtLink
-          href="https://github.com/BetterSEQTA/DesQTA/tree/develop"
+          href="https://github.com/BetterSEQTA/BetterSEQTA-Plus"
           class="text-sm/6 font-semibold text-zinc-100"
           >Quickstart <span aria-hidden="true">&rarr;</span></NuxtLink
         >
