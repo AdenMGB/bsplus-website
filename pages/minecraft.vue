@@ -10,7 +10,7 @@
       preload="auto"
       x-webkit-airplay="allow"
     >
-      <source src="/images/2025_06_06_12_32_38.mp4" type="video/mp4">
+      <source src="https://github.com/AdenMGB/bsplus-website/raw/refs/heads/main/public/images/2025_06_06_12_32_38.mp4" type="video/mp4">
     </video>
 
     <!-- Gradient Overlay -->
