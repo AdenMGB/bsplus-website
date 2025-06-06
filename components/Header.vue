@@ -210,6 +210,10 @@ const routes = [
     name: "Download",
     href: "/download",
   },
+  {
+    name: "Minecraft",
+    href: "/minecraft",
+  },
 ];
 
 const quickstartLink = "https://github.com/BetterSEQTA/DesQTA/tree/develop";
