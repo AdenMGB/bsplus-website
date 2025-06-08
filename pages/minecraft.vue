@@ -24,8 +24,11 @@
             BetterSEQTA Plus Minecraft Server
           </h1>
           <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
-            Coming soon - Join our community in the world of Minecraft!
+            Join our community in Minecraft!
           </p>
+          <div class="mt-4 text-xl font-semibold text-white animate-fade-in delay-150">
+            Server IP: mc.betterseqta.org
+          </div>
         </div>
 
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -38,7 +41,7 @@
                   <svg class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  Survival gameplay with custom plugins
+                  SMP (Survival Multiplayer) as our first release gamemode
                 </li>
                 <li class="flex items-center gap-3">
                   <svg class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,14 +61,20 @@
                   </svg>
                   Regular updates and maintenance
                 </li>
+                <li class="flex items-center gap-3">
+                  <svg class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  The End dimension will be enabled during an upcoming live event
+                </li>
               </ul>
             </div>
 
-            <!-- Coming Soon -->
+            <!-- Join Now -->
             <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-8 animate-fade-in delay-300">
-              <h2 class="text-2xl font-bold text-white mb-6">Coming Soon</h2>
+              <h2 class="text-2xl font-bold text-white mb-6">Join Now</h2>
               <p class="text-zinc-300 mb-6">
-                We're working hard to bring you an amazing Minecraft experience. Join our Discord to stay updated on the launch date and get early access!
+                The server is now live! Join our Discord community to stay updated on events, announcements, and connect with other players!
               </p>
               <a
                 href="https://discord.gg/nv6YSjpEM4"
