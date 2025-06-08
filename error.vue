@@ -4,7 +4,17 @@
       class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8"
     >
       <div class="text-center">
-        <p class="text-base font-semibold text-blue-600">
+        <img
+          src="/images/404.jpg"
+          alt="Sorry kitten"
+          class="mx-auto h-64 w-64 rounded-lg object-cover shadow-lg"
+        />
+        <p class="mt-6 text-xl font-medium text-zinc-300">
+          Oops! Looks like this page got lost in the digital wilderness. 
+          <br />
+          But don't worry, this cute kitten is here to make it up to you!
+        </p>
+        <p class="mt-6 text-base font-semibold text-blue-600">
           {{ error?.statusCode ?? 500 }}
         </p>
         <h1
