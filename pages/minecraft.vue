@@ -106,7 +106,7 @@
             controls
             preload="metadata"
           >
-            <source src="/images/2025-06-09 09-51-43.mp4" type="video/mp4">
+            <source src="https://raw.githubusercontent.com/AdenMGB/bsplus-website/refs/heads/main/public/images/2025-06-09%2009-51-43.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
