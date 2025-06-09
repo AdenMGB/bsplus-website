@@ -89,6 +89,28 @@
           </div>
         </div>
       </div>
+
+      <!-- Quick Guide Section -->
+      <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-fade-in">
+            Quick Guide: Quickshop Hikari
+          </h2>
+          <p class="mt-4 text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
+            Learn how to use our shop system in this quick tutorial
+          </p>
+        </div>
+        <div class="mt-10 mx-auto max-w-3xl">
+          <video
+            class="w-full rounded-xl shadow-2xl"
+            controls
+            preload="metadata"
+          >
+            <source src="/images/2025-06-09 09-51-43.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
     </div>
   </div>
 </template>
