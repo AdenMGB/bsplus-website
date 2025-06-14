@@ -4,7 +4,7 @@
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
         <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-          Add BetterSEQTA Plus to your browser
+          Add BetterSEQTA+ to your browser
         </p>
         <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
           Transform your SEQTA Learn experience with our powerful browser extension.
@@ -25,7 +25,7 @@
             <span class="ml-2">Chrome</span>
           </dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
-            <p class="flex-auto">Install BetterSEQTA Plus on Chrome for the best experience.</p>
+            <p class="flex-auto">Install BetterSEQTA+ on Chrome for the best experience.</p>
             <p class="mt-6">
               <a href="https://chromewebstore.google.com/detail/betterseqta+/afdgaoaclhkhemfkkkonemoapeinchel" class="text-sm font-semibold leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
                 Add to Chrome <span aria-hidden="true">→</span>
@@ -44,7 +44,7 @@
             <span class="ml-2">Edge</span>
           </dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
-            <p class="flex-auto">Install BetterSEQTA Plus on Microsoft Edge.</p>
+            <p class="flex-auto">Install BetterSEQTA+ on Microsoft Edge.</p>
             <p class="mt-6">
               <a href="https://chromewebstore.google.com/detail/betterseqta+/afdgaoaclhkhemfkkkonemoapeinchel" class="text-sm font-semibold leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
                 Add to Edge <span aria-hidden="true">→</span>
@@ -63,7 +63,7 @@
             <span class="ml-2">Firefox</span>
           </dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
-            <p class="flex-auto">Install BetterSEQTA Plus on Firefox.</p>
+            <p class="flex-auto">Install BetterSEQTA+ on Firefox.</p>
             <p class="mt-6">
               <a href="https://addons.mozilla.org/en-US/firefox/addon/betterseqta-plus/" class="text-sm font-semibold leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
                 Add to Firefox <span aria-hidden="true">→</span>
@@ -113,7 +113,7 @@
         <div class="mx-auto max-w-2xl lg:text-center">
           <h2 class="text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
           <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            How to install BetterSEQTA Plus
+            How to install BetterSEQTA+
           </p>
         </div>
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">

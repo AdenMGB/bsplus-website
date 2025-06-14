@@ -24,9 +24,20 @@
           <component :is="item.icon" class="size-6" aria-hidden="true" />
         </NuxtLink>
       </div>
-      <p class="mt-10 text-center text-sm/6 text-zinc-400">
-        &copy; {{ new Date().getFullYear() }} BetterSEQTA Plus. Licensed under MIT License.
-      </p>
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+          <div class="space-y-8">
+            <img
+              class="h-7"
+              src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
+              alt="BetterSEQTA+"
+            />
+            <p class="text-sm leading-6 text-zinc-400">
+              &copy; {{ new Date().getFullYear() }} BetterSEQTA+. Licensed under MIT License.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </footer>
 </template>

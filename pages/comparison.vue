@@ -4,10 +4,10 @@
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Comparison</h2>
         <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-          Why choose BetterSEQTA Plus?
+          Why choose BetterSEQTA+?
         </p>
         <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-          See how BetterSEQTA Plus compares to the web version of SEQTA Learn.
+          See how BetterSEQTA+ compares to the web version of SEQTA Learn.
         </p>
       </div>
 
@@ -26,7 +26,7 @@
           </dd>
         </div>
         <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in delay-200">
-          <dt class="text-base font-semibold leading-7 text-white">BetterSEQTA Plus</dt>
+          <dt class="text-base font-semibold leading-7 text-white">BetterSEQTA+</dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
             <ul class="list-disc pl-6 space-y-3">
               <li>Beautiful custom themes</li>
@@ -45,7 +45,7 @@
         <div class="mx-auto max-w-2xl lg:text-center">
           <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Feature Comparison</h2>
           <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-            What makes BetterSEQTA Plus better?
+            What makes BetterSEQTA+ better?
           </p>
         </div>
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -89,7 +89,7 @@
       <div class="mx-auto mt-32 max-w-2xl text-center animate-fade-in delay-400">
         <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down">Ready to transform SEQTA?</h2>
         <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
-          Add BetterSEQTA Plus to Chrome today and experience the difference.
+          Add BetterSEQTA+ to Chrome today and experience the difference.
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6 animate-fade-in delay-200">
           <NuxtLink

@@ -18,7 +18,7 @@
             </a>
           </div>
           <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl font-display animate-slide-down delay-100">
-            BetterSEQTA Plus - SEQTA Learn Enhanced
+            BetterSEQTA+ - SEQTA Learn Enhanced
           </h1>
           <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
             Transform your SEQTA Learn experience with our powerful browser extension,
@@ -52,7 +52,7 @@
             Making SEQTA Learn actually enjoyable!
           </p>
           <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-            BetterSEQTA Plus brings beautiful themes, live wallpapers, and enhanced features to transform your SEQTA Learn experience.
+            BetterSEQTA+ brings beautiful themes, live wallpapers, and enhanced features to transform your SEQTA Learn experience.
           </p>
         </div>
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -94,10 +94,10 @@
         <div class="mx-auto max-w-2xl lg:text-center">
           <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Screenshots</h2>
           <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-            See BetterSEQTA Plus in action
+            See BetterSEQTA+ in action
           </p>
           <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-            Take a look at some of the key features and interfaces of BetterSEQTA Plus.
+            Take a look at some of the key features and interfaces of BetterSEQTA+.
           </p>
         </div>
         <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -162,9 +162,9 @@
         <rect width="100%" height="100%" stroke-width="0" fill="url(#1d4240dd-898f-445f-932d-e2872fd12de3)" />
       </svg>
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down">Ready to transform SEQTA?<br>Add BetterSEQTA Plus to Chrome today.</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down">Ready to transform SEQTA?<br>Add BetterSEQTA+ to Chrome today.</h2>
         <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
-          Join thousands of students and teachers who are already using BetterSEQTA Plus to make SEQTA Learn actually enjoyable!
+          Join thousands of students and teachers who are already using BetterSEQTA+ to make SEQTA Learn actually enjoyable!
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6 animate-fade-in delay-200">
           <NuxtLink
@@ -191,7 +191,7 @@ import {
 } from "@heroicons/vue/24/outline";
 
 useHead({
-  title: "Home",
+  title: "BetterSEQTA+ - SEQTA Learn Enhanced",
 });
 </script>
 

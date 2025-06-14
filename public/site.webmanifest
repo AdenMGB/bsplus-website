@@ -1,6 +1,6 @@
 {
-  "name": "BetterSEQTA Plus - SEQTA Learn Enhanced",
-  "short_name": "BetterSEQTA Plus",
+  "name": "BetterSEQTA+ - SEQTA Learn Enhanced",
+  "short_name": "BetterSEQTA+",
   "description": "A powerful browser extension that enhances your SEQTA Learn experience",
   "start_url": "/desqta-website/",
   "display": "standalone",
