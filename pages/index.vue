@@ -18,8 +18,11 @@
             </a>
           </div>
           <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl font-display animate-slide-down delay-100">
-            BetterSEQTA+ - SEQTA Learn Enhanced
+            BetterSEQTA+
           </h1>
+          <h2 class="mt-2 text-2xl font-medium tracking-tight text-zinc-400 sm:text-3xl font-display animate-slide-down delay-100">
+            SEQTA Learn Enhanced
+          </h2>
           <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
             Transform your SEQTA Learn experience with our powerful browser extension,
             bringing beautiful themes, live wallpapers, and enhanced features to make SEQTA actually enjoyable!
@@ -191,7 +194,7 @@ import {
 } from "@heroicons/vue/24/outline";
 
 useHead({
-  title: "BetterSEQTA+ - SEQTA Learn Enhanced",
+  title: "BetterSEQTA+ | SEQTA Learn Enhanced",
 });
 </script>
 
