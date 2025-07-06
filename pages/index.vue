@@ -194,7 +194,7 @@ import {
 } from "@heroicons/vue/24/outline";
 
 useHead({
-  title: "BetterSEQTA+ | SEQTA Learn Enhanced",
+  title: "Home | BetterSEQTA+",
 });
 </script>
 
