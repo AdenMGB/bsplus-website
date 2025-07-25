@@ -1,5 +1,49 @@
 <template>
   <div class="relative">
+    <!-- DesQTA Announcement Banner -->
+    <div class="relative w-full py-10 bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20 border-b border-green-400/30 overflow-hidden">
+      <!-- Confetti Animation -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="confetti-container">
+          <div class="confetti" v-for="i in 50" :key="i" :style="`--delay: ${Math.random() * 3}s; --left: ${Math.random() * 100}%; --animation-duration: ${3 + Math.random() * 4}s;`"></div>
+        </div>
+      </div>
+      
+      <div class="relative mx-auto max-w-7xl px-6 py-8 sm:py-12">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div class="flex-1 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start space-x-3 mb-3">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-400/20 text-green-300 border border-green-400/30 animate-pulse">
+                🎉 Brand New
+              </span>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                🚀 Desktop App
+              </span>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2 animate-slide-down">
+              DesQTA
+            </h3>
+            <p class="text-lg text-zinc-200 mb-4 max-w-2xl">
+              BetterSEQTA in a desktop app - the ultimate SEQTA experience with native performance and enhanced features!
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <a
+              href="https://desqta.betterseqta.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg font-semibold hover:from-green-400 hover:to-emerald-400 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500/50 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+            >
+              Learn More
+              <svg class="ml-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Hero Section -->
     <div class="relative isolate overflow-hidden animate-fade-in">
       <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
@@ -33,7 +77,9 @@
               class="rounded-md bg-zinc-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200"
             >
               Add to Chrome
-              <ArrowDownTrayIcon class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" />
+              <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             </NuxtLink>
             <NuxtLink
               href="#features"
@@ -61,7 +107,9 @@
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-              <PaintBrushIcon class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" aria-hidden="true" />
+              <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+              </svg>
               Beautiful Themes
             </dt>
             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
@@ -70,7 +118,9 @@
           </div>
           <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-100">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-              <MoonIcon class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" aria-hidden="true" />
+              <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
               Dark Mode
             </dt>
             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
@@ -79,7 +129,9 @@
           </div>
           <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-              <SparklesIcon class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" aria-hidden="true" />
+              <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
               Enhanced Interface
             </dt>
             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
@@ -186,13 +238,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-  PaintBrushIcon,
-  MoonIcon,
-  SparklesIcon,
-  ArrowDownTrayIcon,
-} from "@heroicons/vue/24/outline";
-
 useHead({
   title: "BetterSEQTA+ | SEQTA Learn Enhanced",
 });
@@ -207,6 +252,61 @@ useHead({
   from { opacity: 0; transform: translateY(-24px); }
   to { opacity: 1; transform: none; }
 }
+
+/* Confetti Animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, #10b981, #059669, #047857, #065f46);
+  border-radius: 2px;
+  animation: confetti-fall var(--animation-duration) linear infinite;
+  animation-delay: var(--delay);
+  left: var(--left);
+  opacity: 0;
+}
+
+.confetti:nth-child(3n) {
+  background: linear-gradient(45deg, #f59e0b, #d97706, #b45309, #92400e);
+  width: 6px;
+  height: 6px;
+}
+
+.confetti:nth-child(3n+1) {
+  background: linear-gradient(45deg, #3b82f6, #2563eb, #1d4ed8, #1e40af);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.confetti:nth-child(3n+2) {
+  background: linear-gradient(45deg, #8b5cf6, #7c3aed, #6d28d9, #5b21b6);
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+}
+
 .animate-fade-in {
   animation: fade-in 0.8s cubic-bezier(0.4,0,0.2,1) both;
 }
