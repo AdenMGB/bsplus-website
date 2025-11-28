@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <!-- DesQTA Announcement Banner -->
-    <div class="relative w-full py-10 bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20 border-b border-green-400/30 overflow-hidden">
+    <div class="relative w-full pt-16 pb-6 bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20 border-b border-green-400/30 overflow-hidden">
       <!-- Confetti Animation -->
       <div class="absolute inset-0 pointer-events-none">
         <div class="confetti-container">
@@ -9,34 +9,33 @@
         </div>
       </div>
       
-      <div class="relative mx-auto max-w-7xl px-6 py-8 sm:py-12">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div class="flex-1 text-center sm:text-left">
-            <div class="flex items-center justify-center sm:justify-start space-x-3 mb-3">
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-400/20 text-green-300 border border-green-400/30 animate-pulse">
-                🎉 Brand New
-              </span>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
-                🚀 Desktop App
+      <div class="relative mx-auto max-w-5xl px-6 py-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex-1 text-center sm:text-left flex items-center gap-4">
+            <div class="flex-shrink-0">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-400/20 text-green-300 border border-green-400/30 animate-pulse">
+                New
               </span>
             </div>
-            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2 animate-slide-down">
-              DesQTA
-            </h3>
-            <p class="text-lg text-zinc-200 mb-4 max-w-2xl">
-              BetterSEQTA in a desktop app - the ultimate SEQTA experience with native performance and enhanced features!
-            </p>
+            <div>
+              <h3 class="text-lg font-bold text-white leading-tight">
+                Introducing DesQTA
+              </h3>
+              <p class="text-sm text-zinc-200">
+                BetterSEQTA in a native desktop app for enhanced performance.
+              </p>
+            </div>
           </div>
           <div class="flex-shrink-0">
             <a
               href="https://desqta.betterseqta.org"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg font-semibold hover:from-green-400 hover:to-emerald-400 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500/50 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+              class="inline-flex items-center px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              Learn More
-              <svg class="ml-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              Check it out
+              <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </a>
           </div>
@@ -54,7 +53,7 @@
                 Latest Release
               </span>
               <span class="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-zinc-300">
-                <span>Just shipped v3.4.8</span>
+                <span>Just shipped v3.4.11</span>
                 <svg class="h-5 w-5 text-zinc-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                 </svg>

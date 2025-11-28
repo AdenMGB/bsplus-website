@@ -214,6 +214,10 @@ const routes = [
     name: "Minecraft",
     href: "/minecraft",
   },
+  {
+    name: "Privacy",
+    href: "/privacy",
+  },
 ];
 
 const quickstartLink = "https://github.com/BetterSEQTA/DesQTA/tree/develop";

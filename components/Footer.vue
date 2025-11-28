@@ -46,7 +46,10 @@
 import { defineComponent, h } from "vue";
 
 const navigation = {
-  main: [],
+  main: [
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Download", href: "/download" },
+  ],
   social: [
     {
       name: "GitHub",
