@@ -22,22 +22,27 @@
           <strong>We do not collect, intercept, or store your personal school data, login credentials, or academic records on our servers.</strong>
         </p>
         <p class="mt-4">
-          BetterSEQTA+ and DesQTA operate entirely as client-side modifications. This ensures your data remains private and secure. To address specific concerns regarding data handling:
+          BetterSEQTA+ and DesQTA operate primarily as client-side modifications. This ensures your academic data remains private. To address specific concerns regarding data handling and optional features:
         </p>
 
         <h4 class="mt-6 text-xl font-semibold text-white">Login Credentials</h4>
         <p class="mt-2">
-          We never capture, store, or transmit your username or password to our servers.
+          We never capture, store, or transmit your school SEQTA username or password to our servers.
         </p>
         <ul role="list" class="mt-2 space-y-2 list-disc list-inside">
           <li><strong>BetterSEQTA+ Extension:</strong> Uses your browser's existing active session with SEQTA. It does not see or handle your login credentials directly.</li>
           <li><strong>DesQTA App:</strong> Sends your credentials directly from your device to your school's SEQTA server to authenticate. It does not send this information to us or any third party.</li>
         </ul>
 
-        <h4 class="mt-6 text-xl font-semibold text-white">Data Storage</h4>
+        <h4 class="mt-6 text-xl font-semibold text-white">Data Storage & Cloud Sync (DesQTA Only)</h4>
         <ul role="list" class="mt-2 space-y-2 list-disc list-inside">
-          <li><strong>BetterSEQTA+ Extension:</strong> Stores only your custom preferences (themes, settings) locally in your browser's extension storage. It relies on your browser's cache for academic data.</li>
-          <li><strong>DesQTA App:</strong> As a standalone application, DesQTA must store your session tokens and cookies locally on your device to keep you logged in. This data is stored securely on your own computer and is never uploaded to our servers.</li>
+          <li><strong>Local Storage:</strong> By default, all custom settings, themes, and preferences are stored locally on your device.</li>
+          <li><strong>Optional Cloud Sync:</strong> DesQTA offers a completely <strong>optional</strong> cloud sync feature to synchronize your <em>application settings</em> (e.g., themes, custom background preferences) across devices.
+            <ul class="ml-6 mt-1 list-[circle]">
+              <li>This uses a custom, in-house authentication system separate from your school SEQTA account.</li>
+              <li>Only your DesQTA configuration is synced. <strong>No school data, academic records, or SEQTA login credentials are ever uploaded or stored in this cloud service.</strong></li>
+            </ul>
+          </li>
         </ul>
 
         <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">3. Transparency & Open Source</h3>
