@@ -189,6 +189,13 @@
                   />
                   <span>{{ user.displayName || user.username }}</span>
                 </div>
+                <NuxtLink 
+                  v-if="user.is_admin === 1" 
+                  to="/admin" 
+                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-green-400 hover:text-green-300 hover:bg-zinc-800"
+                >
+                  Admin
+                </NuxtLink>
                 <button
                   @click="logout"
                   class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800"

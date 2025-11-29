@@ -29,6 +29,27 @@
               Refresh
             </button>
           </div>
+          <p v-if="stats.views?.buffer" class="text-xs text-zinc-500 mt-2">
+            Next update: {{ getTimeUntil(stats.views.buffer.nextFlushEstimate) }}
+            ({{ stats.views.buffer.totalBuffered }} buffered)
+          </p>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
+          <div class="flex items-baseline gap-2">
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.sessions?.total || 0 }}</dd>
+            <button @click="flushViews" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Refresh
+            </button>
+          </div>
+          <p v-if="stats.sessions?.buffer" class="text-xs text-zinc-500 mt-2">
+            Next update: {{ getTimeUntil(stats.sessions.buffer.nextFlushEstimate) }}
+            ({{ stats.sessions.buffer.totalBuffered }} buffered)
+          </p>
         </div>
       </div>
 
@@ -99,11 +120,35 @@ definePageMeta({
 });
 
 const { data: posts } = await useFetch<any[]>('/api/news');
-const { data: stats } = await useFetch<any>('/api/analytics/stats');
+const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
 });
+
+const stats = computed(() => {
+  if (!posts.value) return { news: { total: 0, published: 0 }, views: { total: 0 }, sessions: { total: 0 } };
+  
+  // Merge basic post stats with analytics stats
+  return {
+    news: {
+      total: posts.value.length,
+      published: posts.value.filter(p => p.published).length
+    },
+    // Use optional chaining for analytics data as it might be null initially
+    views: analyticsStats.value?.views || { total: 0 },
+    sessions: analyticsStats.value?.sessions || { total: 0 }
+  };
+});
+
+function getTimeUntil(timestamp: number) {
+  const diff = timestamp - Date.now();
+  if (diff <= 0) return 'Any moment';
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return '< 1 min';
+  if (minutes > 60) return `~${Math.floor(minutes / 60)} hrs`;
+  return `~${minutes} mins`;
+}
 
 function formatDate(timestamp: number) {
   return new Date(timestamp * 1000).toLocaleDateString('en-US', {

@@ -4,16 +4,18 @@
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
         <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-          Add BetterSEQTA+ to your browser
+          Get BetterSEQTA+
         </p>
         <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-          Transform your SEQTA Learn experience with our powerful browser extension.
+          Choose the version that suits you best: Browser Extension or Desktop App.
         </p>
       </div>
 
-      <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Chrome Card -->
-        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
+      <!-- Download Options -->
+      <div class="mt-16 sm:mt-24">
+        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <!-- Chrome Card -->
+          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
           <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
             <svg class="h-7 w-7 flex-none transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
           <path fill="#fff" d="M34,24c0,5.521-4.479,10-10,10s-10-4.479-10-10s4.479-10,10-10S34,18.479,34,24z"/>
@@ -95,36 +97,115 @@
             </p>
           </dd>
         </div>
+
+        <!-- Windows -->
+        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
+              <path d="M7,6h15c0.552,0,1,0.448,1,1v15c0,0.552-0.448,1-1,1H7c-0.552,0-1-0.448-1-1V7 C6,6.448,6.448,6,7,6z"></path>
+              <path d="M25.042,21.958V7c0-0.552,0.448-1,1-1H41c0.552,0,1,0.448,1,1v14.958 c0,0.552-0.448,1-1,1H26.042C25.489,22.958,25.042,22.511,25.042,21.958z"></path>
+              <path d="M7,25h15c0.552,0,1,0.448,1,1v15c0,0.552-0.448,1-1,1H7c-0.552,0-1-0.448-1-1V26 C6,25.448,6.448,25,7,25z"></path>
+              <path d="M25,41V26c0-0.552,0.448-1,1-1h15c0.552,0,1,0.448,1,1v15c0,0.552-0.448,1-1,1H26 C25.448,42,25,41.552,25,41z"></path>
+            </svg>
+            <span class="ml-2">Windows</span>
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
+            <p class="flex-auto">Download the latest version for Windows 10 and above.</p>
+            <p class="mt-6">
+              <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_x64-setup.exe" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                Download <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+
+        <!-- macOS -->
+        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"></path>
+            </svg>
+            <span class="ml-2">macOS</span>
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
+            <p class="flex-auto">Download the latest version for macOS 10.15 and above.</p>
+            <p class="mt-6">
+              <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_aarch64.dmg" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                Download <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+
+        <!-- Linux -->
+        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
+              <path d="M12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6zm0 10c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"></path>
+            </svg>
+            <span class="ml-2">Linux</span>
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
+            <p class="flex-auto">Download the latest version for Linux distributions.</p>
+            <p class="mt-6">
+              <span class="text-sm font-semibold leading-6 text-zinc-500 cursor-not-allowed">
+                Coming Soon
+              </span>
+            </p>
+          </dd>
+        </div>
+
+        <!-- Android -->
+        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+            <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.523 15.3414c-.5665 0-.9414-.4749-.9414-1.0414s.3749-1.0414.9414-1.0414.9414.4749.9414 1.0414-.3749 1.0414-.9414 1.0414zm-11.046 0c-.5665 0-.9414-.4749-.9414-1.0414s.3749-1.0414.9414-1.0414.9414.4749.9414 1.0414-.3749 1.0414-.9414 1.0414zm11.405-6.34l1.0515-1.9003c.1628-.2938.0589-.6673-.2349-.8301-.2938-.1628-.6673-.0589-.8301.2349L16.8732 8.4103c-1.2513-.5729-2.7665-.9414-4.3732-.9414s-3.1219.3685-4.3732.9414L7.1005 6.4659c-.1628-.2938-.5363-.3977-.8301-.2349-.2938.1628-.3977.5363-.2349.8301L6.9871 8.9614C5.1108 10.0847 3.9795 11.9498 3.9795 14.041h16.041c0-2.0912-1.1313-3.9563-3.0076-5.0796z"></path>
+            </svg>
+            <span class="ml-2">Android</span>
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
+            <p class="flex-auto">Download the mobile version for Android devices.</p>
+            <p class="mt-6">
+              <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA.apk" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                Download <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          </dd>
+        </div>
+      </div>
       </div>
 
       <!-- System Requirements -->
       <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-300">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400">Browser Support</h2>
+          <h2 class="text-base font-semibold leading-7 text-zinc-400">System Requirements</h2>
           <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Supported Browsers
+            What you need to run BetterSEQTA+ and DesQTA
           </p>
         </div>
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+            <!-- Browser Reqs -->
             <div class="flex flex-col">
-              <dt class="text-base font-semibold leading-7 text-white">Chrome-based Browsers</dt>
+              <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ul class="list-disc pl-6 space-y-3">
-                  <li>Google Chrome</li>
-                  <li>Microsoft Edge</li>
-                  <li>Brave</li>
-                  <li>Opera</li>
-                  <li>Other Chromium-based browsers</li>
+                  <li><strong>Chrome/Edge/Brave:</strong> Latest version recommended</li>
+                  <li><strong>Firefox:</strong> Supported</li>
+                  <li><strong>Safari:</strong> Experimental</li>
                 </ul>
               </dd>
             </div>
-            <div class="flex flex-col">
-              <dt class="text-base font-semibold leading-7 text-white">Other Browsers</dt>
+            <!-- DesQTA Reqs -->
+             <div class="flex flex-col">
+              <dt class="text-base font-semibold leading-7 text-white">DesQTA (Desktop/Mobile)</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ul class="list-disc pl-6 space-y-3">
-                  <li>Firefox (Supported)</li>
-                  <li>Safari (Experimental)</li>
+                  <li><strong>Windows:</strong> Windows 10 or later, 4GB RAM</li>
+                  <li><strong>macOS:</strong> macOS 10.15 or later, 4GB RAM</li>
+                  <li><strong>Linux:</strong> Ubuntu 18.04+ (or equiv), 4GB RAM</li>
+                  <li><strong>Android:</strong> Android 7.0+ (API 24), 2GB RAM</li>
                 </ul>
               </dd>
             </div>
@@ -137,16 +218,16 @@
         <div class="mx-auto max-w-2xl lg:text-center">
           <h2 class="text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
           <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            How to install BetterSEQTA+
+            How to install
           </p>
         </div>
         <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
             <div class="flex flex-col">
-              <dt class="text-base font-semibold leading-7 text-white">Chrome/Edge</dt>
+              <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ol class="list-decimal pl-6 space-y-3">
-                  <li>Click "Add to Chrome/Edge"</li>
+                  <li>Click "Add to [Browser]"</li>
                   <li>Confirm the installation</li>
                   <li>Visit SEQTA Learn</li>
                   <li>Enjoy the enhanced experience!</li>
@@ -154,24 +235,24 @@
               </dd>
             </div>
             <div class="flex flex-col">
-              <dt class="text-base font-semibold leading-7 text-white">Firefox</dt>
+              <dt class="text-base font-semibold leading-7 text-white">Desktop (DesQTA)</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ol class="list-decimal pl-6 space-y-3">
-                  <li>Click "Add to Firefox"</li>
-                  <li>Confirm the installation</li>
-                  <li>Visit SEQTA Learn</li>
-                  <li>Enjoy the enhanced experience!</li>
+                  <li>Download the installer (.exe/.dmg)</li>
+                  <li>Run the installer or drag to Apps</li>
+                  <li>Launch DesQTA</li>
+                  <li>Log in to your SEQTA account</li>
                 </ol>
               </dd>
             </div>
-            <div class="flex flex-col">
-              <dt class="text-base font-semibold leading-7 text-white">Safari</dt>
+             <div class="flex flex-col">
+              <dt class="text-base font-semibold leading-7 text-white">Android</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ol class="list-decimal pl-6 space-y-3">
-                  <li>Download from GitHub</li>
-                  <li>Enable developer mode</li>
-                  <li>Load the extension</li>
-                  <li>Visit SEQTA Learn</li>
+                  <li>Download the .apk file</li>
+                  <li>Enable "Install from Unknown Sources"</li>
+                  <li>Install the APK</li>
+                  <li>Launch DesQTA from app drawer</li>
                 </ol>
               </dd>
             </div>

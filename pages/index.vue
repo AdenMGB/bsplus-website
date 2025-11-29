@@ -2,8 +2,8 @@
   <div class="relative">
     <!-- Hero Section -->
     <div class="relative isolate overflow-hidden animate-fade-in">
-      <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
-        <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
+      <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:px-8 lg:py-40">
+        <div class="mx-auto max-w-2xl flex-shrink-0 lg:pt-8">
           <div class="mt-24 sm:mt-32 lg:mt-16">
             <a href="/download" class="inline-flex space-x-6 animate-slide-down">
               <span class="rounded-full bg-zinc-500/10 px-3 py-1 text-sm font-semibold leading-6 text-zinc-400 ring-1 ring-inset ring-zinc-500/20">
@@ -32,7 +32,7 @@
               href="/download"
               class="rounded-md bg-zinc-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200"
             >
-              Add to Chrome
+              Get BetterSEQTA+
               <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -43,6 +43,45 @@
             >
               Learn more <span aria-hidden="true">→</span>
             </NuxtLink>
+          </div>
+        </div>
+      </div>
+      <div class="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:mt-0 lg:max-w-none justify-center">
+        <div class="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
+          <div class="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
+            <div class="mt-24 sm:mt-32 lg:mt-16">
+              <a href="/download" class="inline-flex space-x-6 animate-slide-down">
+                <span class="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-semibold leading-6 text-blue-400 ring-1 ring-inset ring-blue-500/20">
+                  Desktop App
+                </span>
+              </a>
+            </div>
+            <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl font-display animate-slide-down delay-100">
+              DesQTA
+            </h1>
+            <h2 class="mt-2 text-2xl font-medium tracking-tight text-blue-400 sm:text-3xl font-display animate-slide-down delay-100">
+              The Desktop Experience
+            </h2>
+            <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
+              A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance.
+            </p>
+            <div class="mt-10 flex items-center gap-x-6 animate-fade-in delay-300">
+              <NuxtLink
+                href="/download"
+                class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200"
+              >
+                Download DesQTA
+                <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </NuxtLink>
+              <NuxtLink
+                href="/comparison"
+                class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400"
+              >
+                Compare Features <span aria-hidden="true">→</span>
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
@@ -98,67 +137,6 @@
       </div>
     </div>
 
-    <!-- Screenshots Section -->
-    <!-- Temporarily commented out until we have actual images
-    <div class="py-24 sm:py-32 animate-fade-in delay-200">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Screenshots</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
-            See BetterSEQTA+ in action
-          </p>
-          <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-            Take a look at some of the key features and interfaces of BetterSEQTA+.
-          </p>
-        </div>
-        <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/homepage.png" alt="Homepage" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">Homepage</h3>
-              <p class="mt-2 text-zinc-300">Your personalized dashboard with upcoming assessments and notices.</p>
-            </div>
-          </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-100">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/assements.png" alt="Assessments View" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">Assessments</h3>
-              <p class="mt-2 text-zinc-300">View and manage your assessments with an intuitive interface.</p>
-            </div>
-          </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/courses.png" alt="Courses Dashboard" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">Courses</h3>
-              <p class="mt-2 text-zinc-300">Access your courses and learning materials in one place.</p>
-            </div>
-          </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/dashboard.png" alt="Dashboard Overview" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">Dashboard</h3>
-              <p class="mt-2 text-zinc-300">Get a quick overview of your important information and tasks.</p>
-            </div>
-          </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/message_inbox.png" alt="Direqt Messages" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">Direqt Messages</h3>
-              <p class="mt-2 text-zinc-300">Stay connected with teachers and students through the messaging system.</p>
-            </div>
-          </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-100">
-            <img src="https://raw.githubusercontent.com/AdenMGB/desqta-website/refs/heads/main/public/images/ss/news.png" alt="News Feed" class="w-full h-auto object-cover" />
-            <div class="p-6">
-              <h3 class="text-lg font-semibold text-white">News Feed</h3>
-              <p class="mt-2 text-zinc-300">Stay updated with the latest news and announcements.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    -->
-
     <!-- CTA Section -->
     <div class="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8 animate-fade-in delay-300">
       <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
@@ -173,19 +151,19 @@
         <rect width="100%" height="100%" stroke-width="0" fill="url(#1d4240dd-898f-445f-932d-e2872fd12de3)" />
       </svg>
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down">Ready to transform SEQTA?<br>Add BetterSEQTA+ to Chrome today.</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down">Ready to transform SEQTA?<br>Get started today.</h2>
         <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
-          Join thousands of students and teachers who are already using BetterSEQTA+ to make SEQTA Learn actually enjoyable!
+          Whether you prefer the browser extension or the full desktop experience, we've got you covered.
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6 animate-fade-in delay-200">
           <NuxtLink
             href="/download"
             class="rounded-md bg-zinc-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200"
           >
-            Add to Chrome
+            Download Now
           </NuxtLink>
           <NuxtLink href="/comparison" class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400">
-            Learn more <span aria-hidden="true">→</span>
+            Compare Features <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
       </div>
