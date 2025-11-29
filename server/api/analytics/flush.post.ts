@@ -1,5 +1,5 @@
 import { getDB } from '../../utils/db';
-import { flushViews, flushSessions } from '../../utils/analytics';
+import { flushSessions } from '../../utils/analytics';
 
 export default defineEventHandler(async (event) => {
   // Auth check
@@ -16,11 +16,10 @@ export default defineEventHandler(async (event) => {
   const db = getDB(event);
   
   try {
-    const c1 = await flushViews(db);
     const c2 = await flushSessions(db);
-    return { success: true, flushed: c1 + c2 };
+    return { success: true, flushed: c2 };
   } catch (e) {
-    throw createError({ statusCode: 500, message: 'Failed to flush views' });
+    throw createError({ statusCode: 500, message: 'Failed to flush sessions' });
   }
 });
 
