@@ -12,6 +12,11 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
+  runtimeConfig: {
+    oauthClientId: process.env.NUXT_OAUTH_CLIENT_ID ?? '',
+    oauthClientSecret: process.env.NUXT_OAUTH_CLIENT_SECRET ?? '',
+    oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8788/api/auth/callback",
+  },
   app: {
     baseURL: '/',
     head: {
@@ -35,14 +40,14 @@ export default defineNuxtConfig({
     prefix: "Vue",
   },
 
-  nitro: {
-    preset: "github_pages",
-    minify: true,
-    compressPublicAssets: true,
-    prerender: {
-      crawlLinks: true,
+    nitro: {
+      preset: "cloudflare-module",
+      minify: true,
+      compressPublicAssets: true,
+      prerender: {
+        crawlLinks: true,
+      },
     },
-  },
 
   ogImage: {
     zeroRuntime: true,

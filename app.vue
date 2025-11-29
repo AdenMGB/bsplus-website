@@ -13,7 +13,8 @@ useHead({
   },
 });
 
-const title = computed(() => {
-  return title ? `${title} | BetterSEQTA+` : "BetterSEQTA+";
+const { fetchUser } = useAuth();
+onMounted(() => {
+  fetchUser();
 });
 </script>

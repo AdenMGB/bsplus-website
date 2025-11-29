@@ -87,13 +87,44 @@
         >
       </PopoverGroup>
 
-      <div class="hidden lg:flex" />
-      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+      <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-8">
         <NuxtLink
           href="https://github.com/BetterSEQTA/BetterSEQTA-Plus"
           class="text-sm/6 font-semibold text-zinc-100"
           >Quickstart <span aria-hidden="true">&rarr;</span></NuxtLink
         >
+        <template v-if="loading">
+          <div class="h-5 w-12 bg-zinc-800/50 rounded animate-pulse"></div>
+        </template>
+        <template v-else-if="user">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <img 
+                v-if="user.pfpUrl" 
+                :src="user.pfpUrl" 
+                :alt="user.username" 
+                class="h-6 w-6 rounded-full ring-2 ring-zinc-800"
+              />
+              <span class="text-sm font-semibold text-zinc-100">{{ user.displayName || user.username }}</span>
+            </div>
+            <button 
+              @click="logout" 
+              class="text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
+            >
+              Logout
+            </button>
+            <NuxtLink v-if="user.is_admin === 1" to="/admin" class="text-sm font-semibold text-green-400 hover:text-green-300 transition-colors">
+              Admin
+            </NuxtLink>
+          </div>
+        </template>
+        <button 
+          v-else 
+          @click="login" 
+          class="text-sm/6 font-semibold text-zinc-100 hover:text-white transition-colors"
+        >
+          Login
+        </button>
       </div>
     </nav>
     <Dialog
@@ -152,12 +183,37 @@
                 {{ route.name }}
               </NuxtLink>
             </div>
-            <div class="py-6">
+            <div class="py-6 space-y-2">
               <NuxtLink
                 :href="quickstartLink"
                 class="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
                 >Quickstart <span aria-hidden="true">&rarr;</span></NuxtLink
               >
+              
+              <template v-if="user">
+                <div class="px-3 py-2 flex items-center gap-3 text-base/7 font-semibold text-zinc-100">
+                  <img 
+                    v-if="user.pfpUrl" 
+                    :src="user.pfpUrl" 
+                    :alt="user.username" 
+                    class="h-6 w-6 rounded-full"
+                  />
+                  <span>{{ user.displayName || user.username }}</span>
+                </div>
+                <button
+                  @click="logout"
+                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800"
+                >
+                  Logout
+                </button>
+              </template>
+              <button
+                v-else
+                @click="login"
+                class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
+              >
+                Login
+              </button>
             </div>
           </div>
         </div>
@@ -218,6 +274,10 @@ const routes = [
     name: "Privacy",
     href: "/privacy",
   },
+  {
+    name: "News",
+    href: "/news",
+  },
 ];
 
 const quickstartLink = "https://github.com/BetterSEQTA/DesQTA/tree/develop";
@@ -259,4 +319,6 @@ router.afterEach(() => {
 });
 
 const mobileMenuOpen = ref(false);
+
+const { user, login, logout, loading } = useAuth();
 </script>

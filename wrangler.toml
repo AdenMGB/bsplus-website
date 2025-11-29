@@ -1,0 +1,22 @@
+name = "bs-website"
+main = ".output/server/index.mjs"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+routes = [
+  { pattern = "betterseqta.org", custom_domain = true }
+]
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bsplus-db"
+database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bsplus-images"
