@@ -1,4 +1,5 @@
 import { getDB } from '../../utils/db';
+import { getBufferStats } from '../../utils/analytics';
 
 export default defineEventHandler(async (event) => {
   // Check Auth (admin only for stats)
@@ -19,13 +20,23 @@ export default defineEventHandler(async (event) => {
     const newsCount = await db.prepare('SELECT COUNT(*) as count FROM news').first();
     const publishedCount = await db.prepare('SELECT COUNT(*) as count FROM news WHERE published = 1').first();
     
-    // Calculate total views across all paths
-    const totalViews = stats.results.reduce((acc: number, curr: any) => acc + (curr.views || 0), 0);
+    // Calculate total views across all paths (excluding bs_sessions)
+    const totalViews = stats.results
+      .filter((r: any) => r.path !== 'bs_sessions')
+      .reduce((acc: number, curr: any) => acc + (curr.views || 0), 0);
+
+    const sessions = stats.results.find((r: any) => r.path === 'bs_sessions')?.views || 0;
+
+    const bufferStats = getBufferStats();
 
     return {
       views: {
         total: totalViews,
-        byPath: stats.results
+        buffer: bufferStats.views
+      },
+      sessions: {
+        total: sessions,
+        buffer: bufferStats.sessions
       },
       news: {
         total: newsCount.count,

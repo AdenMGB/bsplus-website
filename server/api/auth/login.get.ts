@@ -15,6 +15,8 @@ export default defineEventHandler(async (event) => {
   const queryString = new URLSearchParams(query as any).toString();
   const finalUrl = `${baseUrl}?${queryString}`;
   
+  console.log('[Auth] Redirecting to:', finalUrl);
+
   return new Response(null, {
     status: 302,
     headers: {

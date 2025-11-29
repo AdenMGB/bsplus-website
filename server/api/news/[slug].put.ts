@@ -38,14 +38,13 @@ export default defineEventHandler(async (event) => {
 
     await db.prepare(
       `UPDATE news 
-       SET title = ?, slug = ?, content = ?, published = ?, cover_image = ?, updated_at = unixepoch() 
+       SET title = ?, slug = ?, content = ?, published = ?, updated_at = unixepoch() 
        WHERE slug = ?`
     ).bind(
       body.title,
       body.slug,
       body.content,
       body.published ? 1 : 0,
-      body.cover_image || null,
       slug
     ).run();
 
