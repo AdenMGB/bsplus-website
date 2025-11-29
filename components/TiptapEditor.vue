@@ -83,12 +83,36 @@
 </template>
 
 <script setup lang="ts">
-import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { useEditor, EditorContent, VueNodeViewRenderer } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
+import TiptapImage from './TiptapImage.vue'
+
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: null,
+        renderHTML: (attributes) => {
+          if (!attributes.width) {
+            return {}
+          }
+          return {
+            width: attributes.width,
+            style: `width: ${attributes.width}px`,
+          }
+        },
+      },
+    }
+  },
+  addNodeView() {
+    return VueNodeViewRenderer(TiptapImage)
+  },
+})
 
 const props = defineProps({
   modelValue: {
@@ -103,7 +127,7 @@ const editor = useEditor({
   content: props.modelValue,
   extensions: [
     StarterKit,
-    Image,
+    CustomImage,
     Link.configure({
       openOnClick: false,
     }),

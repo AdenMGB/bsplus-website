@@ -88,11 +88,6 @@
       </PopoverGroup>
 
       <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-8">
-        <NuxtLink
-          href="https://github.com/BetterSEQTA/BetterSEQTA-Plus"
-          class="text-sm/6 font-semibold text-zinc-100"
-          >Quickstart <span aria-hidden="true">&rarr;</span></NuxtLink
-        >
         <template v-if="loading">
           <div class="h-5 w-12 bg-zinc-800/50 rounded animate-pulse"></div>
         </template>
@@ -184,12 +179,6 @@
               </NuxtLink>
             </div>
             <div class="py-6 space-y-2">
-              <NuxtLink
-                :href="quickstartLink"
-                class="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
-                >Quickstart <span aria-hidden="true">&rarr;</span></NuxtLink
-              >
-              
               <template v-if="user">
                 <div class="px-3 py-2 flex items-center gap-3 text-base/7 font-semibold text-zinc-100">
                   <img 

@@ -1,0 +1,40 @@
+import { getDB } from '../../utils/db';
+
+export default defineEventHandler(async (event) => {
+  // Check Auth (admin only for stats)
+  const user = await $fetch<any>('/api/auth/me', {
+    headers: {
+      cookie: getHeader(event, 'cookie') || ''
+    }
+  }).catch(() => null);
+
+  if (!user || user.is_admin !== 1) {
+    throw createError({ statusCode: 403, message: 'Forbidden' });
+  }
+
+  const db = getDB(event);
+
+  try {
+    const stats = await db.prepare('SELECT * FROM page_stats').all();
+    const newsCount = await db.prepare('SELECT COUNT(*) as count FROM news').first();
+    const publishedCount = await db.prepare('SELECT COUNT(*) as count FROM news WHERE published = 1').first();
+    
+    // Calculate total views across all paths
+    const totalViews = stats.results.reduce((acc: number, curr: any) => acc + (curr.views || 0), 0);
+
+    return {
+      views: {
+        total: totalViews,
+        byPath: stats.results
+      },
+      news: {
+        total: newsCount.count,
+        published: publishedCount.count
+      }
+    };
+  } catch (e) {
+    console.error('Failed to fetch stats:', e);
+    throw createError({ statusCode: 500, message: 'Database error' });
+  }
+});
+
