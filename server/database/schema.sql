@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS news (
   updated_at INTEGER DEFAULT (unixepoch())
 );
 
+CREATE TABLE IF NOT EXISTS page_stats (
+  path TEXT PRIMARY KEY,
+  views INTEGER DEFAULT 0
+);

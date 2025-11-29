@@ -82,6 +82,8 @@ const form = ref({
 
 const loading = ref(false);
 
+let oldTitle = '';
+
 // If editing, fetch existing post
 if (isEditing.value) {
   const slug = route.params.slug as string;
@@ -109,7 +111,6 @@ watch(() => form.value.title, (newTitle) => {
   }
 });
 
-let oldTitle = '';
 watch(() => form.value.title, (val) => oldTitle = val);
 
 function slugify(text: string) {
