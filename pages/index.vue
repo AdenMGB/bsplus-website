@@ -175,19 +175,6 @@
 useHead({
   title: "Home",
 });
-
-// Analytics tracking
-onMounted(async () => {
-  try {
-    await $fetch('/api/analytics/view', {
-      method: 'POST',
-      body: { path: '/' }
-    });
-  } catch (e) {
-    // Silently fail for analytics
-    console.error('Failed to track view', e);
-  }
-});
 </script>
 
 <style scoped>
