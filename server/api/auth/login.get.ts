@@ -1,13 +1,25 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   
+  // Use localhost for local dev, or get from env
+  const redirectUri = process.env.NUXT_OAUTH_REDIRECT_URI || 'http://localhost:8787/api/auth/callback';
+  
   const query = {
     client_id: config.oauthClientId,
-    redirect_uri: config.oauthRedirectUri,
+    redirect_uri: redirectUri,
     response_type: 'code',
   };
 
-  const url = `https://accounts.betterseqta.org/oauth/authorize?${new URLSearchParams(query as any).toString()}`;
-  return sendRedirect(event, url);
+  // Explicitly construct the absolute URL to prevent any domain rewriting
+  const baseUrl = 'https://accounts.betterseqta.org/oauth/authorize';
+  const queryString = new URLSearchParams(query as any).toString();
+  const finalUrl = `${baseUrl}?${queryString}`;
+  
+  return new Response(null, {
+    status: 302,
+    headers: {
+      'Location': finalUrl,
+    },
+  });
 });
 

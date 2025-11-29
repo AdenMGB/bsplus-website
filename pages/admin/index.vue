@@ -64,6 +64,7 @@
                   </td>
                   <td class="px-6 py-4 text-zinc-400">{{ formatDate(post.created_at) }}</td>
                   <td class="px-6 py-4 text-right">
+                    <NuxtLink :to="`/admin/news/edit/${post.slug}`" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors mr-4">Edit</NuxtLink>
                     <button @click="deletePost(post.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors">Delete</button>
                   </td>
                 </tr>

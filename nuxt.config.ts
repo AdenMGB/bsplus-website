@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     oauthClientId: process.env.NUXT_OAUTH_CLIENT_ID ?? '',
     oauthClientSecret: process.env.NUXT_OAUTH_CLIENT_SECRET ?? '',
-    oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8788/api/auth/callback",
+    oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
   },
   app: {
     baseURL: '/',

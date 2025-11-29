@@ -267,10 +267,6 @@ const routes = [
     href: "/download",
   },
   {
-    name: "Minecraft",
-    href: "/minecraft",
-  },
-  {
     name: "Privacy",
     href: "/privacy",
   },

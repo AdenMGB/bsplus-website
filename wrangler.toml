@@ -7,6 +7,10 @@ routes = [
   { pattern = "betterseqta.org", custom_domain = true }
 ]
 
+[dev]
+ip = "localhost"
+port = 8787
+
 [assets]
 directory = ".output/public"
 binding = "ASSETS"
@@ -18,5 +22,20 @@ database_name = "bsplus-db"
 database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
 
 [[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bsplus-images"
+
+# Development Environment (dev.betterseqta.org)
+[env.dev]
+routes = [
+  { pattern = "dev.betterseqta.org", custom_domain = true }
+]
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "bsplus-db"
+database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
+
+[[env.dev.r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bsplus-images"

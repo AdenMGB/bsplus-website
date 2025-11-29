@@ -67,3 +67,31 @@
 html {
   background-color: oklch(0.21 0.006 285.885);
 }
+
+.prose blockquote {
+  font-style: italic;
+  quotes: none;
+  border-left-width: 0.25rem;
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity));
+  padding-left: 1rem;
+  color: rgb(161 161 170); /* zinc-400 */
+}
+
+/* Tiptap Alignment Classes */
+.prose {
+  p, h1, h2, h3, h4, h5, h6, ul, ol, li {
+    &[style*="text-align: left"] {
+      text-align: left;
+    }
+    &[style*="text-align: center"] {
+      text-align: center;
+    }
+    &[style*="text-align: right"] {
+      text-align: right;
+    }
+    &[style*="text-align: justify"] {
+      text-align: justify;
+    }
+  }
+}

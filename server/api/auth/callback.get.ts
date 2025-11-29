@@ -3,6 +3,9 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const code = query.code;
 
+  // Use localhost for local dev, or get from env
+  const redirectUri = process.env.NUXT_OAUTH_REDIRECT_URI || 'http://localhost:8787/api/auth/callback';
+
   if (!code) {
     return sendRedirect(event, '/?error=no_code');
   }
@@ -16,7 +19,7 @@ export default defineEventHandler(async (event) => {
         client_secret: config.oauthClientSecret,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: config.oauthRedirectUri,
+        redirect_uri: redirectUri,
       }
     });
 
@@ -34,8 +37,10 @@ export default defineEventHandler(async (event) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: expiresIn,
       path: '/',
+      sameSite: 'lax',
     });
 
+    // Use sendRedirect which properly handles cookies in Nitro
     return sendRedirect(event, '/');
   } catch (e) {
     console.error('OAuth Callback Error:', e);

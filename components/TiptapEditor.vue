@@ -7,8 +7,29 @@
       <button @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }" class="editor-btn" title="Italic">
         <span class="italic">I</span>
       </button>
+      <button @click="editor.chain().focus().toggleUnderline().run()" :class="{ 'is-active': editor.isActive('underline') }" class="editor-btn" title="Underline">
+        <span class="underline">U</span>
+      </button>
       <button @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }" class="editor-btn" title="Strikethrough">
         <span class="line-through">S</span>
+      </button>
+      
+      <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
+
+      <button @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }" class="editor-btn" title="Align Left">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+        </svg>
+      </button>
+      <button @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }" class="editor-btn" title="Align Center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+      <button @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }" class="editor-btn" title="Align Right">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
       </button>
       
       <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
@@ -66,6 +87,8 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
 
 const props = defineProps({
   modelValue: {
@@ -83,6 +106,10 @@ const editor = useEditor({
     Image,
     Link.configure({
       openOnClick: false,
+    }),
+    Underline,
+    TextAlign.configure({
+      types: ['heading', 'paragraph'],
     }),
   ],
   editorProps: {
@@ -171,7 +198,7 @@ onBeforeUnmount(() => {
   border-left: 4px solid #4b5563;
   padding-left: 1rem;
   font-style: italic;
-  @apply text-zinc-400;
+  @apply text-zinc-400 my-4;
 }
 :deep(.ProseMirror hr) {
   @apply border-zinc-700 my-4;

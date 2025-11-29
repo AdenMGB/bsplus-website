@@ -1,48 +1,5 @@
 <template>
   <div class="relative">
-    <!-- DesQTA Announcement Banner -->
-    <div class="relative w-full pt-16 pb-6 bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20 border-b border-green-400/30 overflow-hidden">
-      <!-- Confetti Animation -->
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="confetti-container">
-          <div class="confetti" v-for="i in 50" :key="i" :style="`--delay: ${Math.random() * 3}s; --left: ${Math.random() * 100}%; --animation-duration: ${3 + Math.random() * 4}s;`"></div>
-        </div>
-      </div>
-      
-      <div class="relative mx-auto max-w-5xl px-6 py-4">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex-1 text-center sm:text-left flex items-center gap-4">
-            <div class="flex-shrink-0">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-400/20 text-green-300 border border-green-400/30 animate-pulse">
-                New
-              </span>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-white leading-tight">
-                Introducing DesQTA
-              </h3>
-              <p class="text-sm text-zinc-200">
-                BetterSEQTA in a native desktop app for enhanced performance.
-              </p>
-            </div>
-          </div>
-          <div class="flex-shrink-0">
-            <a
-              href="https://desqta.betterseqta.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Check it out
-              <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Hero Section -->
     <div class="relative isolate overflow-hidden animate-fade-in">
       <div class="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
@@ -253,58 +210,6 @@ useHead({
 }
 
 /* Confetti Animation */
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(-100vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-.confetti-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.confetti {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: linear-gradient(45deg, #10b981, #059669, #047857, #065f46);
-  border-radius: 2px;
-  animation: confetti-fall var(--animation-duration) linear infinite;
-  animation-delay: var(--delay);
-  left: var(--left);
-  opacity: 0;
-}
-
-.confetti:nth-child(3n) {
-  background: linear-gradient(45deg, #f59e0b, #d97706, #b45309, #92400e);
-  width: 6px;
-  height: 6px;
-}
-
-.confetti:nth-child(3n+1) {
-  background: linear-gradient(45deg, #3b82f6, #2563eb, #1d4ed8, #1e40af);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.confetti:nth-child(3n+2) {
-  background: linear-gradient(45deg, #8b5cf6, #7c3aed, #6d28d9, #5b21b6);
-  width: 4px;
-  height: 12px;
-  border-radius: 2px;
-}
 
 .animate-fade-in {
   animation: fade-in 0.8s cubic-bezier(0.4,0,0.2,1) both;
