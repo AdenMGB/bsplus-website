@@ -13,7 +13,7 @@
 
       <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-100">
         <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start">
-          <dt class="text-base font-semibold leading-7 text-white">Web Version</dt>
+          <dt class="text-base font-semibold leading-7 text-white">Vanilla SEQTA</dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
             <ul class="list-disc pl-6 space-y-3">
               <li>Basic SEQTA interface</li>
@@ -107,135 +107,135 @@
               <!-- Better than default SEQTA -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Better than default SEQTA</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Grades calculator -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Grades calculator</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Global search -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Global search</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Custom home page -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Custom home page</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Modern, responsive interface -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Modern, responsive interface</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Local notifications -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Local notifications</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Local application -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Local application</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Works whilst offline -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Works whilst offline</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Enhanced styling editor -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Enhanced styling editor</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Optimised performance -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Optimised performance</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Full system integration -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Full system integration</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Browser independent -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Browser independent</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- RSS news feeds -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">RSS news feeds</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Cloud-based messaging -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Cloud-based messaging</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Cloud settings sync -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Cloud settings sync</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- AI integration & features -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">AI integration & features</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- To Do list -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">To Do list</td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Focus timer -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Focus timer</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Student directory -->
               <tr>
                 <td class="px-6 py-5 text-base text-zinc-300">Student directory</td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-green-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></td>
-                <td class="px-6 py-5 text-center align-middle text-red-400"><svg class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
             </tbody>
           </table>
@@ -244,3 +244,81 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { h } from 'vue'
+
+// Simple checkmark and crossmark SVG components
+const Checkmark = defineComponent({
+  name: 'Checkmark',
+  setup() {
+    return () =>
+      h(
+        'svg',
+        {
+          fill: '#fff',
+          width: '24',
+          height: '24',
+          viewBox: '0 0 32 32',
+          xmlns: 'http://www.w3.org/2000/svg',
+          class: 'mx-auto',
+        },
+        [
+          h('path', {
+            d: 'M16,.5C7.44.5.5,7.44.5,16s6.94,15.5,15.5,15.5,15.5-6.94,15.5-15.5S24.56.5,16,.5Z',
+          }),
+        ]
+      )
+  },
+})
+
+const Crossmark = defineComponent({
+  name: 'Crossmark',
+  setup() {
+    return () =>
+      h(
+        'svg',
+        {
+          fill: '#e6e7e8',
+          width: '24',
+          height: '24',
+          viewBox: '0 0 32 32',
+          xmlns: 'http://www.w3.org/2000/svg',
+          class: 'mx-auto',
+        },
+        [
+          h('path', {
+            d: 'M16,.5C7.44.5.5,7.44.5,16s6.94,15.5,15.5,15.5,15.5-6.94,15.5-15.5S24.56.5,16,.5ZM16,30.5c-8.01,0-14.5-6.49-14.5-14.5S7.99,1.5,16,1.5s14.5,6.49,14.5,14.5-6.49,14.5-14.5,14.5Z',
+          }),
+        ]
+      )
+  },
+})
+
+const Semimark = defineComponent({
+  name: 'Semimark',
+  setup() {
+    return () =>
+      h(
+        'svg',
+        {
+          fill: '#f1f2f2',
+          width: '24',
+          height: '24',
+          viewBox: '0 0 32 32',
+          xmlns: 'http://www.w3.org/2000/svg',
+          class: 'mx-auto',
+        },
+        [
+          h('path', {
+            d: 'M16,.5C7.44.5.5,7.44.5,16s6.94,15.5,15.5,15.5,15.5-6.94,15.5-15.5S24.56.5,16,.5ZM16,1.5c8.01,0,14.5,6.49,14.5,14.5s-6.49,14.5-14.5,14.5',
+          }),
+        ]
+      )
+  },
+})
+
+useHead({
+  title: "Comparison",
+});
+</script>
