@@ -46,43 +46,39 @@
           </div>
         </div>
       </div>
-      <div class="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:mt-0 lg:max-w-none justify-center">
-        <div class="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
-          <div class="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-            <div class="mt-24 sm:mt-32 lg:mt-16">
-              <a href="/download" class="inline-flex space-x-6 animate-slide-down">
-                <span class="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-semibold leading-6 text-blue-400 ring-1 ring-inset ring-blue-500/20">
-                  Desktop App
-                </span>
-              </a>
-            </div>
-            <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl font-display animate-slide-down delay-100">
-              DesQTA
-            </h1>
-            <h2 class="mt-2 text-2xl font-medium tracking-tight text-blue-400 sm:text-3xl font-display animate-slide-down delay-100">
-              The Desktop Experience
-            </h2>
-            <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
-              A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance.
-            </p>
-            <div class="mt-10 flex items-center gap-x-6 animate-fade-in delay-300">
-              <NuxtLink
-                href="/download"
-                class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200"
-              >
-                Download DesQTA
-                <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </NuxtLink>
-              <NuxtLink
-                href="/comparison"
-                class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400"
-              >
-                Compare Features <span aria-hidden="true">→</span>
-              </NuxtLink>
-            </div>
-          </div>
+      <div class="mx-auto mt-16 max-w-2xl flex-shrink-0 sm:mt-24 lg:mt-32">
+        <div class="mt-24 sm:mt-32 lg:mt-16">
+          <a href="/download" class="inline-flex space-x-6 animate-slide-down">
+            <span class="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-semibold leading-6 text-blue-400 ring-1 ring-inset ring-blue-500/20">
+              Desktop App
+            </span>
+          </a>
+        </div>
+        <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl font-display animate-slide-down delay-100">
+          DesQTA
+        </h1>
+        <h2 class="mt-2 text-2xl font-medium tracking-tight text-blue-400 sm:text-3xl font-display animate-slide-down delay-100">
+          The Desktop Experience
+        </h2>
+        <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
+          A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance.
+        </p>
+        <div class="mt-10 flex items-center gap-x-6 animate-fade-in delay-300">
+          <NuxtLink
+            href="/download"
+            class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200"
+          >
+            Download DesQTA
+            <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </NuxtLink>
+          <NuxtLink
+            href="/comparison"
+            class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400"
+          >
+            Compare Features <span aria-hidden="true">→</span>
+          </NuxtLink>
         </div>
       </div>
     </div>
