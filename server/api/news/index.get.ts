@@ -6,9 +6,19 @@ export default defineEventHandler(async (event) => {
   const limit = Number(query.limit) || 20;
   const offset = Number(query.offset) || 0;
   
-  // If ?admin=true is passed, check for auth and return drafts too
-  // This is a simple check, in reality we'd check the session
-  const showDrafts = query.admin === 'true'; // Simplified, logic should be robust in real app
+  // Check if admin request - verify auth
+  let showDrafts = false;
+  if (query.admin === 'true') {
+    const user = await $fetch<any>('/api/auth/me', {
+      headers: {
+        cookie: getHeader(event, 'cookie') || ''
+      }
+    }).catch(() => null);
+    
+    if (user && user.is_admin === 1) {
+      showDrafts = true;
+    }
+  }
 
   let sql = 'SELECT * FROM news';
   if (!showDrafts) {
