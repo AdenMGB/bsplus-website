@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS news (
   author_id TEXT NOT NULL,
   author_name TEXT NOT NULL,
   author_avatar TEXT,
+  cover_image TEXT,
   published BOOLEAN DEFAULT 0,
   created_at INTEGER DEFAULT (unixepoch()),
   updated_at INTEGER DEFAULT (unixepoch())
