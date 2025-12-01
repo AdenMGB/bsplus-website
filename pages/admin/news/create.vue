@@ -46,6 +46,7 @@
           <span class="font-mono">slug:</span>
           <input 
             v-model="form.slug" 
+            @input="handleSlugInput"
             type="text" 
             class="bg-transparent border-0 text-sm text-zinc-400 focus:ring-0 p-0 w-full font-mono placeholder:text-zinc-700"
             placeholder="auto-generated-slug"
@@ -64,6 +65,8 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick } from 'vue'
+
 definePageMeta({
   middleware: ["admin"],
   layout: false // Use custom full-screen layout logic
@@ -113,6 +116,37 @@ watch(() => form.value.title, (newTitle) => {
 
 watch(() => form.value.title, (val) => oldTitle = val);
 
+// Handle manual slug input - convert spaces to dashes
+function handleSlugInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const value = target.value;
+  
+  // Convert spaces to dashes and clean up, but preserve trailing dash if it came from a space
+  let processed = value
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-');        // Replace multiple - with single -
+  
+  // Preserve trailing dash if original value ended with space
+  const endsWithSpace = value.trimEnd() !== value;
+  if (endsWithSpace && processed && !processed.endsWith('-')) {
+    processed += '-';
+  }
+  
+  // Trim leading dashes but preserve trailing if it came from space
+  processed = processed.replace(/^-+/, '');
+  
+  if (processed !== value) {
+    const cursorPos = target.selectionStart || 0;
+    form.value.slug = processed;
+    // Restore cursor position after the change
+    nextTick(() => {
+      target.setSelectionRange(cursorPos, cursorPos);
+    });
+  }
+}
+
 function slugify(text: string) {
   return text.toString().toLowerCase()
     .replace(/\s+/g, '-')           // Replace spaces with -
@@ -124,6 +158,11 @@ function slugify(text: string) {
 
 async function savePost() {
   if (!form.value.title) return alert('Please enter a title');
+  
+  // Ensure slug is properly formatted before saving (trim trailing dashes)
+  if (form.value.slug) {
+    form.value.slug = slugify(form.value.slug);
+  }
   
   loading.value = true;
   try {
