@@ -65,6 +65,21 @@
         ---
       </button>
       
+      <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
+      
+      <button @click="toggleCodeBlock" :class="{ 'is-active': editor.isActive('codeBlock') }" class="editor-btn flex items-center gap-1" title="Code Block">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+        </svg>
+        <span>Code</span>
+      </button>
+      <button v-if="editor?.isActive('codeBlock')" @click="setCodeBlockLanguage" class="editor-btn flex items-center gap-1" title="Set Language">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 10.5h18M3 3h18" />
+        </svg>
+        <span>Lang</span>
+      </button>
+      
       <div class="flex-grow"></div>
       
       <button @click="addImage" class="editor-btn flex items-center gap-1">
@@ -85,6 +100,7 @@
 <script setup lang="ts">
 import { useEditor, EditorContent, VueNodeViewRenderer } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import CodeBlock from '@tiptap/extension-code-block'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
@@ -114,6 +130,7 @@ const CustomImage = Image.extend({
   },
 })
 
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -126,7 +143,15 @@ const emit = defineEmits(['update:modelValue'])
 const editor = useEditor({
   content: props.modelValue,
   extensions: [
-    StarterKit,
+    StarterKit.configure({
+      codeBlock: false, // Disable default codeBlock from StarterKit
+    }),
+    CodeBlock.configure({
+      languageClassPrefix: 'language-',
+      HTMLAttributes: {
+        class: 'code-block',
+      },
+    }),
     CustomImage,
     Link.configure({
       openOnClick: false,
@@ -165,6 +190,41 @@ const addImage = () => {
     editor.value?.chain().focus().setImage({ src: url }).run()
   }
 }
+
+const toggleCodeBlock = () => {
+  if (editor.value?.isActive('codeBlock')) {
+    // If already a code block, just toggle it off
+    editor.value?.chain().focus().toggleCodeBlock().run()
+  } else {
+    // Prompt for language when creating new code block
+    const language = window.prompt('Language (e.g., typescript, javascript, python, rust, vue, svelte):', '')
+    if (language !== null) {
+      // Create code block and set language in one chain
+      const chain = editor.value?.chain().focus().setCodeBlock()
+      if (language.trim()) {
+        chain.updateAttributes('codeBlock', { language: language.trim() })
+      }
+      chain.run()
+    }
+  }
+}
+
+const setCodeBlockLanguage = () => {
+  if (!editor.value?.isActive('codeBlock')) return
+  
+  // Get current language from the code block
+  const currentAttrs = editor.value.getAttributes('codeBlock')
+  const currentLanguage = currentAttrs.language || ''
+  
+  const language = window.prompt('Set language (e.g., typescript, javascript, python, rust, vue, svelte):', currentLanguage)
+  
+  if (language !== null) {
+    editor.value?.chain().focus().updateAttributes('codeBlock', { 
+      language: language.trim() || null 
+    }).run()
+  }
+}
+
 
 const handleImageUpload = async (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -244,6 +304,45 @@ onBeforeUnmount(() => {
 }
 :deep(.ProseMirror img) {
   @apply rounded-lg border border-zinc-700 shadow-lg my-6 max-w-full h-auto;
+}
+
+/* Code Block Styles - Override prose styles */
+:deep(.ProseMirror pre) {
+  background-color: rgb(9 9 11) !important; /* bg-zinc-950 */
+  border: 1px solid rgb(63 63 70) !important; /* border-zinc-700 */
+  border-radius: 0.5rem !important;
+  overflow-x: auto !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  padding: 1rem !important;
+  position: relative;
+  color: rgb(244 244 245) !important; /* text-zinc-100 */
+}
+
+:deep(.ProseMirror pre code) {
+  font-size: 0.875rem !important;
+  color: rgb(244 244 245) !important; /* text-zinc-100 */
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  white-space: pre !important;
+  line-height: 1.6 !important;
+  display: block !important;
+  width: 100% !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Ensure code blocks with class are properly styled */
+:deep(.ProseMirror pre.code-block) {
+  background-color: rgb(9 9 11) !important;
+  border: 1px solid rgb(63 63 70) !important;
+  border-radius: 0.5rem !important;
+  overflow-x: auto !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  padding: 1rem !important;
 }
 </style>
 

@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
     const publishedCount = await db.prepare('SELECT COUNT(*) as count FROM news WHERE published = 1').first();
     
     const sessions = stats.results.find((r: any) => r.path === 'bs_sessions')?.views || 0;
+    const desqtaSessions = stats.results.find((r: any) => r.path === 'desqta_sessions')?.views || 0;
 
     const bufferStats = getBufferStats();
 
@@ -28,6 +29,10 @@ export default defineEventHandler(async (event) => {
       sessions: {
         total: sessions,
         buffer: bufferStats.sessions
+      },
+      desqtaSessions: {
+        total: desqtaSessions,
+        buffer: bufferStats.desqtaSessions
       },
       news: {
         total: newsCount.count,
