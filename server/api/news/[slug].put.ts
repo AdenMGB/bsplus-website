@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
-  const slug = getRouterParam(event, 'slug');
+  const slug = event.path.split('/').pop();
   const body = await readBody(event);
   
   if (!slug) {

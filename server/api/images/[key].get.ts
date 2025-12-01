@@ -1,7 +1,7 @@
 import { getBucket } from '../../utils/r2';
 
 export default defineEventHandler(async (event) => {
-  const key = getRouterParam(event, 'key');
+  const key = event.path.split('/').pop();
   
   if (!key) {
     throw createError({ statusCode: 400, message: 'Invalid image key' });

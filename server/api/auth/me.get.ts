@@ -15,6 +15,19 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Ensure profile picture URLs use accounts.betterseqta.org
+    if (user.pfpUrl) {
+      // Replace betterseqta.org with accounts.betterseqta.org for pfp URLs
+      user.pfpUrl = user.pfpUrl.replace(
+        'https://betterseqta.org/pfp/',
+        'https://accounts.betterseqta.org/pfp/'
+      );
+      // Also handle cases where it might already have /pfp/ but wrong domain
+      if (user.pfpUrl.startsWith('/pfp/')) {
+        user.pfpUrl = `https://accounts.betterseqta.org${user.pfpUrl}`;
+      }
+    }
+
     return user;
   } catch (e) {
     // Token might be invalid or expired

@@ -1,7 +1,9 @@
 // Analytics Buffers
 
 const sessionBuffer = new Map<string, number>();
+const desqtaSessionBuffer = new Map<string, number>();
 let lastSessionFlushTime = Date.now();
+let lastDesqtaSessionFlushTime = Date.now();
 
 // Configuration
 
@@ -14,12 +16,23 @@ export const getBufferStats = () => {
     totalBufferedSessions += count;
   }
 
+  let totalBufferedDesqtaSessions = 0;
+  for (const count of desqtaSessionBuffer.values()) {
+    totalBufferedDesqtaSessions += count;
+  }
+
   return {
     sessions: {
       size: sessionBuffer.size,
       totalBuffered: totalBufferedSessions,
       lastFlush: lastSessionFlushTime,
       nextFlushEstimate: lastSessionFlushTime + SESSION_FLUSH_INTERVAL
+    },
+    desqtaSessions: {
+      size: desqtaSessionBuffer.size,
+      totalBuffered: totalBufferedDesqtaSessions,
+      lastFlush: lastDesqtaSessionFlushTime,
+      nextFlushEstimate: lastDesqtaSessionFlushTime + SESSION_FLUSH_INTERVAL
     }
   };
 };
@@ -28,6 +41,12 @@ export const bufferSession = () => {
   const key = 'bs_sessions';
   const count = sessionBuffer.get(key) || 0;
   sessionBuffer.set(key, count + 1);
+};
+
+export const bufferDesqtaSession = () => {
+  const key = 'desqta_sessions';
+  const count = desqtaSessionBuffer.get(key) || 0;
+  desqtaSessionBuffer.set(key, count + 1);
 };
 
 const flushMap = async (db: any, map: Map<string, number>) => {
@@ -63,6 +82,11 @@ export const flushSessions = async (db: any) => {
   return await flushMap(db, sessionBuffer);
 };
 
+export const flushDesqtaSessions = async (db: any) => {
+  lastDesqtaSessionFlushTime = Date.now();
+  return await flushMap(db, desqtaSessionBuffer);
+};
+
 export const checkAndFlush = async (db: any, context: any) => {
   // Check Sessions
   let totalBufferedSessions = 0;
@@ -70,6 +94,16 @@ export const checkAndFlush = async (db: any, context: any) => {
 
   if (totalBufferedSessions >= SESSION_FLUSH_THRESHOLD || (Date.now() - lastSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
     const p = flushSessions(db);
+    if (context?.waitUntil) context.waitUntil(p);
+    else p.catch(console.error);
+  }
+
+  // Check DesQTA Sessions
+  let totalBufferedDesqtaSessions = 0;
+  for (const count of desqtaSessionBuffer.values()) totalBufferedDesqtaSessions += count;
+
+  if (totalBufferedDesqtaSessions >= SESSION_FLUSH_THRESHOLD || (Date.now() - lastDesqtaSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
+    const p = flushDesqtaSessions(db);
     if (context?.waitUntil) context.waitUntil(p);
     else p.catch(console.error);
   }

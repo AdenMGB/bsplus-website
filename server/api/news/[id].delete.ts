@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
-  const id = getRouterParam(event, 'id');
+  const id = event.path.split('/').pop();
   
   if (!id) {
     throw createError({ statusCode: 400, message: 'Invalid ID parameter' });
