@@ -4,7 +4,7 @@
       <div class="mx-auto max-w-2xl lg:mx-0">
         <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl font-display">Privacy Policy</h2>
         <p class="mt-6 text-lg leading-8 text-zinc-300">
-          Last updated: {{ new Date().toLocaleDateString() }}
+          Last updated: December 1, 2025
         </p>
       </div>
 
@@ -74,6 +74,9 @@
         <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">5. Analytics</h3>
         <p class="mt-6">
           We do not employ any in-app analytics or telemetry within the extension or desktop application itself. The only statistics we view are the anonymous, aggregated installation and usage metrics provided automatically by the Chrome Web Store.
+        </p>
+        <p class="mt-4">
+          <strong>DesQTA Anonymous Usage Statistics:</strong> DesQTA collects completely anonymous statistics about how many times the application is used. Each time DesQTA is opened, it sends a single, anonymous session count to our servers. This data is completely anonymous and contains no personal information, user identifiers, or any data that could be used to identify individual users. We use this aggregated data solely to understand overall usage patterns and improve the application.
         </p>
 
         <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">6. Third-Party Services</h3>
