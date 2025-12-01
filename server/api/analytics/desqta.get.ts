@@ -2,11 +2,11 @@ import { getDB } from '../../utils/db';
 import { bufferDesqtaSession, checkAndFlush } from '../../utils/analytics';
 
 export default defineEventHandler(async (event) => {
-  // No auth required - public endpoint for DesQTA extension
+  // No auth required - public GET endpoint for DesQTA extension
   const db = getDB(event);
   
   try {
-    // Buffer the DesQTA session
+    // Buffer the DesQTA session (adds to count)
     bufferDesqtaSession();
     
     // Check if we need to flush (non-blocking)
