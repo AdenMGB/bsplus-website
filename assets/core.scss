@@ -94,4 +94,109 @@ html {
       text-align: justify;
     }
   }
+
+  /* Heading Styles */
+  h1 {
+    font-size: 2.25rem; /* text-4xl */
+    line-height: 2.5rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 1.875rem; /* text-3xl */
+    line-height: 2.25rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  h3 {
+    font-size: 1.5rem; /* text-2xl */
+    line-height: 2rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h4 {
+    font-size: 1.25rem; /* text-xl */
+    line-height: 1.75rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h5 {
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.75rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h6 {
+    font-size: 1rem; /* text-base */
+    line-height: 1.5rem;
+    font-weight: 700;
+    color: rgb(255 255 255); /* text-white */
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Paragraph Styles */
+  p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.75rem;
+  }
+
+  /* List Styles */
+  ul, ol {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  li {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Link Styles */
+  a {
+    color: rgb(74 222 128); /* text-green-400 */
+    text-decoration: underline;
+    text-decoration-color: rgb(74 222 128 / 0.3);
+    transition: all 0.2s;
+
+    &:hover {
+      text-decoration-color: rgb(74 222 128);
+    }
+  }
+
+  /* Image Styles */
+  img {
+    border-radius: 0.5rem;
+    border: 1px solid rgb(63 63 70); /* border-zinc-700 */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+    height: auto;
+  }
 }
