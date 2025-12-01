@@ -39,7 +39,16 @@
 </template>
 
 <script setup lang="ts">
-const { data: posts } = await useFetch('/api/news');
+import { onMounted } from 'vue'
+
+const { data: posts, refresh } = await useFetch('/api/news');
+
+// Fetch again with a slight delay to ensure data loads on direct navigation
+onMounted(() => {
+  setTimeout(() => {
+    refresh();
+  }, 100);
+});
 
 function formatDate(timestamp: number) {
   return new Date(timestamp * 1000).toLocaleDateString('en-US', {
