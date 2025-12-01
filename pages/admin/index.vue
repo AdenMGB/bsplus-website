@@ -98,6 +98,17 @@
                     </td>
                     <td class="px-6 py-4 text-zinc-400">{{ formatDate(post.created_at) }}</td>
                     <td class="px-6 py-4 text-right">
+                      <button 
+                        @click="togglePublish(post)" 
+                        :class="[
+                          post.published 
+                            ? 'text-yellow-400 hover:text-yellow-300' 
+                            : 'text-green-400 hover:text-green-300',
+                          'font-medium transition-colors mr-4'
+                        ]"
+                      >
+                        {{ post.published ? 'Unpublish' : 'Publish' }}
+                      </button>
                       <NuxtLink :to="`/admin/news/edit/${post.slug}`" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors mr-4">Edit</NuxtLink>
                       <button @click="deletePost(post.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors">Delete</button>
                     </td>
@@ -120,7 +131,7 @@ definePageMeta({
   middleware: ["admin"]
 });
 
-const { data: posts } = await useFetch<any[]>('/api/news');
+const { data: posts } = await useFetch<any[]>('/api/news?admin=true');
 const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
 
 const recentPosts = computed(() => {
@@ -159,12 +170,30 @@ function formatDate(timestamp: number) {
   });
 }
 
+async function togglePublish(post: any) {
+  try {
+    const result = await $fetch<{ success: boolean; published: boolean }>(`/api/news/publish?slug=${post.slug}`, { 
+      method: 'PATCH',
+      body: { published: !post.published }
+    });
+    // Update local state
+    if (posts.value) {
+      const index = posts.value.findIndex(p => p.id === post.id);
+      if (index !== -1) {
+        posts.value[index].published = result.published ? 1 : 0;
+      }
+    }
+  } catch (e) {
+    alert('Failed to toggle publish status');
+  }
+}
+
 async function deletePost(id: number) {
   if (!confirm('Are you sure you want to delete this post?')) return;
   try {
     await $fetch(`/api/news/${id}`, { method: 'DELETE' });
     // Refresh data
-    const { data } = await useFetch('/api/news');
+    const { data } = await useFetch('/api/news?admin=true');
     posts.value = data.value as any[];
   } catch (e) {
     alert('Failed to delete post');
