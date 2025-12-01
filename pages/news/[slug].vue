@@ -7,6 +7,12 @@
         </div>
         
         <article v-if="post">
+           <!-- Cover Image Banner -->
+           <div v-if="post.cover_image" class="w-full h-[300px] sm:h-[400px] rounded-2xl overflow-hidden mb-8 relative border border-zinc-800">
+              <img :src="post.cover_image" :alt="post.title" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
+           </div>
+
            <div class="flex items-center gap-x-4 text-xs mb-4">
             <time :datetime="formatDate(post.created_at)" class="text-zinc-400">{{ formatDate(post.created_at) }}</time>
           </div>
