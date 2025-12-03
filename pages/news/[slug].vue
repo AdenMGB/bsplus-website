@@ -36,7 +36,11 @@
 import { ref, onMounted, watch } from 'vue'
 
 const route = useRoute();
-const { data: post } = await useFetch<any>(`/api/news/${route.params.slug}`);
+const { data: post } = await useFetch<any>(`/api/news/${route.params.slug}`, {
+  query: {
+    preview: route.query.preview
+  }
+});
 const contentRef = ref<HTMLElement | null>(null)
 
 if (!post.value) {

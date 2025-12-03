@@ -61,6 +61,21 @@
       
       <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
       
+      <button @click="setLink" :class="{ 'is-active': editor.isActive('link') }" class="editor-btn flex items-center gap-1" title="Link">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+        </svg>
+        <span>Link</span>
+      </button>
+      <button v-if="editor?.isActive('link')" @click="unsetLink" class="editor-btn flex items-center gap-1" title="Remove Link">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244M9 12h6" />
+        </svg>
+        <span>Unlink</span>
+      </button>
+      
+      <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
+      
       <button @click="editor.chain().focus().setHorizontalRule().run()" class="editor-btn" title="Horizontal Rule">
         ---
       </button>
@@ -155,6 +170,9 @@ const editor = useEditor({
     CustomImage,
     Link.configure({
       openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-green-400 underline decoration-green-400/30 hover:decoration-green-400 transition-all',
+      },
     }),
     Underline,
     TextAlign.configure({
@@ -189,6 +207,29 @@ const addImage = () => {
   if (url) {
     editor.value?.chain().focus().setImage({ src: url }).run()
   }
+}
+
+const setLink = () => {
+  const previousUrl = editor.value?.getAttributes('link').href
+  const url = window.prompt('URL', previousUrl)
+
+  // cancelled
+  if (url === null) {
+    return
+  }
+
+  // empty
+  if (url === '') {
+    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+    return
+  }
+
+  // update link
+  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+}
+
+const unsetLink = () => {
+  editor.value?.chain().focus().unsetLink().run()
 }
 
 const toggleCodeBlock = () => {
