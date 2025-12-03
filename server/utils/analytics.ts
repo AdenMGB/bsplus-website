@@ -79,12 +79,43 @@ const flushMap = async (db: any, map: Map<string, number>) => {
 
 export const flushSessions = async (db: any) => {
   lastSessionFlushTime = Date.now();
-  return await flushMap(db, sessionBuffer);
+  const result = await flushMap(db, sessionBuffer);
+  await saveHourlyStats(db);
+  return result;
 };
 
 export const flushDesqtaSessions = async (db: any) => {
   lastDesqtaSessionFlushTime = Date.now();
-  return await flushMap(db, desqtaSessionBuffer);
+  const result = await flushMap(db, desqtaSessionBuffer);
+  await saveHourlyStats(db);
+  return result;
+};
+
+const saveHourlyStats = async (db: any) => {
+  try {
+    // Get current counts from page_stats
+    const stats = await db.prepare('SELECT * FROM page_stats').all();
+    const sessions = stats.results.find((r: any) => r.path === 'bs_sessions')?.views || 0;
+    const desqtaSessions = stats.results.find((r: any) => r.path === 'desqta_sessions')?.views || 0;
+
+    // Round down to the hour (Unix timestamp)
+    const now = Math.floor(Date.now() / 1000);
+    const hourTimestamp = Math.floor(now / 3600) * 3600;
+
+    // Insert or update hourly stats
+    await db.prepare(
+      `INSERT INTO hourly_stats (timestamp, extension_sessions, desqta_sessions)
+       VALUES (?, ?, ?)
+       ON CONFLICT(timestamp) DO UPDATE SET
+         extension_sessions = excluded.extension_sessions,
+         desqta_sessions = excluded.desqta_sessions`
+    ).bind(hourTimestamp, sessions, desqtaSessions).run();
+
+    console.log(`[Hourly Stats] Saved stats for ${new Date(hourTimestamp * 1000).toISOString()}: ${sessions} extension sessions, ${desqtaSessions} desqta sessions`);
+  } catch (e) {
+    console.error('[Hourly Stats] Failed to save:', e);
+    // Don't throw - hourly stats shouldn't break flushing
+  }
 };
 
 export const checkAndFlush = async (db: any, context: any) => {

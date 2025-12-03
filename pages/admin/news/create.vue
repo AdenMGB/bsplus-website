@@ -12,6 +12,60 @@
           <h1 class="text-lg font-semibold text-white">{{ isEditing ? 'Edit News Post' : 'Create News Post' }}</h1>
         </div>
         <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2" v-if="!form.published && isEditing">
+             <div class="relative group">
+               <button 
+                 @click="showPreviewMenu = !showPreviewMenu"
+                 class="text-sm font-medium text-zinc-300 hover:text-white transition-colors flex items-center gap-1"
+               >
+                 <span>Preview</span>
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                   <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                 </svg>
+               </button>
+               
+               <div v-if="showPreviewMenu" class="absolute right-0 top-full mt-2 w-72 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-4 z-50">
+                 <div class="space-y-4">
+                   <div>
+                     <label class="block text-xs font-medium text-zinc-400 mb-1">Duration</label>
+                     <select v-model="previewDuration" class="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-sm text-zinc-300 focus:border-green-500 focus:ring-0">
+                       <option :value="5">5 Minutes</option>
+                       <option :value="10">10 Minutes</option>
+                       <option :value="30">30 Minutes</option>
+                       <option :value="60">1 Hour</option>
+                       <option :value="360">6 Hours</option>
+                       <option :value="720">12 Hours</option>
+                     </select>
+                   </div>
+                   
+                   <button 
+                     @click="generatePreview" 
+                     :disabled="generatingPreview"
+                     class="w-full rounded bg-zinc-800 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-700 border border-zinc-700 transition-colors"
+                   >
+                     {{ generatingPreview ? 'Generating...' : 'Generate Link' }}
+                   </button>
+
+                   <div v-if="previewLink" class="space-y-2 pt-2 border-t border-zinc-800">
+                     <p class="text-xs text-green-500 font-medium">Preview link active!</p>
+                     <div class="flex gap-2">
+                       <input readonly :value="previewLink" class="flex-1 bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-400 font-mono" />
+                       <button @click="copyPreviewLink" class="text-zinc-400 hover:text-white">
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                           <path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12a1.5 1.5 0 01.439 1.061V16.5a1.5 1.5 0 01-1.5 1.5h-4a1.5 1.5 0 01-1.5-1.5v-2.25A.75.75 0 009.25 14h-2.5A.75.75 0 006 14.75v2.25A2.25 2.25 0 013.75 19.25h-1.5A2.25 2.25 0 010 17v-5.5a2.25 2.25 0 012.25-2.25h.75a.75.75 0 00.75-.75v-2.5a.75.75 0 00-.75-.75h-.75A2.25 2.25 0 010 3V2.25A2.25 2.25 0 012.25 0h2.5A2.25 2.25 0 017 2.25v1.25z" />
+                           <path fill-rule="evenodd" d="M12.75 6.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25v6.5a2.25 2.25 0 01-2.25 2.25h-5.5a2.25 2.25 0 01-2.25-2.25v-6.5a2.25 2.25 0 012.25-2.25h5.5zM12.75 16.5a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v.75a.75.75 0 00.75.75h5.5a.75.75 0 00.75-.75v-.75z" clip-rule="evenodd" />
+                         </svg>
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+               
+               <!-- Backdrop to close -->
+               <div v-if="showPreviewMenu" @click="showPreviewMenu = false" class="fixed inset-0 z-40 cursor-default"></div>
+             </div>
+          </div>
+
           <div class="flex items-center gap-2">
              <input 
               v-model="form.published" 
@@ -108,6 +162,11 @@ const form = ref({
 
 const loading = ref(false);
 
+const showPreviewMenu = ref(false);
+const previewDuration = ref(60);
+const generatingPreview = ref(false);
+const previewLink = ref('');
+
 let oldTitle = '';
 
 // If editing, fetch existing post
@@ -123,12 +182,45 @@ if (isEditing.value) {
         published: !!post.value.published,
         cover_image: post.value.cover_image || ''
       };
+      
+      // If there's an existing valid preview token, we could technically reconstruct the link
+      // But we don't return the token in the public GET API for security (unless we add it to the admin response)
+      // For now, we start with no link shown until generated.
+      
       oldTitle = post.value.title;
     } else if (error.value) {
       alert('Failed to load post');
       router.push('/admin');
     }
   }
+}
+
+async function generatePreview() {
+  if (!isEditing.value) return;
+  
+  generatingPreview.value = true;
+  try {
+    const { token } = await $fetch<any>(`/api/news/preview?slug=${encodeURIComponent(form.value.slug)}`, {
+      method: 'POST',
+      body: { duration: previewDuration.value }
+    });
+    
+    // Construct full URL
+    const baseUrl = window.location.origin;
+    previewLink.value = `${baseUrl}/news/${form.value.slug}?preview=${token}`;
+    
+  } catch (e) {
+    console.error(e);
+    alert('Failed to generate preview link');
+  } finally {
+    generatingPreview.value = false;
+  }
+}
+
+function copyPreviewLink() {
+  navigator.clipboard.writeText(previewLink.value);
+  alert('Link copied to clipboard!');
+  showPreviewMenu.value = false;
 }
 
 // Auto-generate slug from title (only if slug is empty or matches old auto-generated one)
