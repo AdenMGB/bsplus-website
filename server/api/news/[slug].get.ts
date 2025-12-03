@@ -1,7 +1,20 @@
 import { getDB } from '../../utils/db';
 
 export default defineEventHandler(async (event) => {
-  const slug = event.path.split('/').pop();
+  // Try to get slug from route params first, fallback to path parsing
+  let slug = event.context.params?.slug as string | undefined;
+  
+  if (!slug) {
+    // Fallback: Extract slug from path (remove query string first)
+    const pathWithoutQuery = event.path.split('?')[0];
+    const pathParts = pathWithoutQuery.split('/').filter(Boolean);
+    const newsIndex = pathParts.indexOf('news');
+    if (newsIndex >= 0 && newsIndex + 1 < pathParts.length) {
+      slug = pathParts[newsIndex + 1];
+    } else {
+      slug = pathParts[pathParts.length - 1];
+    }
+  }
 
   if (!slug) {
     throw createError({ statusCode: 400, message: 'Invalid slug parameter' });
@@ -23,13 +36,16 @@ export default defineEventHandler(async (event) => {
 
     // Check for preview token
     const query = getQuery(event);
-    const previewToken = query.preview as string;
+    const previewToken = query.preview as string | undefined;
 
-    if (previewToken && item.preview_token === previewToken) {
-      // Check expiration
-      const now = Math.floor(Date.now() / 1000);
-      if (item.preview_expires_at && item.preview_expires_at > now) {
-        return item;
+    if (previewToken) {
+      // Check if token matches (handle null/undefined preview_token)
+      if (item.preview_token && item.preview_token === previewToken) {
+        // Check expiration
+        const now = Math.floor(Date.now() / 1000);
+        if (item.preview_expires_at && item.preview_expires_at > now) {
+          return item;
+        }
       }
     }
 
