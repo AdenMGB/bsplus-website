@@ -19,11 +19,11 @@
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.news?.published || 0 }}</dd>
         </div>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <NuxtLink to="/admin/analytics" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 hover:bg-zinc-800/50 transition-all hover:scale-[1.02] cursor-pointer group">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
           <div class="flex items-baseline gap-2">
-            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.sessions?.total || 0 }}</dd>
-            <button @click="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white group-hover:text-green-400 transition-colors">{{ stats.sessions?.total || 0 }}</dd>
+            <button @click.stop="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
@@ -34,13 +34,14 @@
             Next update: {{ getTimeUntil(stats.sessions.buffer.nextFlushEstimate) }}
             ({{ stats.sessions.buffer.totalBuffered }} buffered)
           </p>
-        </div>
+          <p class="text-xs text-green-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Click to view graph →</p>
+        </NuxtLink>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <NuxtLink to="/admin/analytics" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 hover:bg-zinc-800/50 transition-all hover:scale-[1.02] cursor-pointer group">
           <dt class="text-sm font-medium leading-6 text-zinc-400">DesQTA Sessions</dt>
           <div class="flex items-baseline gap-2">
-            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.desqtaSessions?.total || 0 }}</dd>
-            <button @click="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">{{ stats.desqtaSessions?.total || 0 }}</dd>
+            <button @click.stop="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
@@ -51,7 +52,8 @@
             Next update: {{ getTimeUntil(stats.desqtaSessions.buffer.nextFlushEstimate) }}
             ({{ stats.desqtaSessions.buffer.totalBuffered }} buffered)
           </p>
-        </div>
+          <p class="text-xs text-blue-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Click to view graph →</p>
+        </NuxtLink>
       </div>
 
       <!-- News Section -->

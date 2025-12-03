@@ -25,9 +25,11 @@
     "@tiptap/extension-youtube": "^3.11.1",
     "@tiptap/starter-kit": "^3.11.1",
     "@tiptap/vue-3": "^3.11.1",
+    "echarts": "^6.0.0",
     "nuxt": "^3.16.2",
     "vite": "6.3.2",
     "vue": "latest",
+    "vue-echarts": "^8.0.1",
     "vue-router": "latest",
     "vue3-carousel-nuxt": "^1.1.5"
   },
