@@ -91,7 +91,7 @@ export const flushDesqtaSessions = async (db: any) => {
   return result;
 };
 
-const saveHourlyStats = async (db: any) => {
+export const saveHourlyStats = async (db: any) => {
   try {
     // Get current counts from page_stats
     const stats = await db.prepare('SELECT * FROM page_stats').all();
@@ -112,18 +112,25 @@ const saveHourlyStats = async (db: any) => {
     ).bind(hourTimestamp, sessions, desqtaSessions).run();
 
     console.log(`[Hourly Stats] Saved stats for ${new Date(hourTimestamp * 1000).toISOString()}: ${sessions} extension sessions, ${desqtaSessions} desqta sessions`);
+    return { success: true, timestamp: hourTimestamp, sessions, desqtaSessions };
   } catch (e) {
     console.error('[Hourly Stats] Failed to save:', e);
     // Don't throw - hourly stats shouldn't break flushing
+    return { success: false, error: e };
   }
 };
 
+// Track last hourly stats save time
+let lastHourlyStatsSave = 0;
+
 export const checkAndFlush = async (db: any, context: any) => {
+  const now = Date.now();
+  
   // Check Sessions
   let totalBufferedSessions = 0;
   for (const count of sessionBuffer.values()) totalBufferedSessions += count;
 
-  if (totalBufferedSessions >= SESSION_FLUSH_THRESHOLD || (Date.now() - lastSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
+  if (totalBufferedSessions >= SESSION_FLUSH_THRESHOLD || (now - lastSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
     const p = flushSessions(db);
     if (context?.waitUntil) context.waitUntil(p);
     else p.catch(console.error);
@@ -133,8 +140,18 @@ export const checkAndFlush = async (db: any, context: any) => {
   let totalBufferedDesqtaSessions = 0;
   for (const count of desqtaSessionBuffer.values()) totalBufferedDesqtaSessions += count;
 
-  if (totalBufferedDesqtaSessions >= SESSION_FLUSH_THRESHOLD || (Date.now() - lastDesqtaSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
+  if (totalBufferedDesqtaSessions >= SESSION_FLUSH_THRESHOLD || (now - lastDesqtaSessionFlushTime) >= SESSION_FLUSH_INTERVAL) {
     const p = flushDesqtaSessions(db);
+    if (context?.waitUntil) context.waitUntil(p);
+    else p.catch(console.error);
+  }
+
+  // Save hourly stats every hour regardless of flushing
+  // Round down to the hour and check if we've saved for this hour
+  const currentHour = Math.floor(now / 1000 / 3600) * 3600;
+  if (lastHourlyStatsSave !== currentHour) {
+    lastHourlyStatsSave = currentHour;
+    const p = saveHourlyStats(db);
     if (context?.waitUntil) context.waitUntil(p);
     else p.catch(console.error);
   }
