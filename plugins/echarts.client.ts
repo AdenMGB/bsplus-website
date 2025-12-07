@@ -6,6 +6,7 @@ import {
   TooltipComponent,
   LegendComponent,
   GridComponent,
+  DataZoomComponent,
 } from 'echarts/components';
 import VChart from 'vue-echarts';
 
@@ -16,6 +17,7 @@ use([
   TooltipComponent,
   LegendComponent,
   GridComponent,
+  DataZoomComponent,
 ]);
 
 export default defineNuxtPlugin((nuxtApp) => {

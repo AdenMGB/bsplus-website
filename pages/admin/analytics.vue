@@ -105,6 +105,12 @@ async function loadData() {
   loading.value = true;
   try {
     const data = await $fetch<any[]>(`/api/analytics/hourly-stats?hours=${selectedHours.value}`);
+    console.log('Analytics data received:', data);
+    console.log('Data length:', data?.length);
+    if (data && data.length > 0) {
+      console.log('First item:', data[0]);
+      console.log('Last item:', data[data.length - 1]);
+    }
     chartData.value = data || [];
   } catch (e) {
     console.error('Failed to load analytics data:', e);
