@@ -121,8 +121,12 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Windows 10 and above.</p>
                 <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_x64-setup.exe" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                  <a :href="msiDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                    Download MSI <span aria-hidden="true">→</span>
+                  </a>
+                  <br>
+                  <a :href="exeDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                    Download EXE <span aria-hidden="true">→</span>
                   </a>
                 </p>
               </dd>
@@ -139,8 +143,8 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for macOS 10.15 and above.</p>
                 <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_aarch64.dmg" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                  <a :href="dmgDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                    Download DMG <span aria-hidden="true">→</span>
                   </a>
                 </p>
               </dd>
@@ -176,8 +180,8 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the mobile version for Android devices.</p>
                 <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA.apk" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                  <a :href="apkDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                    Download APK <span aria-hidden="true">→</span>
                   </a>
                 </p>
               </dd>
@@ -274,8 +278,37 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
 useHead({
   title: "Download",
+});
+
+const latestRelease = ref<any>(null);
+const apkDownloadUrl = ref<string>('');
+const dmgDownloadUrl = ref<string>('');
+const exeDownloadUrl = ref<string>('');
+const msiDownloadUrl = ref<string>('');
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://api.github.com/repos/betterseqta/desqta/releases?per_page=1');
+    const data = await response.json();
+    if (data && data.length > 0) {
+      latestRelease.value = data[0];
+
+      // Find assets based on content_type or name
+      const assets = latestRelease.value.assets;
+
+      // Set the download URLs based on asset names
+      apkDownloadUrl.value = assets.find(asset => asset.name.endsWith('.apk'))?.browser_download_url || '';
+      dmgDownloadUrl.value = assets.find(asset => asset.name.endsWith('.dmg'))?.browser_download_url || '';
+      exeDownloadUrl.value = assets.find(asset => asset.name.endsWith('.exe'))?.browser_download_url || '';
+      msiDownloadUrl.value = assets.find(asset => asset.name.endsWith('.msi'))?.browser_download_url || '';
+    }
+  } catch (error) {
+    console.error('Error fetching latest release:', error);
+  }
 });
 </script>
 
