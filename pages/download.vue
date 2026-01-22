@@ -11,11 +11,21 @@
         </p>
       </div>
 
+      <!-- Comparison Link -->
+      <div class="mx-auto max-w-2xl text-center mt-8 animate-fade-in delay-300">
+        <p class="text-base leading-7 text-zinc-400">
+          Don't know what version to choose? 
+          <NuxtLink to="/comparison" class="text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200 underline underline-offset-2">
+            Compare editions
+          </NuxtLink>
+        </p>
+      </div>
+
       <!-- Download Options -->
       <div class="mt-16 sm:mt-24 space-y-24">
         <!-- Browser Extensions -->
         <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">Browser Extensions</h3>
+          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">BetterSEQTA+ Extension</h3>
           <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Chrome Card -->
             <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
@@ -105,7 +115,13 @@
 
         <!-- DesQTA Apps -->
         <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">DesQTA Apps</h3>
+          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1 flex items-center gap-3">
+            DesQTA App
+            <span v-if="latestVersion" class="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-0 text-xs font-medium text-blue-300 ring-1 ring-inset ring-blue-500/30 leading-7">
+              {{ latestVersion }}
+            </span>
+          </h3>
+
           <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Windows -->
             <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
@@ -252,7 +268,7 @@
               <dt class="text-base font-semibold leading-7 text-white">Desktop (DesQTA)</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ol class="list-decimal pl-6 space-y-3">
-                  <li>Download the installer (.exe/.dmg)</li>
+                  <li>Download the installer (.msi/.exe/.dmg)</li>
                   <li>Run the installer or drag to Apps</li>
                   <li>Launch DesQTA</li>
                   <li>Log in to your SEQTA account</li>
@@ -278,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 useHead({
   title: "Download",
@@ -289,6 +305,14 @@ const apkDownloadUrl = ref<string>('');
 const dmgDownloadUrl = ref<string>('');
 const exeDownloadUrl = ref<string>('');
 const msiDownloadUrl = ref<string>('');
+
+const latestVersion = computed(() => {
+  if (!latestRelease.value?.tag_name) return null;
+  // enable this next line to remove 'v' prefix if present (e.g., "v1.0.0" -> "1.0.0"):
+  //return latestRelease.value.tag_name.replace(/^v/, '');
+  // enable this next line to show the full tag name (e.g., "v1.0.0" -> "v1.0.0"):
+  return latestRelease.value.tag_name;
+});
 
 onMounted(async () => {
   try {
