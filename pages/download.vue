@@ -1,24 +1,34 @@
 <template>
   <div class="relative isolate overflow-hidden">
-    <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 animate-fade-in">
-      <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 lg:px-8 lg:py-32 animate-fade-in">
+      <div class="mx-auto max-w-2xl text-center px-4 sm:px-0">
+        <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
+        <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-slide-down delay-100">
           Get BetterSEQTA+
         </p>
-        <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
+        <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-200">
           Choose the version that suits you best: Browser Extension or Desktop App.
         </p>
       </div>
 
+      <!-- Comparison Link -->
+      <div class="mx-auto max-w-2xl text-center mt-6 sm:mt-8 px-4 sm:px-0 animate-fade-in delay-300">
+        <p class="text-sm sm:text-base leading-7 text-zinc-400">
+          Don't know what version to choose? 
+          <NuxtLink to="/comparison" class="text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200 underline underline-offset-2">
+            Compare editions
+          </NuxtLink>
+        </p>
+      </div>
+
       <!-- Download Options -->
-      <div class="mt-16 sm:mt-24 space-y-24">
+      <div class="mt-12 sm:mt-16 lg:mt-24 space-y-16 sm:space-y-24">
         <!-- Browser Extensions -->
-        <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">Browser Extensions</h3>
-          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="px-4 sm:px-0">
+          <h3 class="text-xl sm:text-2xl font-semibold leading-7 text-white mb-6 sm:mb-8 pl-1">BetterSEQTA+ Extension</h3>
+          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <!-- Chrome Card -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
               <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
                 <svg class="h-7 w-7 flex-none transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
                   <path fill="#fff" d="M34,24c0,5.521-4.479,10-10,10s-10-4.479-10-10s4.479-10,10-10S34,18.479,34,24z"/>
@@ -104,11 +114,17 @@
         </div>
 
         <!-- DesQTA Apps -->
-        <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">DesQTA Apps</h3>
-          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="px-4 sm:px-0">
+          <h3 class="text-xl sm:text-2xl font-semibold leading-7 text-white mb-6 sm:mb-8 pl-1 flex flex-wrap items-center gap-2 sm:gap-3">
+            DesQTA App
+            <span v-if="latestVersion" class="inline-flex items-center rounded-full bg-blue-500/20 px-2 sm:px-3 py-0 text-xs font-medium text-blue-300 ring-1 ring-inset ring-blue-500/30 leading-7">
+              {{ latestVersion }}
+            </span>
+          </h3>
+
+          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <!-- Windows -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
               <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
                 <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
                   <path d="M7,6h15c0.552,0,1,0.448,1,1v15c0,0.552-0.448,1-1,1H7c-0.552,0-1-0.448-1-1V7 C6,6.448,6.448,6,7,6z"></path>
@@ -120,11 +136,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Windows 10 and above.</p>
-                <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_x64-setup.exe" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="exeDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
+                    Download EXE
                   </a>
-                </p>
+                  <a :href="msiDownloadUrl" class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    Download MSI <span aria-hidden="true">→</span>
+                  </a>
+                </div>
               </dd>
             </div>
 
@@ -138,30 +157,35 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for macOS 10.15 and above.</p>
-                <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA_1.0.0-2_aarch64.dmg" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="dmgDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
+                    Download DMG
                   </a>
-                </p>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀<span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
 
             <!-- Linux -->
             <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in delay-200">
               <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-                <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
-                  <path d="M12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6zm0 10c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"></path>
+                <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 15 15">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.53918 2.40715C4.82145 1.0075 6.06066 0 7.49996 0C8.93926 0 10.1785 1.0075 10.4607 2.40715L10.798 4.07944C10.9743 4.9539 11.3217 5.78562 11.8205 6.52763L12.4009 7.39103C12.7631 7.92978 12.9999 8.5385 13.0979 9.17323C13.6747 9.22167 14.1803 9.58851 14.398 10.1283L14.8897 11.3474C15.1376 11.962 14.9583 12.665 14.4455 13.0887L12.5614 14.6458C12.0128 15.0992 11.2219 15.1193 10.6506 14.6944L9.89192 14.1301C9.88189 14.1227 9.87197 14.1151 9.86216 14.1074C9.48973 14.2075 9.09793 14.261 8.69355 14.261H6.30637C5.90201 14.261 5.51023 14.2076 5.13782 14.1074C5.12802 14.1151 5.11811 14.1227 5.10808 14.1301L4.34942 14.6944C3.77811 15.1193 2.98725 15.0992 2.43863 14.6458L0.55446 13.0887C0.0417175 12.665 -0.1376 11.962 0.110281 11.3474L0.602025 10.1283C0.819715 9.58854 1.32527 9.2217 1.90198 9.17324C2 8.5385 2.2368 7.92978 2.59897 7.39103L3.17938 6.52763C3.67818 5.78562 4.02557 4.9539 4.20193 4.07944L4.53918 2.40715ZM10.8445 9.47585C10.6345 9.63293 10.4642 9.84382 10.3561 10.0938L9.58799 11.8713C9.20026 12.0979 8.75209 12.2237 8.28465 12.2237H6.7153C6.24789 12.2237 5.79975 12.0979 5.41203 11.8714L4.64386 10.0938C4.53581 9.8438 4.36552 9.6329 4.15546 9.47582C4.18121 9.15355 4.2689 8.83503 4.41853 8.53826L5.67678 6.04259L5.68433 6.05007C6.68715 7.04458 8.31304 7.04458 9.31585 6.05007L9.32324 6.04274L10.5814 8.53825C10.7311 8.83504 10.8187 9.15357 10.8445 9.47585ZM9.04068 4.26906V3.05592H8.01353V3.85713C8.23151 3.90123 8.44506 3.97371 8.64848 4.07458L9.04068 4.26906ZM6.98638 3.85718V3.05592H5.95923V4.26919L6.3517 4.07458C6.55504 3.97375 6.7685 3.90129 6.98638 3.85718ZM2.03255 10.1864C1.82255 10.1864 1.6337 10.3132 1.55571 10.5066L1.06397 11.7257C0.981339 11.9306 1.04111 12.1649 1.21203 12.3062L3.0962 13.8633C3.27907 14.0144 3.54269 14.0211 3.73313 13.8795L4.49179 13.3152C4.6813 13.1743 4.74901 12.923 4.6557 12.7071L3.69976 10.4951C3.61884 10.3078 3.43316 10.1864 3.22771 10.1864H2.03255ZM13.4443 10.5066C13.3663 10.3132 13.1775 10.1864 12.9674 10.1864H11.7723C11.5668 10.1864 11.3812 10.3078 11.3002 10.4951L10.3443 12.7071C10.251 12.923 10.3187 13.1743 10.5082 13.3152L11.2669 13.8795C11.4573 14.0211 11.7209 14.0144 11.9038 13.8633L13.788 12.3062C13.9589 12.1649 14.0187 11.9306 13.936 11.7257L13.4443 10.5066ZM6.81106 4.98568C7.24481 4.7706 7.75537 4.7706 8.18912 4.98568L8.68739 5.23275L8.58955 5.32978C7.98786 5.92649 7.01232 5.92649 6.41063 5.32978L6.31279 5.23275L6.81106 4.98568Z"/>
                 </svg>
                 <span class="ml-2">Linux</span>
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Linux distributions.</p>
-                <p class="mt-6">
-                  <span class="text-sm font-semibold leading-6 text-zinc-500 cursor-not-allowed">
+                <div class="mt-auto pt-6 flex flex-col gap-3 min-h-[60px] justify-center">
+                  <a class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-zinc-500 cursor-not-allowed pointer-events-none">
                     Coming Soon
-                  </span>
-                </p>
+                  </a>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀<span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
 
@@ -175,11 +199,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the mobile version for Android devices.</p>
-                <p class="mt-6">
-                  <a href="https://github.com/BetterSEQTA/DesQTA/releases/download/v1.0.0rc-2/DesQTA.apk" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download <span aria-hidden="true">→</span>
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="apkDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
+                    Download APK
                   </a>
-                </p>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀ <span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
           </div>
@@ -187,15 +214,15 @@
       </div>
 
       <!-- System Requirements -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-300">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-300">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400">System Requirements</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400">System Requirements</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
             What you need to run BetterSEQTA+ and DesQTA
           </p>
         </div>
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none">
+          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:gap-y-16 lg:max-w-none lg:grid-cols-2">
             <!-- Browser Reqs -->
             <div class="flex flex-col">
               <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
@@ -224,15 +251,15 @@
       </div>
 
       <!-- Installation Guide -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-400">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-400">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
             How to install
           </p>
         </div>
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none">
+          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:gap-y-16 lg:max-w-none lg:grid-cols-3">
             <div class="flex flex-col">
               <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
@@ -248,7 +275,7 @@
               <dt class="text-base font-semibold leading-7 text-white">Desktop (DesQTA)</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <ol class="list-decimal pl-6 space-y-3">
-                  <li>Download the installer (.exe/.dmg)</li>
+                  <li>Download the installer (.msi/.exe/.dmg)</li>
                   <li>Run the installer or drag to Apps</li>
                   <li>Launch DesQTA</li>
                   <li>Log in to your SEQTA account</li>
@@ -274,8 +301,45 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+
 useHead({
   title: "Download",
+});
+
+const latestRelease = ref<any>(null);
+const apkDownloadUrl = ref<string>('');
+const dmgDownloadUrl = ref<string>('');
+const exeDownloadUrl = ref<string>('');
+const msiDownloadUrl = ref<string>('');
+
+const latestVersion = computed(() => {
+  if (!latestRelease.value?.tag_name) return null;
+  // enable this next line to remove 'v' prefix if present (e.g., "v1.0.0" -> "1.0.0"):
+  //return latestRelease.value.tag_name.replace(/^v/, '');
+  // enable this next line to show the full tag name (e.g., "v1.0.0" -> "v1.0.0"):
+  return latestRelease.value.tag_name;
+});
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://api.github.com/repos/betterseqta/desqta/releases?per_page=1');
+    const data = await response.json();
+    if (data && data.length > 0) {
+      latestRelease.value = data[0];
+
+      // Find assets based on content_type or name
+      const assets = latestRelease.value.assets;
+
+      // Set the download URLs based on asset names
+      apkDownloadUrl.value = assets.find(asset => asset.name.endsWith('.apk'))?.browser_download_url || '';
+      dmgDownloadUrl.value = assets.find(asset => asset.name.endsWith('.dmg'))?.browser_download_url || '';
+      exeDownloadUrl.value = assets.find(asset => asset.name.endsWith('.exe'))?.browser_download_url || '';
+      msiDownloadUrl.value = assets.find(asset => asset.name.endsWith('.msi'))?.browser_download_url || '';
+    }
+  } catch (error) {
+    console.error('Error fetching latest release:', error);
+  }
 });
 </script>
 
