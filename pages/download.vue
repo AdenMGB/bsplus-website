@@ -136,15 +136,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Windows 10 and above.</p>
-                <p class="mt-6">
-                  <a :href="msiDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="exeDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                    Download EXE
+                  </a>
+                  <a :href="msiDownloadUrl" class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
                     Download MSI <span aria-hidden="true">→</span>
                   </a>
-                  <br>
-                  <a :href="exeDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download EXE <span aria-hidden="true">→</span>
-                  </a>
-                </p>
+                </div>
               </dd>
             </div>
 
@@ -158,11 +157,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for macOS 10.15 and above.</p>
-                <p class="mt-6">
-                  <a :href="dmgDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download DMG <span aria-hidden="true">→</span>
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="dmgDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                    Download DMG
                   </a>
-                </p>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀<span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
 
@@ -177,11 +179,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Linux distributions.</p>
-                <p class="mt-6">
-                  <span class="text-sm font-semibold leading-6 text-zinc-500 cursor-not-allowed">
+                <div class="mt-auto pt-6 flex flex-col gap-3 min-h-[60px] justify-center">
+                  <a class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-zinc-500 cursor-not-allowed pointer-events-none">
                     Coming Soon
-                  </span>
-                </p>
+                  </a>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀<span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
 
@@ -195,11 +200,14 @@
               </dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the mobile version for Android devices.</p>
-                <p class="mt-6">
-                  <a :href="apkDownloadUrl" class="text-sm font-semibold leading-6 text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200">
-                    Download APK <span aria-hidden="true">→</span>
+                <div class="mt-auto pt-6 flex flex-col gap-3">
+                  <a :href="apkDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                    Download APK
                   </a>
-                </p>
+                  <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
+                    ⠀ <span aria-hidden="true"> </span>
+                  </a>
+                </div>
               </dd>
             </div>
           </div>
