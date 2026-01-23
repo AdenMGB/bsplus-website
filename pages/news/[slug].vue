@@ -1,31 +1,31 @@
 <template>
-  <div class="py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+  <div class="py-16 sm:py-24 lg:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-5xl">
-        <div class="mb-8">
+        <div class="mb-6 sm:mb-8">
           <NuxtLink to="/news" class="text-sm font-semibold leading-6 text-zinc-400 hover:text-white">&larr; Back to News</NuxtLink>
         </div>
         
         <article v-if="post">
            <!-- Cover Image Banner -->
-           <div v-if="post.cover_image" class="w-full h-[300px] sm:h-[400px] rounded-2xl overflow-hidden mb-8 relative border border-zinc-800">
+           <div v-if="post.cover_image" class="w-full h-[200px] sm:h-[300px] lg:h-[400px] rounded-2xl overflow-hidden mb-6 sm:mb-8 relative border border-zinc-800 -mx-4 sm:mx-0">
               <img :src="post.cover_image" :alt="post.title" class="w-full h-full object-cover" />
               <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
            </div>
 
-           <div class="flex items-center gap-x-4 text-xs mb-4">
+           <div class="flex items-center gap-x-4 text-xs mb-3 sm:mb-4">
             <time :datetime="formatDate(post.created_at)" class="text-zinc-400">{{ formatDate(post.created_at) }}</time>
           </div>
-          <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-8">{{ post.title }}</h1>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-6 sm:mb-8">{{ post.title }}</h1>
           
-          <div class="flex items-center gap-x-4 mb-8 border-b border-zinc-700 pb-8">
-             <img :src="(post as any).author_avatar || `https://ui-avatars.com/api/?name=${(post as any).author_name}`" alt="" class="h-10 w-10 rounded-full bg-zinc-800" />
-            <div class="text-sm leading-6">
+          <div class="flex items-center gap-x-3 sm:gap-x-4 mb-6 sm:mb-8 border-b border-zinc-700 pb-6 sm:pb-8">
+             <img :src="(post as any).author_avatar || `https://ui-avatars.com/api/?name=${(post as any).author_name}`" alt="" class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-zinc-800" />
+            <div class="text-xs sm:text-sm leading-6">
               <p class="font-semibold text-white">{{ (post as any).author_name }}</p>
             </div>
           </div>
 
-          <div ref="contentRef" class="prose prose-invert prose-lg max-w-none text-zinc-300" v-html="post.content"></div>
+          <div ref="contentRef" class="prose prose-sm sm:prose-base lg:prose-lg prose-invert max-w-none text-zinc-300 prose-pre:overflow-x-auto prose-code:text-xs sm:prose-code:text-sm" v-html="post.content"></div>
         </article>
       </div>
     </div>

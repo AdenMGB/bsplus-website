@@ -1,18 +1,18 @@
 <template>
   <div class="relative isolate overflow-hidden">
-    <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 animate-fade-in">
-      <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Comparison</h2>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 lg:px-8 lg:py-32 animate-fade-in">
+      <div class="mx-auto max-w-2xl text-center px-4 sm:px-0">
+        <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Comparison</h2>
+        <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-slide-down delay-100">
           Why choose BetterSEQTA+?
         </p>
-        <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
+        <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-200">
           See how BetterSEQTA+ compares to the web version of SEQTA Learn.
         </p>
       </div>
 
-      <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-100">
-        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start">
+      <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none px-4 sm:px-0 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-fade-in delay-100">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start">
           <dt class="text-base font-semibold leading-7 text-white">Vanilla SEQTA</dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
             <ul class="list-disc pl-6 space-y-3">
@@ -41,14 +41,14 @@
       </div>
 
       <!-- Feature Comparison -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-300">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-300">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Feature Comparison</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Feature Comparison</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-slide-down delay-100">
             What makes BetterSEQTA+ better?
           </p>
         </div>
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
               <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" viewBox="0 0 20 20" fill="currentColor">
@@ -86,30 +86,31 @@
       </div>
 
       <!-- DesQTA Features -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-300">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-300">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-blue-400 animate-slide-down">Detailed Comparison</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-blue-400 animate-slide-down">Detailed Comparison</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-slide-down delay-100">
              DesQTA vs Web Version
           </p>
         </div>
-        <div class="mt-16 overflow-x-auto">
-          <table class="w-full text-left rounded-2xl bg-white/5 shadow-xl">
-            <thead>
-              <tr>
-                <th class="px-6 py-4 text-lg font-semibold text-white">Feature</th>
-                <th class="px-6 py-4 text-lg font-semibold text-blue-400 text-center">BetterSEQTA+</th>
-                <th class="px-6 py-4 text-lg font-semibold text-blue-400 text-center">DesQTA</th>
-                <th class="px-6 py-4 text-lg font-semibold text-zinc-300 text-center">Vanilla SEQTA</th>
-              </tr>
-            </thead>
+        <div class="mt-12 sm:mt-16 overflow-x-auto -mx-4 sm:mx-0">
+          <div class="inline-block min-w-full align-middle">
+            <table class="min-w-full text-left rounded-2xl bg-white/5 shadow-xl">
+              <thead>
+                <tr>
+                  <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-white">Feature</th>
+                  <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-blue-400 text-center">BetterSEQTA+</th>
+                  <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-blue-400 text-center">DesQTA</th>
+                  <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-zinc-300 text-center">Vanilla SEQTA</th>
+                </tr>
+              </thead>
             <tbody class="divide-y divide-white/10 rounded-2xl">
               <!-- Better than default SEQTA -->
               <tr>
-                <td class="px-6 py-5 text-base text-zinc-300">Better than default SEQTA</td>
-                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
-                <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
-                <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
+                <td class="px-4 sm:px-6 py-3 sm:py-5 text-sm sm:text-base text-zinc-300">Better than default SEQTA</td>
+                <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Checkmark /></td>
+                <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Grades calculator -->
               <tr>
@@ -239,6 +240,7 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

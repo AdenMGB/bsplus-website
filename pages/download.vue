@@ -1,19 +1,19 @@
 <template>
   <div class="relative isolate overflow-hidden">
-    <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 animate-fade-in">
-      <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl animate-slide-down delay-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 lg:px-8 lg:py-32 animate-fade-in">
+      <div class="mx-auto max-w-2xl text-center px-4 sm:px-0">
+        <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400 animate-slide-down">Installation</h2>
+        <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-slide-down delay-100">
           Get BetterSEQTA+
         </p>
-        <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-200">
+        <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-200">
           Choose the version that suits you best: Browser Extension or Desktop App.
         </p>
       </div>
 
       <!-- Comparison Link -->
-      <div class="mx-auto max-w-2xl text-center mt-8 animate-fade-in delay-300">
-        <p class="text-base leading-7 text-zinc-400">
+      <div class="mx-auto max-w-2xl text-center mt-6 sm:mt-8 px-4 sm:px-0 animate-fade-in delay-300">
+        <p class="text-sm sm:text-base leading-7 text-zinc-400">
           Don't know what version to choose? 
           <NuxtLink to="/comparison" class="text-blue-400 transition-colors duration-200 hover:text-blue-300 focus:text-blue-200 underline underline-offset-2">
             Compare editions
@@ -22,13 +22,13 @@
       </div>
 
       <!-- Download Options -->
-      <div class="mt-16 sm:mt-24 space-y-24">
+      <div class="mt-12 sm:mt-16 lg:mt-24 space-y-16 sm:space-y-24">
         <!-- Browser Extensions -->
-        <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1">BetterSEQTA+ Extension</h3>
-          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="px-4 sm:px-0">
+          <h3 class="text-xl sm:text-2xl font-semibold leading-7 text-white mb-6 sm:mb-8 pl-1">BetterSEQTA+ Extension</h3>
+          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <!-- Chrome Card -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
               <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
                 <svg class="h-7 w-7 flex-none transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
                   <path fill="#fff" d="M34,24c0,5.521-4.479,10-10,10s-10-4.479-10-10s4.479-10,10-10S34,18.479,34,24z"/>
@@ -114,17 +114,17 @@
         </div>
 
         <!-- DesQTA Apps -->
-        <div>
-          <h3 class="text-2xl font-semibold leading-7 text-white mb-8 pl-1 flex items-center gap-3">
+        <div class="px-4 sm:px-0">
+          <h3 class="text-xl sm:text-2xl font-semibold leading-7 text-white mb-6 sm:mb-8 pl-1 flex flex-wrap items-center gap-2 sm:gap-3">
             DesQTA App
-            <span v-if="latestVersion" class="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-0 text-xs font-medium text-blue-300 ring-1 ring-inset ring-blue-500/30 leading-7">
+            <span v-if="latestVersion" class="inline-flex items-center rounded-full bg-blue-500/20 px-2 sm:px-3 py-0 text-xs font-medium text-blue-300 ring-1 ring-inset ring-blue-500/30 leading-7">
               {{ latestVersion }}
             </span>
           </h3>
 
-          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="mx-auto max-w-2xl lg:max-w-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <!-- Windows -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl animate-fade-in">
               <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
                 <svg class="h-7 w-7 flex-none text-blue-400 transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
                   <path d="M7,6h15c0.552,0,1,0.448,1,1v15c0,0.552-0.448,1-1,1H7c-0.552,0-1-0.448-1-1V7 C6,6.448,6.448,6,7,6z"></path>
@@ -137,7 +137,7 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for Windows 10 and above.</p>
                 <div class="mt-auto pt-6 flex flex-col gap-3">
-                  <a :href="exeDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                  <a :href="exeDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
                     Download EXE
                   </a>
                   <a :href="msiDownloadUrl" class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
@@ -158,7 +158,7 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the latest version for macOS 10.15 and above.</p>
                 <div class="mt-auto pt-6 flex flex-col gap-3">
-                  <a :href="dmgDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                  <a :href="dmgDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
                     Download DMG
                   </a>
                   <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
@@ -200,7 +200,7 @@
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
                 <p class="flex-auto">Download the mobile version for Android devices.</p>
                 <div class="mt-auto pt-6 flex flex-col gap-3">
-                  <a :href="apkDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
+                  <a :href="apkDownloadUrl" class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 w-full">
                     Download APK
                   </a>
                   <a class="text-sm font-medium leading-6 text-zinc-400 transition-colors duration-200 hover:text-zinc-300 focus:text-zinc-200">
@@ -214,15 +214,15 @@
       </div>
 
       <!-- System Requirements -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-300">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-300">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400">System Requirements</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400">System Requirements</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
             What you need to run BetterSEQTA+ and DesQTA
           </p>
         </div>
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none">
+          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:gap-y-16 lg:max-w-none lg:grid-cols-2">
             <!-- Browser Reqs -->
             <div class="flex flex-col">
               <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
@@ -251,15 +251,15 @@
       </div>
 
       <!-- Installation Guide -->
-      <div class="mx-auto mt-32 max-w-2xl sm:mt-40 lg:mt-48 lg:max-w-none animate-fade-in delay-400">
+      <div class="mx-auto mt-16 sm:mt-32 lg:mt-48 max-w-2xl lg:max-w-none px-4 sm:px-0 animate-fade-in delay-400">
         <div class="mx-auto max-w-2xl lg:text-center">
-          <h2 class="text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 class="text-sm sm:text-base font-semibold leading-7 text-zinc-400">Installation Guide</h2>
+          <p class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
             How to install
           </p>
         </div>
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none">
+          <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:gap-y-16 lg:max-w-none lg:grid-cols-3">
             <div class="flex flex-col">
               <dt class="text-base font-semibold leading-7 text-white">Browser Extension</dt>
               <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">

@@ -18,25 +18,25 @@
 
     <!-- Content -->
     <div class="relative isolate">
-      <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-        <div class="mx-auto max-w-2xl text-center">
-          <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl animate-slide-down">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
+        <div class="mx-auto max-w-2xl text-center px-4 sm:px-0">
+          <h1 class="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white animate-slide-down">
             BetterSEQTA Plus Minecraft Server
           </h1>
-          <p class="mt-6 text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
+          <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-100">
             Join our community in Minecraft!
           </p>
-          <div class="mt-4 text-xl font-semibold text-white animate-fade-in delay-150">
+          <div class="mt-4 text-lg sm:text-xl font-semibold text-white animate-fade-in delay-150 break-all sm:break-normal">
             Server IP: mc.betterseqta.org
           </div>
         </div>
 
-        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <div class="grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-2">
+        <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none px-4 sm:px-0">
+          <div class="grid grid-cols-1 gap-6 sm:gap-x-8 sm:gap-y-16 lg:grid-cols-2">
             <!-- Features -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-8 animate-fade-in delay-200">
-              <h2 class="text-2xl font-bold text-white mb-6">Server Features</h2>
-              <ul class="space-y-4 text-zinc-300">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 animate-fade-in delay-200">
+              <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Server Features</h2>
+              <ul class="space-y-3 sm:space-y-4 text-sm sm:text-base text-zinc-300">
                 <li class="flex items-center gap-3">
                   <svg class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -71,14 +71,14 @@
             </div>
 
             <!-- Join Now -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-8 animate-fade-in delay-300">
-              <h2 class="text-2xl font-bold text-white mb-6">Join Now</h2>
-              <p class="text-zinc-300 mb-6">
+            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 animate-fade-in delay-300">
+              <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Join Now</h2>
+              <p class="text-sm sm:text-base text-zinc-300 mb-4 sm:mb-6">
                 The server is now live! Join our Discord community to stay updated on events, announcements, and connect with other players!
               </p>
               <a
                 href="https://discord.gg/nv6YSjpEM4"
-                class="inline-flex items-center gap-x-2 rounded-md bg-zinc-400/10 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
+                class="inline-flex items-center gap-x-2 rounded-md bg-zinc-400/10 px-4 py-2.5 sm:px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 w-full sm:w-auto justify-center"
               >
                 Join Discord
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -91,16 +91,16 @@
       </div>
 
       <!-- Quick Guide Section -->
-      <div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-        <div class="mx-auto max-w-2xl text-center">
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl animate-fade-in">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
+        <div class="mx-auto max-w-2xl text-center px-4 sm:px-0">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white animate-fade-in">
             Quick Guide: Quickshop Hikari
           </h2>
-          <p class="mt-4 text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
+          <p class="mt-4 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-100">
             Learn how to use our shop system in this quick tutorial
           </p>
         </div>
-        <div class="mt-10 mx-auto max-w-3xl">
+        <div class="mt-8 sm:mt-10 mx-auto max-w-3xl px-4 sm:px-0">
           <video
             class="w-full rounded-xl shadow-2xl"
             controls
