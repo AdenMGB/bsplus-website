@@ -83,10 +83,10 @@
               </p>
               <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0">
                 <NuxtLink
-                  href="/comparison"
+                  href="/desqta"
                   class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-blue-200"
                 >
-                  Compare Features <span aria-hidden="true">→</span>
+                  Learn more <span aria-hidden="true">→</span>
                 </NuxtLink>
                 <NuxtLink
                   href="/download"

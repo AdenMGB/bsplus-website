@@ -255,6 +255,10 @@ const routes = [
     href: "/",
   },
   {
+    name: "DesQTA",
+    href: "/desqta",
+  },
+  {
     name: "Comparison",
     href: "/comparison",
   },
