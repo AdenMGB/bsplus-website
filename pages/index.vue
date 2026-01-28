@@ -211,15 +211,14 @@ const desqtaVersion = computed(() => {
 
 onMounted(async () => {
   try {
-    // Fetch BetterSEQTA+ release (assuming it's from a different repo or same)
-    // For now, using desqta repo - update if BetterSEQTA+ has separate repo
-    const response = await fetch('https://api.github.com/repos/betterseqta/desqta/releases?per_page=1');
+    // Fetch BetterSEQTA+ browser extension release
+    const response = await fetch('https://api.github.com/repos/betterseqta/betterseqta-plus/releases?per_page=1');
     const data = await response.json();
     if (data && data.length > 0) {
       latestRelease.value = data[0];
     }
   } catch (error) {
-    console.error('Error fetching latest release:', error);
+    console.error('Error fetching BetterSEQTA+ release:', error);
   }
 
   try {
