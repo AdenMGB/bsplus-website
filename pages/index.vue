@@ -13,7 +13,7 @@
                     Latest Release
                   </span>
                   <span class="inline-flex items-center space-x-2 text-xs sm:text-sm font-medium leading-6 text-zinc-200">
-                    <span v-if="latestVersion">Just shipped {{ latestVersion }}</span>
+                    <span v-if="BSPlusVersion">Just shipped {{ BSPlusVersion }}</span>
                     <span v-else>Just shipped</span>
                     <svg class="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
@@ -196,12 +196,12 @@ useHead({
   title: "Home",
 });
 
-const latestRelease = ref<any>(null);
+const BSPlusRelease = ref<any>(null);
 const desqtaRelease = ref<any>(null);
 
-const latestVersion = computed(() => {
-  if (!latestRelease.value?.tag_name) return null;
-  return latestRelease.value.tag_name;
+const BSPlusVersion = computed(() => {
+  if (!BSPlusRelease.value?.tag_name) return null;
+  return BSPlusRelease.value.tag_name.replace('betterseqtaplus@', 'v');
 });
 
 const desqtaVersion = computed(() => {
@@ -215,7 +215,7 @@ onMounted(async () => {
     const response = await fetch('https://api.github.com/repos/betterseqta/betterseqta-plus/releases?per_page=1');
     const data = await response.json();
     if (data && data.length > 0) {
-      latestRelease.value = data[0];
+      BSPlusRelease.value = data[0];
     }
   } catch (error) {
     console.error('Error fetching BetterSEQTA+ release:', error);
