@@ -13,7 +13,7 @@
                     Latest Release
                   </span>
                   <span class="inline-flex items-center space-x-2 text-xs sm:text-sm font-medium leading-6 text-zinc-200">
-                    <span v-if="latestVersion">Just shipped {{ BSPlusVersion }}</span>
+                    <span v-if="BSPlusVersion">Just shipped {{ BSPlusVersion }}</span>
                     <span v-else>Just shipped</span>
                     <svg class="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
