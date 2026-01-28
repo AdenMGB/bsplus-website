@@ -1,5 +1,4 @@
 import { getDB } from '../../utils/db';
-import { bufferVote, checkAndFlushVotes } from '../../utils/questionnaire';
 
 export default defineEventHandler(async (event) => {
   // Check Auth
@@ -67,11 +66,23 @@ export default defineEventHandler(async (event) => {
       VALUES (?, ?, ?, unixepoch())
     `).bind(questionId, user.id, optionIndex).run();
 
-    // Buffer vote for results
-    bufferVote(questionId, optionIndex);
+    // Update question_results immediately (instant write)
+    // First ensure the question_results row exists
+    await db.prepare(`
+      INSERT INTO question_results (question_id, option1_count, option2_count, option3_count, option4_count, total_votes, last_updated)
+      VALUES (?, 0, 0, 0, 0, 0, unixepoch())
+      ON CONFLICT(question_id) DO UPDATE SET last_updated = unixepoch()
+    `).bind(questionId).run();
 
-    // Check if flush needed (non-blocking)
-    checkAndFlushVotes(db, event.context);
+    // Update the specific option count and total votes
+    const optionColumn = `option${optionIndex}_count`;
+    await db.prepare(`
+      UPDATE question_results 
+      SET ${optionColumn} = ${optionColumn} + 1, 
+          total_votes = total_votes + 1,
+          last_updated = unixepoch()
+      WHERE question_id = ?
+    `).bind(questionId).run();
 
     return { success: true };
   } catch (e: any) {
