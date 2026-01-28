@@ -1,4 +1,13 @@
-export default defineEventHandler(async (event) => {
+interface UserInfo {
+  id: string;
+  username: string;
+  displayName?: string;
+  pfpUrl?: string;
+  is_admin?: number;
+  [key: string]: any;
+}
+
+export default defineEventHandler(async (event): Promise<UserInfo> => {
   const token = getCookie(event, 'auth_token');
 
   if (!token) {
@@ -9,7 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const user = await $fetch('https://accounts.betterseqta.org/api/oauth/userinfo', {
+    const user = await $fetch<UserInfo>('https://accounts.betterseqta.org/api/oauth/userinfo', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
