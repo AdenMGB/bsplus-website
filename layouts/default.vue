@@ -5,6 +5,7 @@
       <slot />
     </main>
     <Footer />
+    <DailyQuestion />
 
     <!-- shadows -->
     <div class="fixed w-screen h-screen -z-10">
@@ -97,6 +98,8 @@
 </template>
 
 <script setup lang="ts">
+import DailyQuestion from '~/components/DailyQuestion.vue';
+
 const siteDesc = "A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance";
 
 useSeoMeta({

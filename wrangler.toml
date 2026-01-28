@@ -39,3 +39,7 @@ database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
 [[env.dev.r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bsplus-images"
+
+# Cron Triggers
+[triggers]
+crons = ["0 2 * * *"]  # Daily at 2 AM UTC
