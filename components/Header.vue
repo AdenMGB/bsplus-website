@@ -274,6 +274,10 @@ const routes = [
     name: "News",
     href: "/news",
   },
+  {
+    name: "Changelogs",
+    href: "/changelogs",
+  },
 ];
 
 const quickstartLink = "https://github.com/BetterSEQTA/DesQTA/tree/develop";

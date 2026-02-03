@@ -30,6 +30,7 @@
     "@tiptap/starter-kit": "^3.11.1",
     "@tiptap/vue-3": "^3.11.1",
     "echarts": "^6.0.0",
+    "markdown-it": "^14.1.0",
     "nuxt": "^3.16.2",
     "vite": "6.3.2",
     "vue": "latest",
