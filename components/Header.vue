@@ -108,7 +108,7 @@
             >
               Logout
             </button>
-            <NuxtLink v-if="user.is_admin === 1" to="/admin" class="text-sm font-semibold text-green-400 hover:text-green-300 transition-colors">
+            <NuxtLink v-if="user.admin_level && user.admin_level >= 1" to="/admin" class="text-sm font-semibold text-green-400 hover:text-green-300 transition-colors">
               Admin
             </NuxtLink>
           </div>
@@ -190,7 +190,7 @@
                   <span>{{ user.displayName || user.username }}</span>
                 </div>
                 <NuxtLink 
-                  v-if="user.is_admin === 1" 
+                  v-if="user.admin_level && user.admin_level >= 1" 
                   to="/admin" 
                   class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-green-400 hover:text-green-300 hover:bg-zinc-800"
                 >

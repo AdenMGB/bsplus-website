@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     await fetchUser();
   }
 
-  if (!user.value || user.value.is_admin !== 1) {
+  if (!user.value || !user.value.admin_level || user.value.admin_level < 1) {
     return navigateTo('/');
   }
 });
