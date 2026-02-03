@@ -6,7 +6,7 @@ API endpoints for managing daily voting questions.
 All endpoints are prefixed with `/api/questionnaire`
 
 ## Authentication
-Most endpoints require authentication via OAuth cookie (`auth_token`). Admin endpoints require `is_admin === 1`.
+Most endpoints require authentication via OAuth cookie (`auth_token`). Admin endpoints require `admin_level >= 1`.
 
 ## Endpoints
 

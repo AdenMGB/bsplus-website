@@ -84,7 +84,7 @@ Authorization: Bearer <ACCESS_TOKEN>
   "username": "aden",
   "displayName": "Aden",
   "pfpUrl": "...",
-  "is_admin": 1
+  "admin_level": 3
 }
 ```
 

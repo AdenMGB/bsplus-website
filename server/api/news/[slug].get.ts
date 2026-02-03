@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
       }
     }).catch(() => null);
 
-    if (user && user.is_admin === 1) {
+    if (user && user.admin_level && user.admin_level >= 1) {
       return item;
     }
 

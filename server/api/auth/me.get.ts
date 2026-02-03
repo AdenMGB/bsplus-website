@@ -3,7 +3,7 @@ interface UserInfo {
   username: string;
   displayName?: string;
   pfpUrl?: string;
-  is_admin?: number;
+  admin_level?: number;
   [key: string]: any;
 }
 
