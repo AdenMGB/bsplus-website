@@ -83,12 +83,6 @@
               </p>
               <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0">
                 <NuxtLink
-                  href="/desqta"
-                  class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-blue-200"
-                >
-                  Learn more <span aria-hidden="true">→</span>
-                </NuxtLink>
-                <NuxtLink
                   href="/download"
                   class="rounded-md bg-blue-600 px-4 py-2.5 sm:px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200"
                 >
@@ -96,6 +90,12 @@
                   <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
+                </NuxtLink>
+                <NuxtLink
+                  href="/desqta"
+                  class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-blue-200"
+                >
+                  Learn more <span aria-hidden="true">→</span>
                 </NuxtLink>
               </div>
             </div>
