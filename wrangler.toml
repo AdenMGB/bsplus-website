@@ -42,7 +42,4 @@ bucket_name = "bsplus-images"
 
 # Cron Triggers
 [triggers]
-crons = [
-  "0 2 * * *",  # Daily at 2 AM UTC (questionnaire cleanup)
-  "0 * * * *"   # Every hour (theme stats recalculation)
-]
+crons = ["0 2 * * *"]  # Daily at 2 AM UTC (questionnaire cleanup + theme stats recalculation)

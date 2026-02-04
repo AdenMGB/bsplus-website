@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
   const bucket = getBucket(event);
 
   try {
+    // ===== QUESTIONNAIRE CLEANUP =====
     // Calculate 30 days ago timestamp
     const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
 
@@ -60,14 +61,59 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // ===== THEME STATS RECALCULATION =====
+    // Get all approved themes
+    const themes = await db.prepare(
+      'SELECT id FROM themes WHERE status = ?'
+    ).bind('approved').all() as { results: { id: string }[] };
+
+    let themesUpdated = 0;
+    let themesErrors = 0;
+
+    for (const theme of themes.results) {
+      try {
+        // Recalculate favorite count
+        const favoriteCountResult = await db.prepare(
+          'SELECT COUNT(*) as count FROM user_favorites WHERE theme_id = ?'
+        ).bind(theme.id).first() as { count: number } | null;
+        const favoriteCount = favoriteCountResult?.count || 0;
+
+        // Recalculate rating average and count
+        const ratingResult = await db.prepare(
+          'SELECT AVG(rating) as avg, COUNT(*) as count FROM theme_ratings WHERE theme_id = ?'
+        ).bind(theme.id).first() as { avg: number | null; count: number } | null;
+        const ratingAverage = ratingResult?.avg || 0;
+        const ratingCount = ratingResult?.count || 0;
+
+        // Update theme with recalculated values
+        await db.prepare(
+          'UPDATE themes SET favorite_count = ?, rating_average = ?, rating_count = ? WHERE id = ?'
+        ).bind(favoriteCount, ratingAverage, ratingCount, theme.id).run();
+
+        themesUpdated++;
+      } catch (e) {
+        console.error(`[Theme Stats] Error updating theme ${theme.id}:`, e);
+        themesErrors++;
+      }
+    }
+
+    console.log(`[Theme Stats] Updated ${themesUpdated} themes, ${themesErrors} errors`);
+
     return {
       success: true,
-      deleted: deletedCount,
-      errors: errorCount,
-      total: questions.results.length
+      questionnaire: {
+        deleted: deletedCount,
+        errors: errorCount,
+        total: questions.results.length
+      },
+      themes: {
+        updated: themesUpdated,
+        errors: themesErrors,
+        total: themes.results.length
+      }
     };
   } catch (e: any) {
-    console.error('[Questionnaire Cleanup] Failed to cleanup images:', e);
-    throw createError({ statusCode: 500, message: 'Failed to cleanup images', cause: e });
+    console.error('[Daily Cleanup] Failed:', e);
+    throw createError({ statusCode: 500, message: 'Failed to run daily cleanup', cause: e });
   }
 });
