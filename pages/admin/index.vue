@@ -11,6 +11,15 @@
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-16">
         <!-- Stats Cards -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">Themes</dt>
+          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.themes?.total || 0 }}</dd>
+          <dd class="mt-1 text-sm text-zinc-500">{{ stats.themes?.pending || 0 }} pending</dd>
+          <NuxtLink to="/admin/themes" class="mt-4 inline-flex items-center gap-2 rounded-md bg-purple-600/10 hover:bg-purple-600/20 border border-purple-600/20 hover:border-purple-600/40 px-3 py-1.5 text-xs font-medium text-purple-400 transition-all hover:scale-105">
+            Manage Themes
+          </NuxtLink>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
           <dt class="text-sm font-medium leading-6 text-zinc-400">News Posts</dt>
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.news?.total || 0 }}</dd>
           <dd class="mt-1 text-sm text-zinc-500">{{ stats.news?.published || 0 }} published</dd>
@@ -144,6 +153,73 @@
         </div>
       </div>
 
+      <!-- Themes Section -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-white">Theme Marketplace</h3>
+          <div class="flex gap-2">
+            <NuxtLink to="/admin/themes/upload" class="flex items-center gap-2 rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 transition-all hover:scale-105">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Upload Theme
+            </NuxtLink>
+            <NuxtLink to="/admin/collections" class="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-all hover:scale-105">
+              Collections
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- Recent Themes Table -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden mb-8">
+          <div class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center">
+            <h3 class="text-base font-semibold leading-7 text-white">Recent Themes</h3>
+            <NuxtLink to="/admin/themes" class="text-sm font-medium text-purple-500 hover:text-purple-400">View all</NuxtLink>
+          </div>
+          <div class="flow-root">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-sm whitespace-nowrap">
+                <thead class="bg-zinc-900/50 text-white">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 font-semibold">Theme</th>
+                    <th scope="col" class="px-6 py-3 font-semibold">Author</th>
+                    <th scope="col" class="px-6 py-3 font-semibold">Status</th>
+                    <th scope="col" class="px-6 py-3 font-semibold">Downloads</th>
+                    <th scope="col" class="px-6 py-3 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                  <tr v-for="theme in recentThemes" :key="theme.id" class="hover:bg-zinc-800/50 transition-colors">
+                    <td class="px-6 py-4">
+                      <div class="font-medium text-white">{{ theme.name }}</div>
+                      <div class="text-xs text-zinc-500 mt-1">{{ theme.version }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-zinc-400">{{ theme.author }}</td>
+                    <td class="px-6 py-4">
+                      <span :class="[
+                        theme.status === 'approved' ? 'bg-green-500/10 text-green-400 ring-green-500/20' :
+                        theme.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/20' :
+                        'bg-red-500/10 text-red-400 ring-red-500/20',
+                        'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset'
+                      ]">
+                        {{ theme.status }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-zinc-400">{{ theme.download_count || 0 }}</td>
+                    <td class="px-6 py-4 text-right">
+                      <NuxtLink :to="`/admin/themes/${theme.id}`" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</NuxtLink>
+                    </td>
+                  </tr>
+                  <tr v-if="!recentThemes || recentThemes.length === 0">
+                    <td colspan="5" class="px-6 py-8 text-center text-zinc-500 italic">No themes found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- News Section -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-6">
@@ -224,6 +300,7 @@ definePageMeta({
 const { data: posts } = await useFetch<any[]>('/api/news?admin=true');
 const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
 const { data: questions, refresh: refreshQuestions } = await useFetch<any[]>('/api/questionnaire?admin=true');
+const { data: themesData } = await useFetch<any>('/api/admin/themes');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -244,8 +321,19 @@ const recentQuestions = computed(() => {
   return result.slice(0, 2);
 });
 
+const recentThemes = computed(() => {
+  const themes = themesData.value?.data?.themes || [];
+  return themes.slice(0, 5);
+});
+
 const stats = computed(() => {
+  const themes = themesData.value?.data?.themes || [];
   return {
+    themes: {
+      total: themes.length,
+      pending: themes.filter((t: any) => t.status === 'pending').length,
+      approved: themes.filter((t: any) => t.status === 'approved').length
+    },
     news: {
       total: posts.value?.length || 0,
       published: posts.value?.filter(p => p.published).length || 0

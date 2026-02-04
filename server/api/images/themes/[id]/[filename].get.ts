@@ -1,11 +1,15 @@
-import { getBucket } from '../../utils/r2';
+import { getBucket } from '../../../../utils/r2';
 
 export default defineEventHandler(async (event) => {
-  const key = event.path.split('/').pop();
+  const id = getRouterParam(event, 'id');
+  const filename = getRouterParam(event, 'filename');
   
-  if (!key) {
-    throw createError({ statusCode: 400, message: 'Invalid image key' });
+  if (!id || !filename) {
+    throw createError({ statusCode: 400, message: 'Invalid image path' });
   }
+
+  // Construct the R2 key: themes/{id}/{filename}
+  const key = `themes/${id}/${filename}`;
 
   const bucket = getBucket(event);
 
@@ -21,4 +25,3 @@ export default defineEventHandler(async (event) => {
 
   return sendStream(event, object.body);
 });
-
