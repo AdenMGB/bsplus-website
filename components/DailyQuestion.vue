@@ -1,69 +1,70 @@
 <template>
-  <div v-if="question" class="fixed bottom-4 right-4 z-50 max-w-md w-full sm:w-96">
+  <div v-if="question && !isDismissed" class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 w-[calc(100%-1rem)] sm:w-auto sm:min-w-[400px] sm:max-w-md">
     <div class="bg-zinc-900/95 border border-zinc-800 rounded-lg backdrop-blur-sm shadow-xl transition-all duration-200">
       <!-- Minimized State -->
       <div v-if="isMinimized" class="p-3 cursor-pointer" @click="isMinimized = false">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-medium text-white truncate">{{ question.question }}</span>
-          <button class="text-zinc-400 hover:text-white transition-colors ml-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-white truncate flex-1">{{ question.question }}</span>
+          <button @click.stop="dismissPoll" class="text-zinc-400 hover:text-white transition-colors flex-shrink-0 ml-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
           </button>
         </div>
       </div>
       
       <!-- Expanded State -->
-      <div v-else class="p-4 md:p-6">
-        <div class="flex items-start justify-between mb-3">
-          <h3 class="text-lg font-semibold text-white flex-1 pr-2">{{ question.question }}</h3>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <div class="text-xs text-zinc-400">
-              <span>Expires: {{ formatExpiration }}</span>
-            </div>
-            <button @click="isMinimized = true" class="text-zinc-400 hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                <path fill-rule="evenodd" d="M5.23 13.79a.75.75 0 011.06-.02L10 8.832l3.71 4.938a.75.75 0 11-1.08 1.04l-4.25-4.5a.75.75 0 010-1.08l4.25-4.5a.75.75 0 111.08 1.04L10 8.832l-3.71-4.938a.75.75 0 01-1.06-1.04l4.25 4.5a.75.75 0 010 1.08l-4.25 4.5z" clip-rule="evenodd" />
-              </svg>
-            </button>
+      <div v-else class="p-4 sm:p-5 md:p-6">
+        <div class="flex items-start justify-between gap-3 mb-3 sm:mb-4">
+          <h3 class="text-base sm:text-lg font-semibold text-white flex-1 pr-2 break-words">{{ question.question }}</h3>
+          <button @click="dismissPoll" class="text-zinc-400 hover:text-white transition-colors p-1 -mt-1 -mr-1 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="mb-3 sm:mb-4">
+          <div class="text-xs sm:text-sm text-zinc-400">
+            <span>Expires: {{ formatExpiration }}</span>
           </div>
         </div>
         
         <div class="flex flex-col gap-4">
           <!-- Cover Image -->
-          <div v-if="question.cover_image" class="w-full">
+          <div v-if="question.cover_image" class="w-full -mx-4 sm:mx-0">
             <img 
               :src="question.cover_image" 
               :alt="question.question"
-              class="w-full h-32 object-cover rounded-lg"
+              class="w-full h-32 sm:h-40 object-cover rounded-lg sm:rounded-lg"
             />
           </div>
             
           <!-- Options -->
-          <div v-if="!hasVoted && !showResults" class="space-y-2">
+          <div v-if="!hasVoted && !showResults" class="space-y-2 sm:space-y-3">
             <button
               v-for="(option, index) in question.options"
               :key="index"
               @click="handleVote(index + 1)"
               :disabled="voting"
-              class="w-full text-left px-4 py-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700 hover:border-accent-ring text-white transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full text-left px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700 hover:border-accent-ring text-white text-sm sm:text-base transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed break-words"
             >
               {{ option }}
             </button>
           </div>
           
           <!-- Results -->
-          <div v-if="hasVoted || showResults" class="space-y-2">
+          <div v-if="hasVoted || showResults" class="space-y-3 sm:space-y-4">
             <div
               v-for="(result, index) in results"
               :key="index"
               class="relative"
             >
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-sm text-zinc-300">{{ result.text }}</span>
-                <span class="text-sm font-medium text-white">{{ result.percentage }}% ({{ result.count }})</span>
+              <div class="flex items-center justify-between mb-1.5 sm:mb-2 gap-2">
+                <span class="text-sm sm:text-base text-zinc-300 break-words flex-1">{{ result.text }}</span>
+                <span class="text-sm sm:text-base font-medium text-white flex-shrink-0">{{ Math.round(result.percentage) }}% ({{ result.count }})</span>
               </div>
-              <div class="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+              <div class="w-full bg-zinc-800 rounded-full h-2 sm:h-2.5 overflow-hidden">
                 <div
                   class="h-full bg-indigo-500 transition-all duration-500"
                   :style="{ width: `${Math.max(0, Math.min(100, result.percentage))}%` }"
@@ -183,8 +184,13 @@ const results = ref<Result[]>([]);
 const loadingResults = ref(false);
 const isMinimized = ref(false);
 const showSignInModal = ref(false);
+const isDismissed = ref(false);
 // Optimistic vote counts (client-side only, before server sync)
 const optimisticVotes = ref<Map<number, number>>(new Map());
+
+function dismissPoll() {
+  isDismissed.value = true;
+}
 
 const formatExpiration = computed(() => {
   if (!question.value) return '';
@@ -341,6 +347,7 @@ watch(() => question.value, (newQuestion) => {
     showResults.value = false;
     results.value = [];
     isMinimized.value = false;
+    isDismissed.value = false;
     checkVoteStatus();
   }
 }, { immediate: true });
