@@ -195,11 +195,15 @@ watch(collection, (col) => {
   }
 }, { immediate: true });
 
-const { data: themesData } = await useFetch<any>('/api/admin/themes', {
-  query: { status: 'approved' }
+const { data: themesData } = await useFetch<any>('/api/themes', {
+  query: { limit: '1000' } // Get all themes
 });
 
-const allThemes = computed(() => themesData.value?.data?.themes || []);
+const allThemes = computed(() => {
+  const themes = themesData.value?.data?.themes || [];
+  // Filter to only approved themes (public API already does this, but extra safety)
+  return themes.filter((t: any) => t.status === 'approved');
+});
 
 const filteredThemes = computed(() => {
   let themes = allThemes.value.filter((t: any) => !isThemeSelected(t.id));
