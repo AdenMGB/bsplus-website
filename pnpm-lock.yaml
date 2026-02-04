@@ -50,6 +50,9 @@ importers:
       '@tiptap/vue-3':
         specifier: ^3.11.1
         version: 3.11.1(@floating-ui/dom@1.7.4)(@tiptap/core@3.11.1(@tiptap/pm@3.11.1))(@tiptap/pm@3.11.1)(vue@3.5.25(typescript@5.9.3))
+      '@zip.js/zip.js':
+        specifier: ^2.8.16
+        version: 2.8.16
       echarts:
         specifier: ^6.0.0
         version: 6.0.0
@@ -1965,6 +1968,10 @@ packages:
 
   '@zeit/schemas@2.36.0':
     resolution: {integrity: sha512-7kjMwcChYEzMKjeex9ZFXkt1AyNov9R5HZtjBKVsmVpw7pa7ZtlCGvCBC2vnnXctaYN+aRI61HjIqeetZW5ROg==}
+
+  '@zip.js/zip.js@2.8.16':
+    resolution: {integrity: sha512-kCjaXh50GCf9afcof6ekjXPKR//rBVIxNHJLSUaM3VAET2F0+hymgrK1GpInRIIFUpt+wsnUfgx2+bbrmc+7Tw==}
+    engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
 
   abbrev@3.0.1:
     resolution: {integrity: sha512-AO2ac6pjRB3SJmGJo+v5/aK6Omggp6fsLrs6wN9bd35ulu4cCwaAU9+7ZhXjeqHVkaHThLuzH0nZr0YpCDhygg==}
@@ -7508,6 +7515,8 @@ snapshots:
       vue: 3.5.25(typescript@5.9.3)
 
   '@zeit/schemas@2.36.0': {}
+
+  '@zip.js/zip.js@2.8.16': {}
 
   abbrev@3.0.1: {}
 
