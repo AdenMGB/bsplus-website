@@ -454,23 +454,20 @@ const route = useRoute();
 const router = useRouter();
 const themeId = route.params.id as string;
 
-// Fetch theme data - we'll get all themes and filter, or use public endpoint
-const { data: themesData, refresh } = await useFetch<any>('/api/admin/themes');
+// Fetch theme data by ID
+const { data: themeData, refresh } = await useFetch<any>(`/api/admin/themes/${themeId}`);
 
 const theme = computed(() => {
-  if (!themesData.value?.data?.themes) return null;
-  const found = themesData.value.data.themes.find((t: any) => t.id === themeId);
-  if (found) {
-    // Ensure preview structure is correct
-    return {
-      ...found,
-      preview: {
-        thumbnail: found.preview_thumbnail_url || found.preview?.thumbnail,
-        screenshots: found.preview_screenshots ? (typeof found.preview_screenshots === 'string' ? JSON.parse(found.preview_screenshots) : found.preview_screenshots) : (found.preview?.screenshots || [])
-      }
-    };
-  }
-  return null;
+  if (!themeData.value?.data?.theme) return null;
+  const found = themeData.value.data.theme;
+  // Ensure preview structure is correct
+  return {
+    ...found,
+    preview: {
+      thumbnail: found.preview_thumbnail_url || found.preview?.thumbnail,
+      screenshots: found.preview_screenshots ? (typeof found.preview_screenshots === 'string' ? JSON.parse(found.preview_screenshots) : found.preview_screenshots) : (found.preview?.screenshots || [])
+    }
+  };
 });
 
 const showApproveModal = ref(false);
