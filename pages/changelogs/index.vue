@@ -124,8 +124,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { useMarkdown } from '~/composables/useMarkdown';
 
-useHead({
+usePageSeo({
   title: 'Changelogs - BetterSEQTA+ & DesQTA',
+  description: 'Release notes and changelogs for BetterSEQTA+ browser extension and DesQTA desktop app. See what\'s new in each version.',
 });
 
 const { render } = useMarkdown();

@@ -101,10 +101,15 @@
 import DailyQuestion from '~/components/DailyQuestion.vue';
 
 const siteDesc = "A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance";
+const config = useRuntimeConfig();
+const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
 useSeoMeta({
   description: siteDesc,
   ogDescription: siteDesc,
+  ogSiteName: 'BetterSEQTA Plus',
+  ogImage: `${siteUrl}/favicon-96x96.png`,
+  twitterCard: 'summary_large_image',
 });
 useHead({
   htmlAttrs: {

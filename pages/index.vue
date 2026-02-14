@@ -192,9 +192,16 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 
-useHead({
+usePageSeo({
   title: "Home",
+  description: "BetterSEQTA+ and DesQTA enhance SEQTA Learn with beautiful themes, live wallpapers, and a full desktop experience. Download the browser extension or desktop app for Windows, Mac, Linux, and Android.",
+  image: "/favicon-96x96.png",
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.webSite('BetterSEQTA Plus', 'BetterSEQTA+ and DesQTA enhance SEQTA Learn with themes, live wallpapers, and a full desktop experience.'),
+]);
 
 const BSPlusRelease = ref<any>(null);
 const desqtaRelease = ref<any>(null);

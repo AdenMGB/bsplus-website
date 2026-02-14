@@ -1,6 +1,10 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  useHead({
+    meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+  });
+
   const { user, fetchUser } = useAuth();
-  
+
   if (!user.value) {
     await fetchUser();
   }

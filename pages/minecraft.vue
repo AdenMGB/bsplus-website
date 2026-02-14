@@ -116,8 +116,9 @@
 </template>
 
 <script setup lang="ts">
-useHead({
+usePageSeo({
   title: "Minecraft Server",
+  description: "Join the BetterSEQTA+ Minecraft server. Community gaming for SEQTA users.",
 });
 </script>
 

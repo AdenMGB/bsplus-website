@@ -16,6 +16,9 @@ export default defineNuxtConfig({
     oauthClientId: process.env.NUXT_OAUTH_CLIENT_ID ?? '',
     oauthClientSecret: process.env.NUXT_OAUTH_CLIENT_SECRET ?? '',
     oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
+    public: {
+      siteUrl: 'https://betterseqta.org',
+    },
   },
   app: {
     baseURL: '/',
@@ -24,7 +27,8 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A powerful browser extension that enhances your SEQTA Learn experience' }
+        { name: 'description', content: 'BetterSEQTA+ and DesQTA enhance SEQTA Learn with themes, live wallpapers, and a full desktop experience. Download for Windows, Mac, Linux, and Android.' },
+        { name: 'theme-color', content: '#18181b' }
       ]
     }
   },
@@ -51,6 +55,20 @@ export default defineNuxtConfig({
 
   ogImage: {
     zeroRuntime: true,
+  },
+
+  schemaOrg: {
+    identity: {
+      type: 'Organization',
+      name: 'BetterSEQTA',
+      url: 'https://betterseqta.org',
+      logo: 'https://betterseqta.org/favicon-96x96.png',
+    },
+  },
+
+  robots: {
+    disallow: ['/admin', '/api'],
+    allow: ['/'],
   },
 
   fonts: {

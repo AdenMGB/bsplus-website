@@ -303,9 +303,15 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 
-useHead({
+usePageSeo({
   title: "Download",
+  description: "Download BetterSEQTA+ and DesQTA for Windows, Mac, Linux, and Android. Get the SEQTA Learn browser extension or full desktop application.",
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.webPage('Download BetterSEQTA+ and DesQTA', 'Download BetterSEQTA+ and DesQTA for Windows, Mac, Linux, and Android.'),
+]);
 
 const latestRelease = ref<any>(null);
 const apkDownloadUrl = ref<string>('');
