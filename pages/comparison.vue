@@ -320,7 +320,8 @@ const Semimark = defineComponent({
   },
 })
 
-useHead({
+usePageSeo({
   title: "Comparison",
+  description: "Compare BetterSEQTA+ browser extension and DesQTA desktop app. See features, platforms, and choose the best SEQTA Learn experience for you.",
 });
 </script>

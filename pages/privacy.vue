@@ -109,11 +109,14 @@
 </template>
 
 <script setup lang="ts">
-useHead({
+usePageSeo({
   title: "Privacy Policy",
-  meta: [
-    { name: "description", content: "Privacy Policy for BetterSEQTA+ - Learn how we handle your data." }
-  ]
+  description: "Privacy Policy for BetterSEQTA+ and DesQTA. Learn how we handle your data and protect your privacy.",
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.webPage('Privacy Policy', 'Privacy Policy for BetterSEQTA+ and DesQTA. Learn how we handle your data and protect your privacy.'),
+]);
 </script>
 

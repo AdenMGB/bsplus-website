@@ -186,8 +186,40 @@ function formatDate(timestamp: number) {
   });
 }
 
-useHead({
-  title: post.value?.title || 'News Post',
+function stripHtml(html: string, maxLength = 155): string {
+  const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  return text.length > maxLength ? text.slice(0, maxLength - 3) + '...' : text;
+}
+
+const p = post.value!;
+const description = p.content ? stripHtml(p.content) : `${p.title} - News from BetterSEQTA+`;
+const config = useRuntimeConfig();
+const baseUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
+
+usePageSeo({
+  title: p.title,
+  description,
+  image: (p as any).cover_image || '/favicon-96x96.png',
+  canonical: `${baseUrl}/news/${route.params.slug}`,
 });
+
+useSeoMeta({
+  articlePublishedTime: new Date(p.created_at * 1000).toISOString(),
+  articleAuthor: (p as any).author_name,
+  articleSection: 'News',
+});
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.article({
+    headline: p.title,
+    description,
+    image: (p as any).cover_image,
+    datePublished: p.created_at,
+    dateModified: (p as any).updated_at ?? p.created_at,
+    author: (p as any).author_name ? [{ name: (p as any).author_name }] : undefined,
+    url: `${baseUrl}/news/${route.params.slug}`,
+  }),
+]);
 </script>
 

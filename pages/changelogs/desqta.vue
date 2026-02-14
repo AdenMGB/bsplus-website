@@ -105,8 +105,9 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { useMarkdown } from '~/composables/useMarkdown';
 
-useHead({
+usePageSeo({
   title: 'DesQTA Changelog',
+  description: 'Complete release history and updates for DesQTA desktop application. See new features, bug fixes, and improvements.',
 });
 
 const { render } = useMarkdown();

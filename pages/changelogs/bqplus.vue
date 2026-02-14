@@ -105,8 +105,9 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { ChevronUpIcon } from '@heroicons/vue/24/outline';
 import { useMarkdown } from '~/composables/useMarkdown';
 
-useHead({
+usePageSeo({
   title: 'BetterSEQTA+ Changelog',
+  description: 'Complete release history and updates for BetterSEQTA+ browser extension. See new features, themes, and SEQTA Learn enhancements.',
 });
 
 const { render } = useMarkdown();

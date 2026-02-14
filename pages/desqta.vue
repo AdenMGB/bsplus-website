@@ -332,15 +332,20 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 
-useHead({
+usePageSeo({
   title: "DesQTA - The Desktop Experience",
-  meta: [
-    {
-      name: 'description',
-      content: 'DesQTA is a powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features, offline support, and optimized performance.'
-    }
-  ]
+  description: "DesQTA is a powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features, offline support, and optimized performance.",
+  image: "/favicon-96x96.png",
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.softwareApplication({
+    name: 'DesQTA',
+    description: 'A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features, offline support, and optimized performance.',
+    url: 'https://betterseqta.org/desqta',
+  }),
+]);
 
 const desqtaRelease = ref<any>(null);
 

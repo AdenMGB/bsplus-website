@@ -10,7 +10,7 @@
         <article v-for="post in posts" :key="post.id" class="flex flex-col items-start justify-between bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-all hover:scale-[1.02] duration-300 overflow-hidden relative group min-h-[350px] sm:h-[400px]">
           <!-- Cover Image Background -->
           <div v-if="post.cover_image" class="absolute inset-0 z-0">
-             <img :src="post.cover_image" alt="" class="w-full h-full object-cover opacity-50 transition-transform duration-700 group-hover:scale-110" />
+             <img :src="post.cover_image" :alt="post.title" class="w-full h-full object-cover opacity-50 transition-transform duration-700 group-hover:scale-110" />
              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-900/90 to-transparent"></div>
           </div>
 
@@ -65,8 +65,9 @@ function formatDate(timestamp: number) {
   });
 }
 
-useHead({
+usePageSeo({
   title: "News",
+  description: "Latest news and updates from the BetterSEQTA+ team. Stay informed about new features, releases, and SEQTA Learn enhancements.",
 });
 </script>
 
