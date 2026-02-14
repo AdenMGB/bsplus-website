@@ -179,10 +179,10 @@ const categoryFilter = ref('');
 const currentPage = ref(1);
 
 const { data: themesData, refresh } = await useFetch<any>('/api/admin/themes', {
-  query: {
-    page: currentPage,
+  query: computed(() => ({
+    page: currentPage.value,
     limit: 20
-  }
+  }))
 });
 
 const themes = computed(() => themesData.value?.data?.themes || []);
@@ -221,6 +221,7 @@ const filteredThemes = computed(() => {
 async function loadPage(page: number) {
   if (page < 1 || page > pagination.value.total_pages) return;
   currentPage.value = page;
+  // Explicitly refresh with query params
   await refresh();
 }
 
