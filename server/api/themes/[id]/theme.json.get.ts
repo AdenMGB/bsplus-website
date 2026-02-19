@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await object.arrayBuffer();
-  setHeader(event, 'Content-Type', 'application/json');
+  const json = new TextDecoder().decode(body);
   setHeader(event, 'Cache-Control', 'public, max-age=3600');
-  return body;
+  return send(event, json, 'application/json');
 });
