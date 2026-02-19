@@ -11,6 +11,7 @@ interface ThemeQuery {
   featured?: string;
   min_rating?: string;
   compatible_version?: string;
+  type?: string; // 'betterseqta' | 'desqta' | omit for all
 }
 
 export default defineEventHandler(async (event) => {
@@ -29,10 +30,15 @@ export default defineEventHandler(async (event) => {
   const featured = query.featured === 'true';
   const minRating = query.min_rating ? parseFloat(query.min_rating) : undefined;
   const compatibleVersion = query.compatible_version;
+  const themeType = query.type; // 'betterseqta' | 'desqta'
 
   // Build WHERE clause
   const conditions: string[] = ["status = 'approved'"];
   const params: any[] = [];
+  if (themeType === 'betterseqta' || themeType === 'desqta') {
+    conditions.push('theme_type = ?');
+    params.push(themeType);
+  }
 
   if (category) {
     conditions.push('category = ?');
@@ -129,9 +135,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Format themes
-  const themes = themesResult.results.map((theme: any) => {
-    const userRating = userRatings.get(theme.id);
-    return {
+  const themes = themesResult.results.map((theme: Record<string, unknown>) => {
+    const userRating = userRatings.get(theme.id as string);
+    const base = {
       id: theme.id,
       name: theme.name,
       slug: theme.slug,
@@ -140,7 +146,7 @@ export default defineEventHandler(async (event) => {
       author: theme.author,
       license: theme.license,
       category: theme.category,
-      tags: theme.tags ? JSON.parse(theme.tags) : [],
+      tags: theme.tags ? JSON.parse(theme.tags as string) : [],
       status: theme.status,
       featured: Boolean(theme.featured),
       download_count: theme.download_count,
@@ -153,15 +159,25 @@ export default defineEventHandler(async (event) => {
       },
       preview: {
         thumbnail: theme.preview_thumbnail_url,
-        screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots) : []
+        screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots as string) : []
       },
       created_at: theme.created_at,
       updated_at: theme.updated_at,
       published_at: theme.published_at,
       file_size: theme.file_size,
-      is_favorited: favoriteThemeIds.has(theme.id),
+      is_favorited: favoriteThemeIds.has(theme.id as string),
       user_rating: userRating || null
     };
+    if (theme.theme_type === 'betterseqta') {
+      return {
+        ...base,
+        theme_type: 'betterseqta',
+        coverImage: theme.cover_image_url,
+        marqueeImage: theme.marquee_image_url,
+        theme_json_url: theme.theme_json_url
+      };
+    }
+    return { ...base, theme_type: theme.theme_type || 'desqta' };
   });
 
   return {

@@ -34,6 +34,14 @@
           <option value="rejected">Rejected</option>
         </select>
         <select
+          v-model="typeFilter"
+          class="rounded-md bg-zinc-900/50 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+        >
+          <option value="">All Types</option>
+          <option value="desqta">DesQTA</option>
+          <option value="betterseqta">BetterSEQTA</option>
+        </select>
+        <select
           v-model="categoryFilter"
           class="rounded-md bg-zinc-900/50 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
         >
@@ -95,6 +103,14 @@
                     </span>
                     <span v-if="theme.featured" class="ml-2 inline-flex items-center rounded-md bg-blue-500/10 text-blue-400 ring-blue-500/20 px-2 py-1 text-xs font-medium ring-1 ring-inset">
                       Featured
+                    </span>
+                    <span
+                      :class="[
+                        theme.theme_type === 'betterseqta' ? 'bg-purple-500/10 text-purple-400 ring-purple-500/20' : 'bg-cyan-500/10 text-cyan-400 ring-cyan-500/20',
+                        'ml-2 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset'
+                      ]"
+                    >
+                      {{ theme.theme_type === 'betterseqta' ? 'BetterSEQTA' : 'DesQTA' }}
                     </span>
                   </td>
                   <td class="px-6 py-4 text-zinc-400">{{ theme.download_count || 0 }}</td>
@@ -176,12 +192,14 @@ definePageMeta({
 const searchQuery = ref('');
 const statusFilter = ref('');
 const categoryFilter = ref('');
+const typeFilter = ref('');
 const currentPage = ref(1);
 
 const { data: themesData, refresh } = await useFetch<any>('/api/admin/themes', {
   query: computed(() => ({
     page: currentPage.value,
-    limit: 20
+    limit: 20,
+    type: typeFilter.value || undefined
   }))
 });
 
@@ -213,6 +231,10 @@ const filteredThemes = computed(() => {
 
   if (categoryFilter.value) {
     result = result.filter((t: any) => t.category === categoryFilter.value);
+  }
+
+  if (typeFilter.value) {
+    result = result.filter((t: any) => t.theme_type === typeFilter.value);
   }
 
   return result;

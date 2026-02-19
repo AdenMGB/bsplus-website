@@ -8,7 +8,11 @@ interface UserInfo {
 }
 
 export default defineEventHandler(async (event): Promise<UserInfo> => {
-  const token = getCookie(event, 'auth_token');
+  const authHeader = getHeader(event, 'authorization');
+  const bearerToken = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : null;
+  const token = bearerToken || getCookie(event, 'auth_token');
 
   if (!token) {
     throw createError({

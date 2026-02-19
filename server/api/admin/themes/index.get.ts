@@ -6,6 +6,7 @@ interface AdminThemeQuery {
   limit?: string;
   status?: string;
   search?: string;
+  type?: string; // 'betterseqta' | 'desqta' | omit for all
 }
 
 export default defineEventHandler(async (event) => {
@@ -18,8 +19,13 @@ export default defineEventHandler(async (event) => {
   const offset = (page - 1) * limit;
   const status = query.status;
   const search = query.search;
+  const type = query.type;
 
   const conditions: string[] = [];
+  if (type === 'betterseqta' || type === 'desqta') {
+    conditions.push('theme_type = ?');
+    params.push(type);
+  }
   const params: any[] = [];
 
   if (status) {
@@ -74,11 +80,15 @@ export default defineEventHandler(async (event) => {
       max: theme.compatibility_max || undefined
     },
     preview: {
-      thumbnail: theme.preview_thumbnail_url,
+      thumbnail: theme.preview_thumbnail_url || theme.cover_image_url,
       screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots) : []
     },
-    preview_thumbnail_url: theme.preview_thumbnail_url,
+    preview_thumbnail_url: theme.preview_thumbnail_url || theme.cover_image_url,
+    theme_type: theme.theme_type || 'desqta',
     zip_download_url: theme.zip_download_url,
+    theme_json_url: theme.theme_json_url,
+    cover_image_url: theme.cover_image_url,
+    marquee_image_url: theme.marquee_image_url,
     file_size: theme.file_size,
     checksum: theme.checksum,
     created_at: theme.created_at,

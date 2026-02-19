@@ -43,8 +43,8 @@
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
           <div class="flex items-start gap-6">
             <img
-              v-if="theme.preview?.thumbnail"
-              :src="theme.preview.thumbnail"
+              v-if="theme.preview?.thumbnail || theme.cover_image_url"
+              :src="theme.preview?.thumbnail || theme.cover_image_url"
               :alt="theme.name"
               class="h-32 w-48 object-cover rounded-lg border border-zinc-700"
             />
@@ -61,6 +61,14 @@
                 </span>
                 <span v-if="theme.featured" class="inline-flex items-center rounded-md bg-blue-500/10 text-blue-400 ring-blue-500/20 px-2 py-1 text-xs font-medium ring-1 ring-inset">
                   Featured
+                </span>
+                <span
+                  :class="[
+                    theme.theme_type === 'betterseqta' ? 'bg-purple-500/10 text-purple-400 ring-purple-500/20' : 'bg-cyan-500/10 text-cyan-400 ring-cyan-500/20',
+                    'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset'
+                  ]"
+                >
+                  {{ theme.theme_type === 'betterseqta' ? 'BetterSEQTA' : 'DesQTA' }}
                 </span>
               </div>
               <p class="text-zinc-400 mb-4">{{ theme.description }}</p>
@@ -103,9 +111,28 @@
               <span class="text-lg text-zinc-500">({{ theme.rating_count || 0 }})</span>
             </dd>
           </div>
-          <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+          <div v-if="theme.theme_type !== 'betterseqta'" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             <dt class="text-sm font-medium leading-6 text-zinc-400">File Size</dt>
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ formatFileSize(theme.file_size || 0) }}</dd>
+          </div>
+        </div>
+
+        <!-- BetterSEQTA: Cover & Marquee images -->
+        <div v-if="theme.theme_type === 'betterseqta' && (theme.cover_image_url || theme.marquee_image_url)" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
+          <h2 class="text-xl font-semibold text-white mb-4">Preview Images</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-if="theme.cover_image_url">
+              <label class="block text-sm font-medium text-zinc-400 mb-2">Cover (Banner)</label>
+              <img :src="theme.cover_image_url" alt="Cover" class="w-full max-h-64 object-contain rounded-lg border border-zinc-700" />
+            </div>
+            <div v-if="theme.marquee_image_url">
+              <label class="block text-sm font-medium text-zinc-400 mb-2">Marquee</label>
+              <img :src="theme.marquee_image_url" alt="Marquee" class="w-full max-h-64 object-contain rounded-lg border border-zinc-700" />
+            </div>
+          </div>
+          <div v-if="theme.theme_json_url" class="mt-4">
+            <label class="block text-sm font-medium text-zinc-400 mb-1">Theme JSON URL</label>
+            <p class="text-white font-mono text-sm break-all">{{ theme.theme_json_url }}</p>
           </div>
         </div>
 
@@ -127,9 +154,9 @@
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
           <h2 class="text-xl font-semibold text-white mb-4">Theme Information</h2>
           <div class="grid grid-cols-2 gap-6">
-            <div>
+            <div v-if="theme.compatibility?.min">
               <label class="block text-sm font-medium text-zinc-400 mb-1">Compatibility</label>
-              <p class="text-white">{{ theme.compatibility?.min }} - {{ theme.compatibility?.max || 'Latest' }}</p>
+              <p class="text-white">{{ theme.compatibility.min }} - {{ theme.compatibility.max || 'Latest' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-zinc-400 mb-1">Created</label>
@@ -139,7 +166,7 @@
               <label class="block text-sm font-medium text-zinc-400 mb-1">Published</label>
               <p class="text-white">{{ theme.published_at ? formatDate(theme.published_at) : 'Not published' }}</p>
             </div>
-            <div>
+            <div v-if="theme.checksum">
               <label class="block text-sm font-medium text-zinc-400 mb-1">Checksum</label>
               <p class="text-white font-mono text-xs">{{ theme.checksum }}</p>
             </div>
@@ -158,8 +185,8 @@
           </div>
         </div>
 
-        <!-- Update Files Section -->
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
+        <!-- Update Files Section (DesQTA only - BetterSEQTA themes have no ZIP) -->
+        <div v-if="theme.theme_type !== 'betterseqta'" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
           <h2 class="text-xl font-semibold text-white mb-4">Update Theme Files</h2>
           <p class="text-zinc-400 mb-6">Upload a new ZIP file to update the theme files. This will replace the existing ZIP, preview image, and screenshots.</p>
           
