@@ -46,7 +46,7 @@
               Browse Files
             </button>
             <p class="text-zinc-500 text-xs mt-4">
-              ZIP must contain: theme-manifest.json, styles/ directory, and preview.png (optional)
+              DesQTA: theme-manifest.json, styles/ directory, preview.png (optional). BetterSEQTA: theme.json (CustomCSS, id, name), images/banner.webp, images/marquee.webp (optional).
             </p>
           </div>
 
@@ -70,7 +70,9 @@
 
         <!-- Manifest Preview -->
         <div v-if="manifestPreview" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
-          <h3 class="text-lg font-semibold text-white mb-4">Manifest Preview</h3>
+          <h3 class="text-lg font-semibold text-white mb-4">
+            {{ manifestPreview.theme_type === 'betterseqta' ? 'BetterSEQTA' : 'DesQTA' }} Theme Preview
+          </h3>
           
           <div v-if="manifestPreview.validation" class="mb-6">
             <div v-if="manifestPreview.validation.valid" class="flex items-center gap-2 text-green-400 mb-2">
@@ -99,13 +101,13 @@
                 <label class="block text-sm font-medium text-zinc-400 mb-1">Name</label>
                 <p class="text-white">{{ manifestPreview.manifest.name }}</p>
               </div>
-              <div>
+              <div v-if="manifestPreview.manifest.version">
                 <label class="block text-sm font-medium text-zinc-400 mb-1">Version</label>
                 <p class="text-white">{{ manifestPreview.manifest.version }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-zinc-400 mb-1">Author</label>
-                <p class="text-white">{{ manifestPreview.manifest.author }}</p>
+                <p class="text-white">{{ manifestPreview.manifest.author || 'BetterSEQTA' }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-zinc-400 mb-1">License</label>
@@ -119,13 +121,20 @@
             <div v-if="manifestPreview.structure" class="mt-4">
               <label class="block text-sm font-medium text-zinc-400 mb-2">File Structure</label>
               <div class="bg-zinc-950 rounded p-4 font-mono text-sm">
-                <div v-if="manifestPreview.structure.has_manifest" class="text-green-400">✓ theme-manifest.json</div>
-                <div v-if="manifestPreview.structure.has_styles" class="text-green-400">✓ styles/ directory</div>
-                <div v-if="manifestPreview.structure.has_preview" class="text-green-400">✓ preview image</div>
-                <div v-if="manifestPreview.structure.style_files?.length">
-                  <div class="text-zinc-400 mt-2">Style files:</div>
-                  <div v-for="file in manifestPreview.structure.style_files" :key="file" class="text-zinc-500 ml-4">- {{ file }}</div>
-                </div>
+                <template v-if="manifestPreview.theme_type === 'betterseqta'">
+                  <div v-if="manifestPreview.structure.has_theme_json" class="text-green-400">✓ theme.json</div>
+                  <div v-if="manifestPreview.structure.has_banner" class="text-green-400">✓ images/banner.webp</div>
+                  <div v-if="manifestPreview.structure.has_marquee" class="text-green-400">✓ images/marquee.webp</div>
+                </template>
+                <template v-else>
+                  <div v-if="manifestPreview.structure.has_manifest" class="text-green-400">✓ theme-manifest.json</div>
+                  <div v-if="manifestPreview.structure.has_styles" class="text-green-400">✓ styles/ directory</div>
+                  <div v-if="manifestPreview.structure.has_preview" class="text-green-400">✓ preview image</div>
+                  <div v-if="manifestPreview.structure.style_files?.length">
+                    <div class="text-zinc-400 mt-2">Style files:</div>
+                    <div v-for="file in manifestPreview.structure.style_files" :key="file" class="text-zinc-500 ml-4">- {{ file }}</div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>

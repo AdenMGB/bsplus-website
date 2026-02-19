@@ -1,14 +1,16 @@
 import { getDB } from '../../../utils/db';
 import { getBucket } from '../../../utils/r2';
 import { requireAdmin } from '../../../utils/auth';
-import { 
-  parseManifest, 
-  validateThemeStructure, 
-  slugify, 
-  generateUUID, 
+import {
+  parseManifest,
+  validateThemeStructure,
+  validateBetterSeqtaStructure,
+  parseBetterSeqtaTheme,
+  detectThemeType,
+  slugify,
+  generateUUID,
   calculateSHA256,
   inferCategory,
-  uploadToR2,
   createZipArchive
 } from '../../../utils/themes';
 
@@ -16,6 +18,8 @@ export default defineEventHandler(async (event) => {
   const adminUser = await requireAdmin(event);
   const db = getDB(event);
   const bucket = getBucket(event);
+  const config = useRuntimeConfig();
+  const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
   const formData = await readMultipartFormData(event);
   if (!formData || formData.length === 0) {
@@ -27,18 +31,12 @@ export default defineEventHandler(async (event) => {
 
   // Find the ZIP file or theme folder
   let zipFile: { filename?: string; data: Uint8Array; type?: string } | null = null;
-  let manifestFile: { filename?: string; data: Uint8Array } | null = null;
   const themeFiles = new Map<string, ArrayBuffer>();
 
   for (const part of formData) {
-    if (part.name === 'theme_zip' && part.filename) {
+    if ((part.name === 'theme_zip' || part.name === 'theme_folder') && part.filename?.endsWith('.zip')) {
       zipFile = part;
-    } else if (part.name === 'theme_folder' && part.filename?.endsWith('.zip')) {
-      zipFile = part;
-    } else if (part.filename === 'theme-manifest.json' || part.name === 'manifest') {
-      manifestFile = part;
     } else if (part.filename) {
-      // Individual files from folder upload
       const path = part.name || part.filename;
       themeFiles.set(path, new Uint8Array(part.data).buffer);
     }
@@ -47,7 +45,6 @@ export default defineEventHandler(async (event) => {
   // If ZIP file provided, extract it
   if (zipFile) {
     try {
-      // Dynamic import for zip.js
       const zipJs = await import('@zip.js/zip.js');
       const { ZipReader, BlobReader, BlobWriter } = zipJs;
       const zipReader = new ZipReader(new BlobReader(new Blob([new Uint8Array(zipFile.data)])));
@@ -62,15 +59,151 @@ export default defineEventHandler(async (event) => {
       }
 
       await zipReader.close();
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw createError({
         statusCode: 400,
-        statusMessage: `Failed to extract ZIP: ${error.message}`
+        statusMessage: `Failed to extract ZIP: ${error instanceof Error ? error.message : 'Unknown error'}`
       });
     }
   }
 
-  // Validate structure
+  // Type detection
+  const themeType = detectThemeType(themeFiles);
+  if (!themeType) {
+    return {
+      success: false,
+      data: null,
+      error: {
+        code: 'UNKNOWN_THEME_TYPE',
+        message: 'Could not detect theme type. Expected DesQTA (theme-manifest.json + styles/) or BetterSEQTA (theme.json with CustomCSS, id, name).',
+        details: { errors: [], warnings: [] }
+      },
+      meta: { timestamp: Date.now(), version: '1.0.0' }
+    };
+  }
+
+  // --- BetterSEQTA flow ---
+  if (themeType === 'betterseqta') {
+    const validation = validateBetterSeqtaStructure(themeFiles);
+    if (!validation.valid) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'INVALID_THEME_STRUCTURE',
+          message: 'BetterSEQTA theme validation failed',
+          details: { errors: validation.errors, warnings: validation.warnings }
+        },
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
+    const themeJsonPath = Array.from(themeFiles.keys()).find(k => k.endsWith('/theme.json')) ?? 'theme.json';
+    const themeJsonContent = new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
+    const bsTheme = await parseBetterSeqtaTheme(themeJsonContent);
+    const themeId = bsTheme.id;
+    const themeSlug = slugify(bsTheme.name);
+
+    const existing = await db.prepare('SELECT id FROM themes WHERE id = ? OR slug = ?')
+      .bind(themeId, themeSlug).first();
+    if (existing) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: `Theme with id "${themeId}" or slug "${themeSlug}" already exists`
+      });
+    }
+
+    // Upload theme.json to R2
+    const themeJsonKey = `themes/${themeId}/theme.json`;
+    await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
+      httpMetadata: { contentType: 'application/json' }
+    });
+
+    let coverImageUrl: string | null = null;
+    let marqueeImageUrl: string | null = null;
+
+    const bannerEntry = Array.from(themeFiles.entries()).find(([p]) =>
+      p.includes('images/banner.webp') || p.includes('banner.webp')
+    );
+    if (bannerEntry) {
+      const bannerKey = `themes/${themeId}/images/banner.webp`;
+      await bucket.put(bannerKey, bannerEntry[1], {
+        httpMetadata: { contentType: 'image/webp' }
+      });
+      coverImageUrl = `${siteUrl}/api/images/${bannerKey}`;
+    }
+
+    const marqueeEntry = Array.from(themeFiles.entries()).find(([p]) =>
+      p.includes('images/marquee.webp') || p.includes('marquee.webp')
+    );
+    if (marqueeEntry) {
+      const marqueeKey = `themes/${themeId}/images/marquee.webp`;
+      await bucket.put(marqueeKey, marqueeEntry[1], {
+        httpMetadata: { contentType: 'image/webp' }
+      });
+      marqueeImageUrl = `${siteUrl}/api/images/${marqueeKey}`;
+    }
+
+    const themeJsonUrl = `${siteUrl}/api/themes/${themeId}/theme.json`;
+    const now = Date.now();
+
+    await db.prepare(
+      `INSERT INTO themes (
+        id, name, slug, version, description, author, license,
+        category, tags, status, theme_type, theme_json_url,
+        cover_image_url, marquee_image_url, zip_download_url,
+        compatibility_min, compatibility_max, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      themeId,
+      bsTheme.name,
+      themeSlug,
+      '1.0.0',
+      bsTheme.description,
+      'BetterSEQTA',
+      'MIT',
+      'other',
+      '[]',
+      'approved',
+      'betterseqta',
+      themeJsonUrl,
+      coverImageUrl,
+      marqueeImageUrl,
+      null,
+      null,
+      null,
+      now,
+      now
+    ).run();
+
+    const submissionId = generateUUID();
+    await db.prepare(
+      `INSERT INTO theme_submissions (id, theme_id, submitted_by, status, created_at)
+       VALUES (?, ?, ?, ?, ?)`
+    ).bind(submissionId, themeId, adminUser.id, 'approved', now).run();
+
+    const theme = await db.prepare('SELECT * FROM themes WHERE id = ?').bind(themeId).first() as Record<string, unknown>;
+
+    return {
+      success: true,
+      data: {
+        theme: {
+          id: theme.id,
+          name: theme.name,
+          slug: theme.slug,
+          theme_type: 'betterseqta',
+          theme_json_url: theme.theme_json_url,
+          cover_image_url: theme.cover_image_url,
+          marquee_image_url: theme.marquee_image_url
+        },
+        validation: { valid: true, warnings: validation.warnings, errors: [] }
+      },
+      error: null,
+      meta: { timestamp: Date.now(), version: '1.0.0' }
+    };
+  }
+
+  // --- DesQTA flow (existing) ---
   const validation = validateThemeStructure(themeFiles);
   if (!validation.valid) {
     return {
@@ -195,8 +328,8 @@ export default defineEventHandler(async (event) => {
       id, name, slug, version, description, author, license,
       category, tags, status, preview_thumbnail_url, preview_screenshots,
       zip_download_url, file_size, checksum, compatibility_min, compatibility_max,
-      created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      theme_type, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     themeId,
     manifest.name,
@@ -215,6 +348,7 @@ export default defineEventHandler(async (event) => {
     `sha256:${zipChecksum}`,
     manifest.compatibility.minVersion,
     manifest.compatibility.maxVersion || null,
+    'desqta',
     now,
     now
   ).run();

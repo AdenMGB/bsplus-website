@@ -52,11 +52,15 @@ export default defineEventHandler(async (event) => {
           max: theme.compatibility_max || undefined
         },
         preview: {
-          thumbnail: theme.preview_thumbnail_url,
+          thumbnail: theme.preview_thumbnail_url || theme.cover_image_url,
           screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots) : []
         },
-        preview_thumbnail_url: theme.preview_thumbnail_url,
+        preview_thumbnail_url: theme.preview_thumbnail_url || theme.cover_image_url,
         preview_screenshots: theme.preview_screenshots,
+        theme_type: theme.theme_type || 'desqta',
+        theme_json_url: theme.theme_json_url,
+        cover_image_url: theme.cover_image_url,
+        marquee_image_url: theme.marquee_image_url,
         zip_download_url: theme.zip_download_url,
         file_size: theme.file_size,
         checksum: theme.checksum,

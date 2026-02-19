@@ -76,6 +76,77 @@ export async function parseManifest(manifestContent: string): Promise<ThemeManif
   }
 }
 
+export interface BetterSeqtaTheme {
+  id: string;
+  name: string;
+  description: string;
+  CustomCSS: string;
+  defaultColour?: string;
+  CanChangeColour?: boolean;
+  coverImage?: string;
+  images?: string[];
+  [key: string]: unknown;
+}
+
+export function detectThemeType(files: Map<string, ArrayBuffer>): 'betterseqta' | 'desqta' | null {
+  const hasManifest = files.has('theme-manifest.json') ||
+    Array.from(files.keys()).some(k => k.endsWith('/theme-manifest.json'));
+  const hasStyles = Array.from(files.keys()).some(k =>
+    k.includes('/styles/') || k.startsWith('styles/')
+  );
+  if (hasManifest && hasStyles) return 'desqta';
+
+  const themeJsonPaths = ['theme.json', ...Array.from(files.keys()).filter(k => k.endsWith('/theme.json'))];
+  for (const path of themeJsonPaths) {
+    const data = files.get(path);
+    if (!data) continue;
+    try {
+      const parsed = JSON.parse(new TextDecoder().decode(data)) as Record<string, unknown>;
+      if (parsed.CustomCSS && parsed.id && parsed.name) return 'betterseqta';
+    } catch {
+      // not valid JSON
+    }
+  }
+  return null;
+}
+
+export function validateBetterSeqtaStructure(files: Map<string, ArrayBuffer>): ThemeValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  const themeJsonPaths = ['theme.json', ...Array.from(files.keys()).filter(k => k.endsWith('/theme.json'))];
+  const themeJsonPath = themeJsonPaths.find(p => files.has(p));
+  if (!themeJsonPath) {
+    errors.push('Missing theme.json');
+    return { valid: false, errors, warnings };
+  }
+
+  try {
+    const data = files.get(themeJsonPath)!;
+    const parsed = JSON.parse(new TextDecoder().decode(data)) as BetterSeqtaTheme;
+    if (!parsed.CustomCSS) errors.push('theme.json must have CustomCSS');
+    if (!parsed.id) errors.push('theme.json must have id');
+    if (!parsed.name) errors.push('theme.json must have name');
+    if (!parsed.description) errors.push('theme.json must have description');
+  } catch (e: unknown) {
+    errors.push(`Invalid theme.json: ${e instanceof Error ? e.message : 'parse error'}`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+export async function parseBetterSeqtaTheme(themeJsonContent: string): Promise<BetterSeqtaTheme> {
+  const parsed = JSON.parse(themeJsonContent) as BetterSeqtaTheme;
+  if (!parsed.CustomCSS || !parsed.id || !parsed.name || !parsed.description) {
+    throw new Error('theme.json must have CustomCSS, id, name, and description');
+  }
+  return parsed;
+}
+
 export function validateThemeStructure(files: Map<string, ArrayBuffer>): ThemeValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
