@@ -164,7 +164,7 @@ export default defineEventHandler(async (event) => {
       'MIT',
       'other',
       '[]',
-      'approved',
+      'pending',
       'betterseqta',
       themeJsonUrl,
       coverImageUrl,
@@ -180,7 +180,7 @@ export default defineEventHandler(async (event) => {
     await db.prepare(
       `INSERT INTO theme_submissions (id, theme_id, submitted_by, status, created_at)
        VALUES (?, ?, ?, ?, ?)`
-    ).bind(submissionId, themeId, adminUser.id, 'approved', now).run();
+    ).bind(submissionId, themeId, adminUser.id, 'pending', now).run();
 
     const theme = await db.prepare('SELECT * FROM themes WHERE id = ?').bind(themeId).first() as Record<string, unknown>;
 
