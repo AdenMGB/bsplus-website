@@ -300,9 +300,7 @@ definePageMeta({
 const { data: posts } = await useFetch<any[]>('/api/news?admin=true');
 const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
 const { data: questions, refresh: refreshQuestions } = await useFetch<any[]>('/api/questionnaire?admin=true');
-const { data: themesData } = await useFetch<any>('/api/admin/themes', {
-  query: { limit: 5 }
-});
+const { data: themesData } = await useFetch<any>('/api/admin/themes');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -329,13 +327,12 @@ const recentThemes = computed(() => {
 });
 
 const stats = computed(() => {
-  const pagination = themesData.value?.data?.pagination;
-  const summary = themesData.value?.data?.summary;
+  const themeStats = analyticsStats.value?.themes;
   return {
     themes: {
-      total: pagination?.total ?? 0,
-      pending: summary?.pending ?? 0,
-      approved: summary?.approved ?? 0
+      total: themeStats?.total ?? 0,
+      pending: themeStats?.pending ?? 0,
+      approved: themeStats?.approved ?? 0
     },
     news: {
       total: posts.value?.length || 0,

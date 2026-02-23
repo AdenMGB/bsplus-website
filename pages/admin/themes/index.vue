@@ -220,10 +220,10 @@ const { data: themesData, refresh } = await useFetch<any>('/api/admin/themes', {
     limit: 20,
     type: typeFilter.value || undefined,
     status: statusFilter.value || undefined,
-    category: categoryFilter.value || undefined,
     search: searchQuery.value || undefined,
-    sort_by: sortBy.value,
-    sort_order: sortOrder.value
+    category: categoryFilter.value || undefined,
+    sort: sortBy.value,
+    order: sortOrder.value
   }))
 });
 
@@ -237,17 +237,20 @@ const pagination = computed(() => themesData.value?.data?.pagination || {
   has_prev: false
 });
 
-const filteredThemes = computed(() => themes);
+// Server handles filtering via query params; themes are already filtered
+const filteredThemes = computed(() => themes.value);
+
+// Reset to page 1 when filters or sort change
+watch([statusFilter, typeFilter, categoryFilter, sortBy, sortOrder, searchQuery], () => {
+  currentPage.value = 1;
+});
 
 async function loadPage(page: number) {
   if (page < 1 || page > pagination.value.total_pages) return;
   currentPage.value = page;
+  // Explicitly refresh with query params
   await refresh();
 }
-
-watch([searchQuery, statusFilter, categoryFilter, typeFilter, sortBy, sortOrder], () => {
-  currentPage.value = 1;
-});
 
 async function approveTheme(id: string) {
   if (!confirm('Approve this theme?')) return;
