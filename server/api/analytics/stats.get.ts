@@ -19,7 +19,10 @@ export default defineEventHandler(async (event) => {
     const stats = await db.prepare('SELECT * FROM page_stats').all();
     const newsCount = await db.prepare('SELECT COUNT(*) as count FROM news').first();
     const publishedCount = await db.prepare('SELECT COUNT(*) as count FROM news WHERE published = 1').first();
-    
+    const themesTotal = await db.prepare('SELECT COUNT(*) as count FROM themes').first() as { count: number };
+    const themesPending = await db.prepare("SELECT COUNT(*) as count FROM themes WHERE status = 'pending'").first() as { count: number };
+    const themesApproved = await db.prepare("SELECT COUNT(*) as count FROM themes WHERE status = 'approved'").first() as { count: number };
+
     const sessions = stats.results.find((r: any) => r.path === 'bs_sessions')?.views || 0;
     const desqtaSessions = stats.results.find((r: any) => r.path === 'desqta_sessions')?.views || 0;
 
@@ -37,6 +40,11 @@ export default defineEventHandler(async (event) => {
       news: {
         total: newsCount.count,
         published: publishedCount.count
+      },
+      themes: {
+        total: themesTotal?.count ?? 0,
+        pending: themesPending?.count ?? 0,
+        approved: themesApproved?.count ?? 0
       }
     };
   } catch (e) {
