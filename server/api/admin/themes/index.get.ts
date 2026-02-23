@@ -7,6 +7,9 @@ interface AdminThemeQuery {
   status?: string;
   search?: string;
   type?: string; // 'betterseqta' | 'desqta' | omit for all
+  category?: string;
+  sort_by?: string; // 'created_at' | 'download_count' | 'rating_average' | 'name' | 'updated_at'
+  sort_order?: string; // 'asc' | 'desc'
 }
 
 export default defineEventHandler(async (event) => {
@@ -20,17 +23,28 @@ export default defineEventHandler(async (event) => {
   const status = query.status;
   const search = query.search;
   const type = query.type;
+  const category = query.category;
+  const sortBy = ['created_at', 'download_count', 'rating_average', 'name', 'updated_at'].includes(query.sort_by || '')
+    ? query.sort_by
+    : 'created_at';
+  const sortOrder = query.sort_order === 'asc' ? 'ASC' : 'DESC';
 
+  const params: any[] = [];
   const conditions: string[] = [];
+
   if (type === 'betterseqta' || type === 'desqta') {
     conditions.push('theme_type = ?');
     params.push(type);
   }
-  const params: any[] = [];
 
   if (status) {
     conditions.push('status = ?');
     params.push(status);
+  }
+
+  if (category) {
+    conditions.push('category = ?');
+    params.push(category);
   }
 
   if (search) {
@@ -49,13 +63,32 @@ export default defineEventHandler(async (event) => {
   const total = countResult?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
+  // Get summary counts (total by status) - only when no filters to avoid extra queries when filtered
+  let summary: { pending: number; approved: number; rejected: number } | undefined;
+  if (conditions.length === 0) {
+    const summaryResult = await db.prepare(
+      `SELECT status, COUNT(*) as count FROM themes GROUP BY status`
+    ).all() as { results: { status: string; count: number }[] };
+    const byStatus = Object.fromEntries(
+      (summaryResult.results || []).map((r: any) => [r.status, r.count])
+    );
+    summary = {
+      pending: byStatus.pending || 0,
+      approved: byStatus.approved || 0,
+      rejected: byStatus.rejected || 0
+    };
+  }
+
+  const orderColumn = sortBy === 'name' ? 't.name' : `t.${sortBy}`;
+  const orderClause = `${orderColumn} ${sortOrder}`;
+
   // Get themes
   const themesResult = await db.prepare(
     `SELECT t.*, ts.submission_notes, ts.reviewed_by, ts.reviewed_at, ts.rejection_reason 
      FROM themes t
      LEFT JOIN theme_submissions ts ON t.id = ts.theme_id
      ${whereClause}
-     ORDER BY t.created_at DESC
+     ORDER BY ${orderClause}
      LIMIT ? OFFSET ?`
   ).bind(...params, limit, offset).all();
 
@@ -111,7 +144,8 @@ export default defineEventHandler(async (event) => {
         total_pages: totalPages,
         has_next: page < totalPages,
         has_prev: page > 1
-      }
+      },
+      ...(summary && { summary })
     },
     error: null,
     meta: {
