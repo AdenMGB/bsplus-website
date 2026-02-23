@@ -52,6 +52,23 @@
           <option value="minimal">Minimal</option>
           <option value="other">Other</option>
         </select>
+        <select
+          v-model="sortBy"
+          class="rounded-md bg-zinc-900/50 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+        >
+          <option value="created_at">Newest</option>
+          <option value="updated_at">Recently Updated</option>
+          <option value="download_count">Downloads</option>
+          <option value="rating_average">Rating</option>
+          <option value="name">Name</option>
+        </select>
+        <select
+          v-model="sortOrder"
+          class="rounded-md bg-zinc-900/50 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+        >
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
       </div>
 
       <!-- Themes Table -->
@@ -193,13 +210,20 @@ const searchQuery = ref('');
 const statusFilter = ref('');
 const categoryFilter = ref('');
 const typeFilter = ref('');
+const sortBy = ref('created_at');
+const sortOrder = ref('desc');
 const currentPage = ref(1);
 
 const { data: themesData, refresh } = await useFetch<any>('/api/admin/themes', {
   query: computed(() => ({
     page: currentPage.value,
     limit: 20,
-    type: typeFilter.value || undefined
+    type: typeFilter.value || undefined,
+    status: statusFilter.value || undefined,
+    category: categoryFilter.value || undefined,
+    search: searchQuery.value || undefined,
+    sort_by: sortBy.value,
+    sort_order: sortOrder.value
   }))
 });
 
@@ -213,39 +237,17 @@ const pagination = computed(() => themesData.value?.data?.pagination || {
   has_prev: false
 });
 
-const filteredThemes = computed(() => {
-  let result = themes.value;
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter((t: any) =>
-      t.name.toLowerCase().includes(query) ||
-      t.author.toLowerCase().includes(query) ||
-      t.description?.toLowerCase().includes(query)
-    );
-  }
-
-  if (statusFilter.value) {
-    result = result.filter((t: any) => t.status === statusFilter.value);
-  }
-
-  if (categoryFilter.value) {
-    result = result.filter((t: any) => t.category === categoryFilter.value);
-  }
-
-  if (typeFilter.value) {
-    result = result.filter((t: any) => t.theme_type === typeFilter.value);
-  }
-
-  return result;
-});
+const filteredThemes = computed(() => themes);
 
 async function loadPage(page: number) {
   if (page < 1 || page > pagination.value.total_pages) return;
   currentPage.value = page;
-  // Explicitly refresh with query params
   await refresh();
 }
+
+watch([searchQuery, statusFilter, categoryFilter, typeFilter, sortBy, sortOrder], () => {
+  currentPage.value = 1;
+});
 
 async function approveTheme(id: string) {
   if (!confirm('Approve this theme?')) return;
