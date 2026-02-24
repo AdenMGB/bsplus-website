@@ -53,7 +53,7 @@ const navigation = {
   social: [
     {
       name: "GitHub",
-      href: "https://github.com/BetterSEQTA/DesQTA/tree/develop",
+      href: "https://github.com/BetterSEQTA/BetterSEQTA-Plus",
       icon: defineComponent({
         render: () =>
           h("svg", { fill: "currentColor", viewBox: "0 0 24 24" }, [
