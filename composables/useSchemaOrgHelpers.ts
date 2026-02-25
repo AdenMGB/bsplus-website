@@ -10,7 +10,6 @@ export function useSchemaOrgHelpers() {
     siteUrl,
     /** Base Organization for the site */
     organization: () =>
-      // @ts-expect-error - from @nuxtjs/seo
       defineOrganization({
         name: 'BetterSEQTA',
         url: siteUrl,
@@ -18,7 +17,6 @@ export function useSchemaOrgHelpers() {
       }),
     /** WebSite schema for homepage */
     webSite: (name: string, description?: string) =>
-      // @ts-expect-error - from @nuxtjs/seo
       defineWebSite({
         name,
         description: description ?? 'BetterSEQTA Plus - SEQTA Learn Enhanced. Browser extension and desktop app for SEQTA.',
@@ -26,7 +24,6 @@ export function useSchemaOrgHelpers() {
       }),
     /** WebPage schema for generic pages */
     webPage: (name: string, description?: string) =>
-      // @ts-expect-error - from @nuxtjs/seo
       defineWebPage({
         name,
         description,
@@ -40,7 +37,6 @@ export function useSchemaOrgHelpers() {
       applicationCategory?: string;
       url?: string;
     }) =>
-      // @ts-expect-error - from @unhead/schema-org
       defineSoftwareApp({
         name: options.name,
         description: options.description,
@@ -62,7 +58,6 @@ export function useSchemaOrgHelpers() {
       const url = options.url ?? `${siteUrl}${route.path}`;
       const image = options.image?.startsWith('http') ? options.image : options.image ? `${siteUrl}${options.image}` : undefined;
       return (
-        // @ts-expect-error - from @nuxtjs/seo
         defineArticle({
           '@type': 'BlogPosting',
           headline: options.headline,

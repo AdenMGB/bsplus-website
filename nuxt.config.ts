@@ -152,8 +152,8 @@ export default defineNuxtConfig({
       compilerOptions: {
         verbatimModuleSyntax: false,
         strictNullChecks: true,
-        exactOptionalPropertyTypes: true,
         skipLibCheck: true,
+        // exactOptionalPropertyTypes disabled - @nuxt/image types are incompatible
       },
     },
   },

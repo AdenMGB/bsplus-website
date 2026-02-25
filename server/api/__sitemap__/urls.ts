@@ -14,7 +14,7 @@ export default defineSitemapEventHandler(async (event) => {
       const lastmod = row.updated_at ?? row.created_at;
       urls.push({
         loc: `/news/${row.slug}`,
-        lastmod: lastmod ? new Date(lastmod * 1000).toISOString() : undefined,
+        ...(lastmod && { lastmod: new Date(lastmod * 1000).toISOString() }),
         changefreq: 'monthly',
         priority: 0.7,
       });

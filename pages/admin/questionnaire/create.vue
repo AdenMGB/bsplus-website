@@ -181,18 +181,18 @@ async function saveQuestion() {
   try {
     // Queue-based: use duration
     const durationDays = parseInt(selectedDuration.value);
+    // Get next queue order
+    const { data: questions } = await useFetch<any[]>('/api/questionnaire?admin=true');
+    const maxOrder = questions.value?.reduce((max, q) => Math.max(max, q.queue_order || 0), 0) || 0;
+
     const body = {
       question: form.value.question,
       options: validOptions,
       cover_image: form.value.cover_image || undefined,
       duration: durationDays * 24 * 60 * 60, // Convert to seconds
-      auto_activate: true
+      auto_activate: true,
+      queue_order: maxOrder + 1
     };
-    
-    // Get next queue order
-    const { data: questions } = await useFetch<any[]>('/api/questionnaire?admin=true');
-    const maxOrder = questions.value?.reduce((max, q) => Math.max(max, q.queue_order || 0), 0) || 0;
-    body.queue_order = maxOrder + 1;
 
     await $fetch('/api/questionnaire/create', {
       method: 'POST',

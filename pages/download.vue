@@ -338,10 +338,10 @@ onMounted(async () => {
       const assets = latestRelease.value.assets;
 
       // Set the download URLs based on asset names
-      apkDownloadUrl.value = assets.find(asset => asset.name.endsWith('.apk'))?.browser_download_url || '';
-      dmgDownloadUrl.value = assets.find(asset => asset.name.endsWith('.dmg'))?.browser_download_url || '';
-      exeDownloadUrl.value = assets.find(asset => asset.name.endsWith('.exe'))?.browser_download_url || '';
-      msiDownloadUrl.value = assets.find(asset => asset.name.endsWith('.msi'))?.browser_download_url || '';
+      apkDownloadUrl.value = assets.find((asset: { name: string; browser_download_url?: string }) => asset.name.endsWith('.apk'))?.browser_download_url || '';
+      dmgDownloadUrl.value = assets.find((asset: { name: string; browser_download_url?: string }) => asset.name.endsWith('.dmg'))?.browser_download_url || '';
+      exeDownloadUrl.value = assets.find((asset: { name: string; browser_download_url?: string }) => asset.name.endsWith('.exe'))?.browser_download_url || '';
+      msiDownloadUrl.value = assets.find((asset: { name: string; browser_download_url?: string }) => asset.name.endsWith('.msi'))?.browser_download_url || '';
     }
   } catch (error) {
     console.error('Error fetching latest release:', error);

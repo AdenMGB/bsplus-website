@@ -207,13 +207,13 @@ onMounted(async () => {
         rootMargin: '100px'
       }
     );
-    observer.observe(loadMoreTrigger.value);
+    observer.observe(loadMoreTrigger.value as unknown as Element);
   }
 });
 
 onUnmounted(() => {
   if (observer && loadMoreTrigger.value) {
-    observer.unobserve(loadMoreTrigger.value);
+    observer.unobserve(loadMoreTrigger.value as unknown as Element);
     observer.disconnect();
   }
 });
@@ -221,7 +221,7 @@ onUnmounted(() => {
 // Watch for changes to loadMoreTrigger ref
 watch(loadMoreTrigger, (newVal) => {
   if (newVal && observer) {
-    observer.observe(newVal);
+    observer.observe(newVal as unknown as Element);
   }
 });
 </script>
