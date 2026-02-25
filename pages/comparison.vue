@@ -168,9 +168,9 @@
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
-              <!-- Optimised performance -->
+              <!-- Optimized performance -->
               <tr>
-                <td class="px-6 py-5 text-base text-zinc-300">Optimised performance</td>
+                <td class="px-6 py-5 text-base text-zinc-300">Optimized performance</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
