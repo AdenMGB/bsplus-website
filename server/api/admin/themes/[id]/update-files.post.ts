@@ -1,18 +1,23 @@
 import { getDB } from '../../../../utils/db';
 import { getBucket } from '../../../../utils/r2';
 import { requireAdmin } from '../../../../utils/auth';
-import { 
-  parseManifest, 
-  validateThemeStructure, 
+import {
+  parseManifest,
+  parseBetterSeqtaTheme,
+  validateThemeStructure,
+  validateBetterSeqtaStructure,
   calculateSHA256,
   inferCategory,
-  createZipArchive
+  createZipArchive,
+  slugify
 } from '../../../../utils/themes';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
   const db = getDB(event);
   const bucket = getBucket(event);
+  const config = useRuntimeConfig();
+  const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
   const id = getRouterParam(event, 'id');
 
   if (!id) {
@@ -84,7 +89,128 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Validate structure
+  // --- BetterSEQTA update flow ---
+  if (existingTheme.theme_type === 'betterseqta') {
+    const validation = validateBetterSeqtaStructure(themeFiles);
+    if (!validation.valid) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'INVALID_THEME_STRUCTURE',
+          message: 'BetterSEQTA theme validation failed',
+          details: { errors: validation.errors, warnings: validation.warnings }
+        },
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
+    const themeJsonPath = Array.from(themeFiles.keys()).find(k => k.endsWith('/theme.json')) ?? 'theme.json';
+    const themeJsonContent = new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
+    const bsTheme = await parseBetterSeqtaTheme(themeJsonContent);
+
+    if (bsTheme.id !== id) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'THEME_ID_MISMATCH',
+          message: `Theme ID in theme.json (${bsTheme.id}) does not match this theme (${id}). Upload a ZIP for the correct theme.`
+        },
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
+    // Upload theme.json
+    const themeJsonKey = `themes/${id}/theme.json`;
+    await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
+      httpMetadata: { contentType: 'application/json' }
+    });
+
+    let coverImageUrl: string | null = existingTheme.cover_image_url;
+    let marqueeImageUrl: string | null = existingTheme.marquee_image_url;
+
+    const bannerEntry = Array.from(themeFiles.entries()).find(([p]) =>
+      p.includes('images/banner.webp') || p.includes('banner.webp')
+    );
+    if (bannerEntry) {
+      const bannerKey = `themes/${id}/images/banner.webp`;
+      await bucket.put(bannerKey, bannerEntry[1], {
+        httpMetadata: { contentType: 'image/webp' }
+      });
+      coverImageUrl = `${siteUrl}/api/images/${bannerKey}`;
+    }
+
+    const marqueeEntry = Array.from(themeFiles.entries()).find(([p]) =>
+      p.includes('images/marquee.webp') || p.includes('marquee.webp')
+    );
+    if (marqueeEntry) {
+      const marqueeKey = `themes/${id}/images/marquee.webp`;
+      await bucket.put(marqueeKey, marqueeEntry[1], {
+        httpMetadata: { contentType: 'image/webp' }
+      });
+      marqueeImageUrl = `${siteUrl}/api/images/${marqueeKey}`;
+    }
+
+    const newSlug = slugify(bsTheme.name);
+    const now = Date.now();
+
+    try {
+      await db.prepare(
+        `UPDATE themes SET
+          name = ?,
+          slug = ?,
+          description = ?,
+          cover_image_url = ?,
+          marquee_image_url = ?,
+          updated_at = ?
+        WHERE id = ?`
+      ).bind(
+        bsTheme.name,
+        newSlug,
+        bsTheme.description,
+        coverImageUrl,
+        marqueeImageUrl,
+        now,
+        id
+      ).run();
+    } catch (err: any) {
+      if (err?.message?.includes('UNIQUE') || err?.message?.includes('unique')) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: 'SLUG_CONFLICT',
+            message: `Slug "${newSlug}" is already used by another theme. Try a different theme name.`
+          },
+          meta: { timestamp: Date.now(), version: '1.0.0' }
+        };
+      }
+      throw err;
+    }
+
+    const theme = await db.prepare('SELECT * FROM themes WHERE id = ?').bind(id).first() as any;
+
+    return {
+      success: true,
+      data: {
+        theme: {
+          id: theme.id,
+          name: theme.name,
+          slug: theme.slug,
+          theme_type: 'betterseqta',
+          theme_json_url: theme.theme_json_url,
+          cover_image_url: theme.cover_image_url,
+          marquee_image_url: theme.marquee_image_url
+        },
+        validation: { valid: true, warnings: validation.warnings, errors: [] }
+      },
+      error: null,
+      meta: { timestamp: Date.now(), version: '1.0.0' }
+    };
+  }
+
+  // --- DesQTA update flow ---
   const validation = validateThemeStructure(themeFiles);
   if (!validation.valid) {
     return {
