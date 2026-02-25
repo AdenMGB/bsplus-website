@@ -185,10 +185,14 @@
           </div>
         </div>
 
-        <!-- Update Files Section (DesQTA only - BetterSEQTA themes have no ZIP) -->
-        <div v-if="theme.theme_type !== 'betterseqta'" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
+        <!-- Update Theme Files Section (DesQTA & BetterSEQTA) -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
           <h2 class="text-xl font-semibold text-white mb-4">Update Theme Files</h2>
-          <p class="text-zinc-400 mb-6">Upload a new ZIP file to update the theme files. This will replace the existing ZIP, preview image, and screenshots.</p>
+          <p class="text-zinc-400 mb-6">
+            {{ theme.theme_type === 'betterseqta'
+              ? 'Upload a new ZIP file to update the theme files. This will replace theme.json and images (banner, marquee).'
+              : 'Upload a new ZIP file to update the theme files. This will replace the existing ZIP, preview image, and screenshots.' }}
+          </p>
           
           <div
             @drop.prevent="handleDrop"
@@ -218,7 +222,9 @@
               Browse Files
             </button>
             <p class="text-zinc-500 text-xs mt-4">
-              ZIP must contain: theme-manifest.json, styles/ directory, and preview.png (optional)
+              {{ theme.theme_type === 'betterseqta'
+                ? 'ZIP must contain: theme.json (id, name, description, CustomCSS) and optionally images/banner.webp, images/marquee.webp'
+                : 'ZIP must contain: theme-manifest.json, styles/ directory, and preview.png (optional)' }}
             </p>
           </div>
 
@@ -269,23 +275,40 @@
                 <span class="text-zinc-400">Name:</span>
                 <span class="text-white ml-2">{{ updateManifestPreview.manifest.name }}</span>
               </div>
-              <div>
-                <span class="text-zinc-400">Version:</span>
-                <span class="text-white ml-2">{{ updateManifestPreview.manifest.version }}</span>
+              <div v-if="updateManifestPreview.theme_type === 'betterseqta'">
+                <span class="text-zinc-400">ID:</span>
+                <span class="text-white ml-2 font-mono text-xs">{{ updateManifestPreview.manifest.id }}</span>
               </div>
+              <template v-else>
+                <div>
+                  <span class="text-zinc-400">Version:</span>
+                  <span class="text-white ml-2">{{ updateManifestPreview.manifest.version }}</span>
+                </div>
+                <div>
+                  <span class="text-zinc-400">Author:</span>
+                  <span class="text-white ml-2">{{ updateManifestPreview.manifest.author }}</span>
+                </div>
+                <div>
+                  <span class="text-zinc-400">License:</span>
+                  <span class="text-white ml-2">{{ updateManifestPreview.manifest.license || 'MIT' }}</span>
+                </div>
+              </template>
               <div>
-                <span class="text-zinc-400">Author:</span>
-                <span class="text-white ml-2">{{ updateManifestPreview.manifest.author }}</span>
-              </div>
-              <div>
-                <span class="text-zinc-400">License:</span>
-                <span class="text-white ml-2">{{ updateManifestPreview.manifest.license || 'MIT' }}</span>
+                <span class="text-zinc-400">Description:</span>
+                <span class="text-white ml-2 line-clamp-2">{{ updateManifestPreview.manifest.description }}</span>
               </div>
             </div>
           </div>
 
+          <!-- ID mismatch warning (BetterSEQTA) -->
+          <div v-if="theme.theme_type === 'betterseqta' && updateManifestPreview?.manifest?.id && updateManifestPreview.manifest.id !== themeId" class="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+            <p class="text-amber-400 text-sm">
+              Theme ID in ZIP ({{ updateManifestPreview.manifest.id }}) does not match this theme ({{ themeId }}). Upload a ZIP for the correct theme.
+            </p>
+          </div>
+
           <!-- Update Button -->
-          <div v-if="selectedUpdateFile && updateManifestPreview?.validation?.valid" class="mt-6 flex justify-end">
+          <div v-if="selectedUpdateFile && updateManifestPreview?.validation?.valid && (theme.theme_type !== 'betterseqta' || updateManifestPreview.manifest?.id === themeId)" class="mt-6 flex justify-end">
             <button
               @click="updateThemeFiles"
               :disabled="updatingFiles"
