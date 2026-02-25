@@ -217,7 +217,7 @@ useSchemaOrg([
     image: (p as any).cover_image,
     datePublished: p.created_at,
     dateModified: (p as any).updated_at ?? p.created_at,
-    author: (p as any).author_name ? [{ name: (p as any).author_name }] : undefined,
+    author: (p as any).author_name ? [{ name: (p as any).author_name }] : [{ name: 'BetterSEQTA' }],
     url: `${baseUrl}/news/${route.params.slug}`,
   }),
 ]);

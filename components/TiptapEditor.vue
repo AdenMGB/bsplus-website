@@ -242,10 +242,12 @@ const toggleCodeBlock = () => {
     if (language !== null) {
       // Create code block and set language in one chain
       const chain = editor.value?.chain().focus().setCodeBlock()
-      if (language.trim()) {
-        chain.updateAttributes('codeBlock', { language: language.trim() })
+      if (chain) {
+        if (language.trim()) {
+          chain.updateAttributes('codeBlock', { language: language.trim() })
+        }
+        chain.run()
       }
-      chain.run()
     }
   }
 }
