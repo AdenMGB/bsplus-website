@@ -196,11 +196,19 @@ const description = p.content ? stripHtml(p.content) : `${p.title} - News from B
 const config = useRuntimeConfig();
 const baseUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
+const coverImage = (p as any).cover_image
+  ? ((p as any).cover_image.startsWith('http') ? (p as any).cover_image : `${baseUrl}${(p as any).cover_image}`)
+  : undefined;
+
 usePageSeo({
   title: p.title,
   description,
-  image: (p as any).cover_image || '/favicon-96x96.png',
+  ...(coverImage ? { image: coverImage, imageAlt: p.title } : {
+    ogImageComponent: 'PageOG',
+    ogImageProps: { title: p.title, description: description.slice(0, 120), headline: 'News' },
+  }),
   canonical: `${baseUrl}/news/${route.params.slug}`,
+  ogType: 'article',
 });
 
 useSeoMeta({

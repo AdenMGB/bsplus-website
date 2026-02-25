@@ -54,7 +54,7 @@ export default defineNuxtConfig({
     },
 
   ogImage: {
-    zeroRuntime: true,
+    zeroRuntime: false, // Enable runtime for dynamic OG images (news, etc.)
   },
 
   schemaOrg: {

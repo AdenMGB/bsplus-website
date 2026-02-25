@@ -108,6 +108,12 @@ import { useMarkdown } from '~/composables/useMarkdown';
 usePageSeo({
   title: 'BetterSEQTA+ Changelog',
   description: 'Complete release history and updates for BetterSEQTA+ browser extension. See new features, themes, and SEQTA Learn enhancements.',
+  ogImageComponent: "PageOG",
+  ogImageProps: {
+    title: "BetterSEQTA+ Changelog",
+    description: "Release history and updates for the extension",
+    headline: "Extension Updates",
+  },
 });
 
 const { render } = useMarkdown();

@@ -108,6 +108,12 @@ import { useMarkdown } from '~/composables/useMarkdown';
 usePageSeo({
   title: 'DesQTA Changelog',
   description: 'Complete release history and updates for DesQTA desktop application. See new features, bug fixes, and improvements.',
+  ogImageComponent: "DesQTAOG",
+  ogImageProps: {
+    title: "DesQTA Changelog",
+    description: "Release history and updates for the desktop app",
+    headline: "Desktop App Updates",
+  },
 });
 
 const { render } = useMarkdown();

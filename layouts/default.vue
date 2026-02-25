@@ -100,15 +100,18 @@
 <script setup lang="ts">
 import DailyQuestion from '~/components/DailyQuestion.vue';
 
-const siteDesc = "A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance";
+const siteDesc = "BetterSEQTA+ and DesQTA enhance SEQTA Learn with themes, live wallpapers, and a full desktop experience. Download for Windows, Mac, Linux, and Android.";
 const config = useRuntimeConfig();
 const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
+// Fallback defaults - pages override with usePageSeo
 useSeoMeta({
   description: siteDesc,
   ogDescription: siteDesc,
   ogSiteName: 'BetterSEQTA Plus',
   ogImage: `${siteUrl}/favicon-96x96.png`,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
   twitterCard: 'summary_large_image',
 });
 useHead({
@@ -142,8 +145,5 @@ useHead({
     },
   ],
 });
-defineOgImageComponent("DropOG", {
-  title: "DesQTA",
-  // logo: "/favicon.png",
-});
+// OG images set per-page via usePageSeo
 </script>
