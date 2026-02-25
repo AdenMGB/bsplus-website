@@ -55,7 +55,6 @@ defineOgImageComponent('PageOG');
         {{ desc }}
       </p>
       <div class="mt-8 flex items-center gap-3">
-        <img src="/favicon-96x96.png" alt="" class="h-12 w-12 rounded-lg" />
         <span class="text-xl font-medium text-zinc-300">BetterSEQTA Plus</span>
       </div>
     </div>
