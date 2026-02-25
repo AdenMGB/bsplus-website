@@ -306,6 +306,12 @@ import { ref, onMounted, computed } from 'vue';
 usePageSeo({
   title: "Download",
   description: "Download BetterSEQTA+ and DesQTA for Windows, Mac, Linux, and Android. Get the SEQTA Learn browser extension or full desktop application.",
+  ogImageComponent: "PageOG",
+  ogImageProps: {
+    title: "Download BetterSEQTA+ & DesQTA",
+    description: "Browser extension and desktop app for SEQTA Learn",
+    headline: "Get Started",
+  },
 });
 
 const schemaHelpers = useSchemaOrgHelpers();

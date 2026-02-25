@@ -118,8 +118,19 @@
 <script setup lang="ts">
 usePageSeo({
   title: "Minecraft Server",
-  description: "Join the BetterSEQTA+ Minecraft server. Community gaming for SEQTA users.",
+  description: "Join the BetterSEQTA+ Minecraft server. Community gaming for SEQTA users. Server: mc.betterseqta.org",
+  ogImageComponent: "PageOG",
+  ogImageProps: {
+    title: "BetterSEQTA+ Minecraft",
+    description: "Join our community — mc.betterseqta.org",
+    headline: "Community Server",
+  },
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.webPage('Minecraft Server', 'Join the BetterSEQTA+ Minecraft community server.'),
+]);
 </script>
 
 <style scoped>

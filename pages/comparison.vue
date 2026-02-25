@@ -323,5 +323,16 @@ const Semimark = defineComponent({
 usePageSeo({
   title: "Comparison",
   description: "Compare BetterSEQTA+ browser extension and DesQTA desktop app. See features, platforms, and choose the best SEQTA Learn experience for you.",
+  ogImageComponent: "PageOG",
+  ogImageProps: {
+    title: "BetterSEQTA+ vs DesQTA",
+    description: "Compare extension and desktop app — choose your SEQTA experience",
+    headline: "Feature Comparison",
+  },
 });
+
+const schemaHelpers = useSchemaOrgHelpers();
+useSchemaOrg([
+  schemaHelpers.webPage('Comparison', 'Compare BetterSEQTA+ extension and DesQTA desktop app features.'),
+]);
 </script>

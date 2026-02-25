@@ -112,6 +112,12 @@
 usePageSeo({
   title: "Privacy Policy",
   description: "Privacy Policy for BetterSEQTA+ and DesQTA. Learn how we handle your data and protect your privacy.",
+  ogImageComponent: "PageOG",
+  ogImageProps: {
+    title: "Privacy Policy",
+    description: "How BetterSEQTA+ and DesQTA handle your data",
+    headline: "Your Privacy Matters",
+  },
 });
 
 const schemaHelpers = useSchemaOrgHelpers();
