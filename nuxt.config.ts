@@ -49,7 +49,7 @@ export default defineNuxtConfig({
       minify: true,
       compressPublicAssets: true,
       prerender: {
-        crawlLinks: true,
+        crawlLinks: false, // DB binding unavailable at build time; render at runtime on CF Workers
       },
     },
 

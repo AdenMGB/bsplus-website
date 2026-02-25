@@ -23,7 +23,8 @@ export function usePageSeo(options: {
 
   // Dynamic OG image - generates at runtime when crawlers request it
   if (options.ogImageComponent) {
-    defineOgImage(options.ogImageComponent, {
+    defineOgImage({
+      component: options.ogImageComponent,
       ...options.ogImageProps,
       alt: options.imageAlt ?? options.description?.slice(0, 100),
     });
