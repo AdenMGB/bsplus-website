@@ -1,16 +1,36 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
+      <div class="flex flex-col gap-6 mb-12 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Dashboard</h2>
           <p class="mt-2 text-lg text-zinc-400">Welcome back, Admin.</p>
         </div>
+        <div class="flex flex-wrap gap-2">
+          <NuxtLink to="/admin/analytics" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 px-3 py-2 text-sm font-medium text-emerald-400 transition-all duration-200 hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            Analytics
+          </NuxtLink>
+          <NuxtLink to="/admin/themes" class="inline-flex items-center gap-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 px-3 py-2 text-sm font-medium text-purple-400 transition-all duration-200 hover:scale-105">
+            Themes
+          </NuxtLink>
+          <NuxtLink to="/admin/collections" class="inline-flex items-center gap-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 px-3 py-2 text-sm font-medium text-blue-400 transition-all duration-200 hover:scale-105">
+            Collections
+          </NuxtLink>
+          <NuxtLink to="/admin/questionnaire" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 px-3 py-2 text-sm font-medium text-indigo-400 transition-all duration-200 hover:scale-105">
+            Questions
+          </NuxtLink>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-16">
+      <!-- Stats Cards -->
+      <div class="mb-12">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">Overview</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
         <!-- Stats Cards -->
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Themes</dt>
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.themes?.total || 0 }}</dd>
           <dd class="mt-1 text-sm text-zinc-500">{{ stats.themes?.pending || 0 }} pending</dd>
@@ -19,13 +39,25 @@
           </NuxtLink>
         </div>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">Collections</dt>
+          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.collections?.total || 0 }}</dd>
+          <dd class="mt-1 text-sm text-zinc-500">{{ stats.collections?.totalThemes || 0 }} themes total</dd>
+          <NuxtLink to="/admin/collections" class="mt-4 inline-flex items-center gap-2 rounded-md bg-blue-600/10 hover:bg-blue-600/20 border border-blue-600/20 hover:border-blue-600/40 px-3 py-1.5 text-xs font-medium text-blue-400 transition-all hover:scale-105">
+            Manage Collections
+          </NuxtLink>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">News Posts</dt>
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.news?.total || 0 }}</dd>
           <dd class="mt-1 text-sm text-zinc-500">{{ stats.news?.published || 0 }} published</dd>
+          <NuxtLink to="/admin/news/create" class="mt-4 inline-flex items-center gap-2 rounded-md bg-green-600/10 hover:bg-green-600/20 border border-green-600/20 hover:border-green-600/40 px-3 py-1.5 text-xs font-medium text-green-400 transition-all hover:scale-105">
+            Create Post
+          </NuxtLink>
         </div>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
           <div class="flex items-baseline gap-2">
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.sessions?.total || 0 }}</dd>
@@ -48,7 +80,7 @@
           </NuxtLink>
         </div>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Daily Questions</dt>
           <div class="flex items-baseline gap-2">
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.questions?.total || 0 }}</dd>
@@ -64,7 +96,7 @@
           </p>
         </div>
 
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">DesQTA Sessions</dt>
           <div class="flex items-baseline gap-2">
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.desqtaSessions?.total || 0 }}</dd>
@@ -85,6 +117,61 @@
             </svg>
             View Charts
           </NuxtLink>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">App Usage (30d)</dt>
+          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ usageSummary.totalReports ?? 0 }}</dd>
+          <dd class="mt-1 text-sm text-zinc-500">{{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices</dd>
+          <NuxtLink to="/admin/analytics" class="mt-4 inline-flex items-center gap-2 rounded-md bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-600/20 hover:border-emerald-600/40 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-all hover:scale-105">
+            Full Analytics
+          </NuxtLink>
+        </div>
+        </div>
+      </div>
+
+      <!-- Collections Section -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-white">Collections</h3>
+          <NuxtLink to="/admin/collections/new" class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create Collection
+          </NuxtLink>
+        </div>
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden mb-8">
+          <div class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center">
+            <h3 class="text-base font-semibold leading-7 text-white">Recent Collections</h3>
+            <NuxtLink to="/admin/collections" class="text-sm font-medium text-blue-500 hover:text-blue-400">View all</NuxtLink>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <NuxtLink
+                v-for="collection in recentCollections"
+                :key="collection.id"
+                :to="`/admin/collections/${collection.id}`"
+                class="flex items-center gap-4 p-4 rounded-lg border border-zinc-700 bg-zinc-800/50 hover:border-zinc-600 transition-all duration-200 hover:scale-[1.02]"
+              >
+                <div class="aspect-video w-16 shrink-0 rounded overflow-hidden bg-zinc-900">
+                  <img v-if="collection.cover_image_url" :src="collection.cover_image_url" :alt="collection.name" class="w-full h-full object-cover" />
+                  <div v-else class="w-full h-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-zinc-600">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-medium text-white truncate">{{ collection.name }}</div>
+                  <div class="text-xs text-zinc-500 mt-0.5">{{ collection.theme_count || 0 }} themes</div>
+                </div>
+              </NuxtLink>
+              <div v-if="!recentCollections?.length" class="col-span-full text-center py-8 text-zinc-500 italic">
+                No collections yet. Create your first collection!
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -220,6 +307,42 @@
         </div>
       </div>
 
+      <!-- Analytics Summary -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-white">Analytics Summary</h3>
+          <NuxtLink to="/admin/analytics" class="flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-all hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z" />
+            </svg>
+            Full Analytics
+          </NuxtLink>
+        </div>
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden mb-8">
+          <div class="px-6 py-4 border-b border-zinc-800">
+            <h3 class="text-base font-semibold leading-7 text-white">App Usage (Last 30 Days)</h3>
+          </div>
+          <div class="p-6">
+            <div v-if="usageData?.byPlatform?.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div
+                v-for="p in usageData.byPlatform"
+                :key="p.platform"
+                class="flex items-center gap-3 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3"
+              >
+                <admin-platform-icon :platform="p.platform" />
+                <div>
+                  <span class="font-medium capitalize text-white">{{ p.platform }}</span>
+                  <span class="block text-sm text-zinc-500">{{ p.total_sessions }} sessions</span>
+                </div>
+              </div>
+            </div>
+            <div v-else class="py-8 text-center text-zinc-500 text-sm">
+              No app usage data yet. Data appears when DesQTA sends usage reports.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- News Section -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-6">
@@ -299,8 +422,10 @@ definePageMeta({
 
 const { data: posts } = await useFetch<any[]>('/api/news?admin=true');
 const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
+const { data: usageData } = await useFetch<any>('/api/analytics/usage?days=30');
 const { data: questions, refresh: refreshQuestions } = await useFetch<any[]>('/api/questionnaire?admin=true');
 const { data: themesData } = await useFetch<any>('/api/admin/themes');
+const { data: collectionsData } = await useFetch<any>('/api/admin/collections');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -326,13 +451,26 @@ const recentThemes = computed(() => {
   return themes.slice(0, 5);
 });
 
+const recentCollections = computed(() => {
+  const collections = collectionsData.value?.data?.collections || [];
+  return collections.slice(0, 6);
+});
+
+const usageSummary = computed(() => usageData.value?.summary || {});
+
 const stats = computed(() => {
   const themeStats = analyticsStats.value?.themes;
+  const collections = collectionsData.value?.data?.collections || [];
+  const totalThemesInCollections = collections.reduce((sum: number, c: any) => sum + (c.theme_count || 0), 0);
   return {
     themes: {
       total: themeStats?.total ?? 0,
       pending: themeStats?.pending ?? 0,
       approved: themeStats?.approved ?? 0
+    },
+    collections: {
+      total: collections.length,
+      totalThemes: totalThemesInCollections
     },
     news: {
       total: posts.value?.length || 0,
