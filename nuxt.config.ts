@@ -16,6 +16,8 @@ export default defineNuxtConfig({
     oauthClientId: process.env.NUXT_OAUTH_CLIENT_ID ?? '',
     oauthClientSecret: process.env.NUXT_OAUTH_CLIENT_SECRET ?? '',
     oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
+    accountsApiKey: process.env.ACCOUNTS_API_KEY ?? '',
+    accountsApiUrl: process.env.ACCOUNTS_API_URL ?? 'https://accounts.betterseqta.org',
     public: {
       siteUrl: 'https://betterseqta.org',
     },
