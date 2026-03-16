@@ -1,89 +1,97 @@
 <script lang="ts" setup>
 /**
- * @credits Pergel <https://nuxtlabs.com/>
- * Based on https://github.com/nuxt-modules/og-image/blob/b510a7170d8feeb70790707eab7a075f6b029339/src/runtime/app/components/Templates/Community/Pergel.vue
+ * DesQTA OG image template.
+ * 1200x630 - standard OG dimensions.
+ * Full bleed, site-themed, with logo.
  */
-import { computed } from "vue";
+import { computed } from 'vue';
 
 const {
-  title: propTitle = "title",
-  description = "description",
-  headline = "v0.2",
+  title: propTitle = 'DesQTA',
+  description = 'description',
+  headline = 'v0.2',
 } = defineProps<{
   title?: string;
   description?: string;
   headline?: string;
 }>();
 
-const title = computed(() => propTitle.slice(0, 60));
+const title = computed(() => String(propTitle || 'DesQTA').slice(0, 60));
+const desc = computed(() => String(description || '').slice(0, 200));
 
-defineOgImageComponent("DesQTAOG", {
-  title: "DesQTA",
-  // logo: "/favicon.png",
+defineOgImageComponent('DesQTAOG', {
+  title: 'DesQTA',
 });
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col justify-center bg-[#121212]">
+  <div
+    class="relative flex flex-col justify-between bg-[#09090b] p-16"
+    style="width: 1200px; height: 630px;"
+  >
+    <!-- Full-bleed background -->
     <svg
-      class="absolute top-0 right-0"
-      width="1200"
-      height="675"
-      viewBox="0 0 1200 675"
+      class="absolute inset-0 h-full w-full"
+      viewBox="0 0 1200 630"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g
-        style="mix-blend-mode: overlay"
-        opacity="0.7"
-        filter="url(#filter0_f_448_25)"
-      >
-        <circle cx="901.5" cy="45.5" r="199.5" fill="#333333" />
-        <circle cx="600.5" cy="216.5" r="199.5" fill="#444444" />
-        <circle cx="179.5" cy="317.5" r="199.5" fill="#555555" />
-      </g>
       <defs>
-        <filter
-          id="filter0_f_448_25"
-          x="-240"
-          y="-374"
-          width="1561"
-          height="1111"
-          filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
-        >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="110"
-            result="effect1_foregroundBlur_448_25"
-          />
+        <radialGradient id="dropog-grad" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" style="stop-color:#18181b" />
+          <stop offset="100%" style="stop-color:#09090b" />
+        </radialGradient>
+        <filter id="dropog-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="110" />
         </filter>
       </defs>
+      <rect width="1200" height="630" fill="url(#dropog-grad)" />
+      <g style="mix-blend-mode: overlay" opacity="0.15">
+        <circle cx="901.5" cy="45.5" r="199.5" fill="#27272a" filter="url(#dropog-blur)" />
+        <circle cx="600.5" cy="216.5" r="199.5" fill="#3f3f46" filter="url(#dropog-blur)" />
+        <circle cx="179.5" cy="317.5" r="199.5" fill="#52525b" filter="url(#dropog-blur)" />
+      </g>
+      <circle cx="900" cy="120" r="180" fill="#3b82f6" filter="url(#dropog-blur)" opacity="0.1" />
     </svg>
 
-    <div class="w-[600px] pl-[100px]">
-      <p
-        v-if="headline"
-        class="uppercase text-[24px] text-blue-400 mb-4 font-semibold"
-      >
-        {{ headline }}
-      </p>
-      <h1
-        class="w-[600px] m-0 text-[75px] font-semibold mb-4 text-[#E0E0E0] flex items-center"
-      >
-        <span>{{ title }}</span>
-      </h1>
-      <p class="text-[32px] text-[#B0B0B0] leading-tight">
-        {{ description.slice(0, 200) }}
-      </p>
+    <div class="relative z-10 flex flex-1 items-center">
+      <div class="max-w-[600px]">
+        <p
+          v-if="headline"
+          class="mb-4 text-2xl font-semibold uppercase tracking-wide text-blue-400"
+        >
+          {{ headline }}
+        </p>
+        <h1 class="m-0 mb-4 text-[72px] font-semibold leading-tight text-white">
+          {{ title }}
+        </h1>
+        <p v-if="desc" class="text-3xl leading-snug text-zinc-400">
+          {{ desc }}
+        </p>
+      </div>
+
+      <!-- Logo on the right -->
+      <div class="absolute right-16 top-1/2 -translate-y-1/2">
+        <img
+          src="/favicon-96x96.png"
+          alt="DesQTA"
+          width="180"
+          height="180"
+          class="rounded-2xl"
+        />
+      </div>
     </div>
 
-    <Logo class="absolute top-[180px] right-[190px]" height="250" />
+    <!-- Bottom bar with site name -->
+    <div class="relative z-10 mt-8 flex items-center gap-4">
+      <img
+        src="/favicon-96x96.png"
+        alt="BetterSEQTA Plus"
+        width="40"
+        height="40"
+        class="rounded-lg"
+      />
+      <span class="text-lg font-semibold text-zinc-400">BetterSEQTA Plus</span>
+    </div>
   </div>
 </template>
