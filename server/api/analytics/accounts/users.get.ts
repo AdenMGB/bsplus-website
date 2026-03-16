@@ -16,7 +16,9 @@ interface ExportUser {
   displayName?: string;
   pfpUrl?: string;
   admin_level?: number;
-  created_at: number;
+  is_admin?: number;
+  created_at?: number;
+  createdAt?: string;
 }
 
 interface UsersFullResponse {
@@ -30,6 +32,17 @@ function extractEmailDomain(email: string | undefined): string {
   if (at === -1) return '(invalid)';
   const domain = email.slice(at + 1).toLowerCase().trim();
   return domain || '(empty)';
+}
+
+function getCreatedAtDate(u: ExportUser): Date | null {
+  const ts = u.created_at;
+  if (typeof ts === 'number' && ts > 0) return new Date(ts * 1000);
+  const str = u.createdAt;
+  if (typeof str === 'string') {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
+  }
+  return null;
 }
 
 export default defineEventHandler(async (event) => {
@@ -64,12 +77,11 @@ export default defineEventHandler(async (event) => {
     const users = res?.users || [];
     const total = users.length;
 
-    // Daily signups: group by date
+    // Daily signups: group by date (createdAt or created_at)
     const dailyMap = new Map<string, number>();
     for (const u of users) {
-      const ts = u.created_at;
-      if (!ts) continue;
-      const date = new Date(ts * 1000);
+      const date = getCreatedAtDate(u);
+      if (!date) continue;
       const key = date.toISOString().slice(0, 10); // YYYY-MM-DD
       dailyMap.set(key, (dailyMap.get(key) || 0) + 1);
     }
@@ -100,7 +112,9 @@ export default defineEventHandler(async (event) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 15);
 
-    const adminCount = users.filter((u) => (u.admin_level ?? 0) > 0).length;
+    const adminCount = users.filter(
+      (u) => (u.admin_level ?? 0) > 0 || (u.is_admin ?? 0) > 0
+    ).length;
 
     return {
       error: null,
