@@ -28,7 +28,14 @@
       <!-- Stats Cards -->
       <div class="mb-12">
         <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">Overview</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
+        <div v-if="overviewLoading" class="mb-8 flex items-center gap-2 text-zinc-500">
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Loading stats...
+        </div>
+        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
         <!-- Stats Cards -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Themes</dt>
@@ -167,7 +174,10 @@
                   <div class="text-xs text-zinc-500 mt-0.5">{{ collection.theme_count || 0 }} themes</div>
                 </div>
               </NuxtLink>
-              <div v-if="!recentCollections?.length" class="col-span-full text-center py-8 text-zinc-500 italic">
+              <div v-if="collectionsLoading" class="col-span-full text-center py-8 text-zinc-500">
+                Loading collections...
+              </div>
+              <div v-else-if="!recentCollections?.length" class="col-span-full text-center py-8 text-zinc-500 italic">
                 No collections yet. Create your first collection!
               </div>
             </div>
@@ -230,7 +240,10 @@
                       <NuxtLink :to="`/admin/questionnaire/edit/${q.id}`" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Edit</NuxtLink>
                     </td>
                   </tr>
-                  <tr v-if="!recentQuestions || recentQuestions.length === 0">
+                  <tr v-if="questionsLoading">
+                    <td colspan="5" class="px-6 py-8 text-center text-zinc-500">Loading questions...</td>
+                  </tr>
+                  <tr v-else-if="!recentQuestions || recentQuestions.length === 0">
                     <td colspan="5" class="px-6 py-8 text-center text-zinc-500 italic">No questions found.</td>
                   </tr>
                 </tbody>
@@ -297,7 +310,10 @@
                       <NuxtLink :to="`/admin/themes/${theme.id}`" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</NuxtLink>
                     </td>
                   </tr>
-                  <tr v-if="!recentThemes || recentThemes.length === 0">
+                  <tr v-if="themesLoading">
+                    <td colspan="5" class="px-6 py-8 text-center text-zinc-500">Loading themes...</td>
+                  </tr>
+                  <tr v-else-if="!recentThemes || recentThemes.length === 0">
                     <td colspan="5" class="px-6 py-8 text-center text-zinc-500 italic">No themes found.</td>
                   </tr>
                 </tbody>
@@ -402,7 +418,10 @@
                       <button @click="deletePost(post.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors">Delete</button>
                     </td>
                   </tr>
-                  <tr v-if="!recentPosts || recentPosts.length === 0">
+                  <tr v-if="postsLoading">
+                    <td colspan="5" class="px-6 py-8 text-center text-zinc-500">Loading posts...</td>
+                  </tr>
+                  <tr v-else-if="!recentPosts || recentPosts.length === 0">
                      <td colspan="5" class="px-6 py-8 text-center text-zinc-500 italic">No posts found.</td>
                   </tr>
                 </tbody>
@@ -420,12 +439,12 @@ definePageMeta({
   middleware: ["admin"]
 });
 
-const { data: posts } = await useFetch<any[]>('/api/news?admin=true');
-const { data: analyticsStats } = await useFetch<any>('/api/analytics/stats');
-const { data: usageData } = await useFetch<any>('/api/analytics/usage?days=30');
-const { data: questions, refresh: refreshQuestions } = await useFetch<any[]>('/api/questionnaire?admin=true');
-const { data: themesData } = await useFetch<any>('/api/admin/themes');
-const { data: collectionsData } = await useFetch<any>('/api/admin/collections');
+const { data: posts, pending: postsLoading, refresh: refreshPosts } = useLazyFetch<any[]>('/api/news?admin=true');
+const { data: analyticsStats, pending: statsLoading } = useLazyFetch<any>('/api/analytics/stats');
+const { data: usageData, pending: usageLoading } = useLazyFetch<any>('/api/analytics/usage?days=30');
+const { data: questions, refresh: refreshQuestions, pending: questionsLoading } = useLazyFetch<any[]>('/api/questionnaire?admin=true');
+const { data: themesData, pending: themesLoading } = useLazyFetch<any>('/api/admin/themes');
+const { data: collectionsData, pending: collectionsLoading } = useLazyFetch<any>('/api/admin/collections');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -457,6 +476,10 @@ const recentCollections = computed(() => {
 });
 
 const usageSummary = computed(() => usageData.value?.summary || {});
+
+const overviewLoading = computed(() =>
+  statsLoading.value || usageLoading.value || themesLoading.value || collectionsLoading.value
+);
 
 const stats = computed(() => {
   const themeStats = analyticsStats.value?.themes;
@@ -541,9 +564,7 @@ async function deletePost(id: number) {
   if (!confirm('Are you sure you want to delete this post?')) return;
   try {
     await $fetch(`/api/news/${id}`, { method: 'DELETE' });
-    // Refresh data
-    const { data } = await useFetch('/api/news?admin=true');
-    posts.value = data.value as any[];
+    await refreshPosts();
   } catch (e) {
     alert('Failed to delete post');
   }
