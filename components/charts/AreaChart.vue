@@ -30,6 +30,8 @@ const props = defineProps<{
   xAxisKey?: string;
   containerClass?: string;
   hours?: number;
+  /** When set, stacks series on top of each other (e.g. for signed-in vs anonymous) */
+  stack?: string;
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -66,6 +68,7 @@ const chartOption = computed(() => {
       name: config.label || key,
       type: 'line',
       data: seriesData,
+      stack: props.stack,
       smooth: true,
       symbol: 'none',
       sampling: 'lttb',
