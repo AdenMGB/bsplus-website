@@ -2,10 +2,10 @@ export const useAuth = () => {
   const user = useState<any | null>('auth_user', () => null);
   const loading = useState<boolean>('auth_loading', () => true);
 
-  const fetchUser = async () => {
+  const fetchUser = async (headers?: Record<string, string>) => {
     loading.value = true;
     try {
-      const data = await $fetch('/api/auth/me');
+      const data = await $fetch('/api/auth/me', { headers });
       user.value = data;
     } catch (e) {
       user.value = null;

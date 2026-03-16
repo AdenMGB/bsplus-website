@@ -1,5 +1,7 @@
 <template>
-  <div v-if="question && !isDismissed" class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 w-[calc(100%-1rem)] sm:w-auto sm:min-w-[400px] sm:max-w-md">
+  <div v-if="question">
+    <!-- Main poll widget -->
+    <div v-if="!isDismissed" class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 w-[calc(100%-1rem)] sm:w-auto sm:min-w-[400px] sm:max-w-md">
     <div class="bg-zinc-900/95 border border-zinc-800 rounded-lg backdrop-blur-sm shadow-xl transition-all duration-200">
       <!-- Minimized State -->
       <div v-if="isMinimized" class="p-3 cursor-pointer" @click="isMinimized = false">
@@ -134,6 +136,20 @@
         </div>
       </Dialog>
     </TransitionRoot>
+    </div>
+
+    <!-- Tiny "bring back" button when dismissed -->
+    <button
+      v-else
+      @click="showPoll"
+      class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 flex items-center gap-1.5 rounded-md bg-zinc-800/90 hover:bg-zinc-700 border border-zinc-600 px-2 py-1.5 text-xs font-medium text-zinc-300 hover:text-white transition-all duration-200 backdrop-blur-sm"
+      title="Show daily poll"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+        <path d="M2 3a1 1 0 011-1h2a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V3zM8 6a1 1 0 011-1h2a1 1 0 011 1v11a1 1 0 01-1 1H9a1 1 0 01-1-1V6zM14 9a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z" />
+      </svg>
+      Poll
+    </button>
   </div>
 </template>
 
@@ -193,6 +209,14 @@ function dismissPoll() {
   isDismissed.value = true;
   if (typeof sessionStorage !== 'undefined' && question.value) {
     sessionStorage.setItem(DISMISSED_KEY, String(question.value.id));
+  }
+}
+
+function showPoll() {
+  isDismissed.value = false;
+  isMinimized.value = false;
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.removeItem(DISMISSED_KEY);
   }
 }
 
