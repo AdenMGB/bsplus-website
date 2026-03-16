@@ -351,26 +351,93 @@
         <div v-if="accountsLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
           <div class="text-zinc-400">Loading accounts...</div>
         </div>
-        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-            <dt class="text-sm font-medium text-zinc-400">Total Users</dt>
-            <dd v-if="accountsData.users?.error" class="mt-2 text-sm text-amber-400">
-              {{ accountsData.users.error }}
-            </dd>
-            <dd v-else class="mt-2 text-3xl font-bold text-white">
-              {{ accountsData.users?.total ?? '—' }}
-            </dd>
-            <dd class="mt-1 text-xs text-zinc-500">From accounts.betterseqta.org</dd>
+        <div v-else class="space-y-6">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-sm font-medium text-zinc-400">Total Users</dt>
+              <dd v-if="accountsData.users?.error" class="mt-2 text-sm text-amber-400">
+                {{ accountsData.users.error }}
+              </dd>
+              <dd v-else class="mt-2 text-3xl font-bold text-white">
+                {{ accountsData.users?.total ?? '—' }}
+              </dd>
+              <dd class="mt-1 text-xs text-zinc-500">From accounts.betterseqta.org</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-sm font-medium text-zinc-400">Reserved Clients</dt>
+              <dd v-if="accountsData.reservedClients?.error" class="mt-2 text-sm text-amber-400">
+                {{ accountsData.reservedClients.error }}
+              </dd>
+              <dd v-else class="mt-2 text-3xl font-bold text-white">
+                {{ accountsData.reservedClients?.count ?? '—' }}
+              </dd>
+              <dd class="mt-1 text-xs text-zinc-500">DesQTA client instances</dd>
+            </div>
+            <div
+              v-if="accountsUsersData.total != null"
+              class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]"
+            >
+              <dt class="text-sm font-medium text-zinc-400">Admins</dt>
+              <dd class="mt-2 text-3xl font-bold text-white">{{ accountsUsersData.adminCount ?? '—' }}</dd>
+              <dd class="mt-1 text-xs text-zinc-500">From full user export</dd>
+            </div>
+            <div
+              v-if="accountsUsersData.topDomains?.length"
+              class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]"
+            >
+              <dt class="text-sm font-medium text-zinc-400">Top Domain</dt>
+              <dd class="mt-2 text-xl font-bold text-white truncate" :title="accountsUsersData.topDomains[0]?.domain">
+                {{ accountsUsersData.topDomains[0]?.domain ?? '—' }}
+              </dd>
+              <dd class="mt-1 text-xs text-zinc-500">{{ accountsUsersData.topDomains[0]?.count ?? 0 }} users</dd>
+            </div>
           </div>
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-            <dt class="text-sm font-medium text-zinc-400">Reserved Clients</dt>
-            <dd v-if="accountsData.reservedClients?.error" class="mt-2 text-sm text-amber-400">
-              {{ accountsData.reservedClients.error }}
-            </dd>
-            <dd v-else class="mt-2 text-3xl font-bold text-white">
-              {{ accountsData.reservedClients?.count ?? '—' }}
-            </dd>
-            <dd class="mt-1 text-xs text-zinc-500">DesQTA client instances</dd>
+
+          <!-- Signups over time & email domains -->
+          <div v-if="accountsUsersLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
+            <div class="text-zinc-400">Loading user analytics...</div>
+          </div>
+          <div v-else-if="!accountsUsersData.error" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">User Signups Over Time</h4>
+              <div v-if="!signupsChartData.length" class="flex min-h-[300px] items-center justify-center text-zinc-500">
+                No signup data
+              </div>
+              <div v-else class="space-y-6">
+                <div>
+                  <p class="mb-2 text-sm text-zinc-400">Daily signups</p>
+                  <AreaChart
+                    :data="signupsChartData"
+                    :chart-config="signupsChartConfig"
+                    container-class="min-h-[240px]"
+                  />
+                </div>
+                <div>
+                  <p class="mb-2 text-sm text-zinc-400">Cumulative users</p>
+                  <AreaChart
+                    :data="signupsChartData"
+                    :chart-config="cumulativeChartConfig"
+                    container-class="min-h-[240px]"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">Most Used Email Domains</h4>
+              <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] items-center justify-center text-zinc-500">
+                No domain data
+              </div>
+              <div v-else class="space-y-2">
+                <div
+                  v-for="d in accountsUsersData.topDomains"
+                  :key="d.domain"
+                  class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3"
+                >
+                  <span class="font-mono text-sm text-white">{{ d.domain }}</span>
+                  <span class="ml-4 shrink-0 text-zinc-400">{{ d.count }} users</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <p v-if="accountsData.users?.error || accountsData.reservedClients?.error" class="mt-4 text-sm text-zinc-500">
@@ -424,12 +491,20 @@ const usageLoading = ref(true);
 const themeLoading = ref(true);
 const questionnaireLoading = ref(true);
 const accountsLoading = ref(true);
+const accountsUsersLoading = ref(true);
 const flushing = ref(false);
 const chartData = ref<any[]>([]);
 const stats = ref<any>({});
 const themeData = ref<any>({ summary: {}, byCategory: [], topByDownloads: [] });
 const questionnaireData = ref<any>({ summary: {}, questions: [] });
 const accountsData = ref<any>({ users: {}, reservedClients: {} });
+const accountsUsersData = ref<any>({
+  error: null,
+  total: null,
+  signupsOverTime: [],
+  topDomains: [],
+  adminCount: null,
+});
 const usageData = ref<{
   daily: any[];
   byPlatform: any[];
@@ -475,6 +550,12 @@ const signedInChartConfig = {
   signed_in_sessions: { label: 'Cloud Signed-in', color: '#34d399' },
   anonymous_sessions: { label: 'Anonymous', color: '#64748b' },
 };
+const signupsChartConfig = {
+  daily_signups: { label: 'Daily Signups', color: '#34d399' },
+};
+const cumulativeChartConfig = {
+  cumulative_signups: { label: 'Cumulative Users', color: '#60a5fa' },
+};
 
 const usageSummary = computed(() => usageData.value.summary || {});
 
@@ -498,6 +579,14 @@ const usageChartData = computed(() =>
     total_sessions: d.total_sessions,
     signed_in_sessions: d.signed_in_sessions ?? 0,
     anonymous_sessions: d.anonymous_sessions ?? 0,
+  }))
+);
+
+const signupsChartData = computed(() =>
+  (accountsUsersData.value.signupsOverTime || []).map((d) => ({
+    timestamp: d.timestamp,
+    daily_signups: d.daily_signups,
+    cumulative_signups: d.cumulative_signups,
   }))
 );
 
@@ -552,6 +641,23 @@ async function loadAccountsData() {
     accountsData.value = { users: {}, reservedClients: {} };
   } finally {
     accountsLoading.value = false;
+  }
+}
+
+async function loadAccountsUsersData() {
+  accountsUsersLoading.value = true;
+  try {
+    accountsUsersData.value = await $fetch<any>('/api/analytics/accounts/users');
+  } catch {
+    accountsUsersData.value = {
+      error: 'Failed to load',
+      total: null,
+      signupsOverTime: [],
+      topDomains: [],
+      adminCount: null,
+    };
+  } finally {
+    accountsUsersLoading.value = false;
   }
 }
 
@@ -613,5 +719,6 @@ onMounted(() => {
   loadThemeData();
   loadQuestionnaireData();
   loadAccountsData();
+  loadAccountsUsersData();
 });
 </script>

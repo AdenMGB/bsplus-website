@@ -1,9 +1,10 @@
 /**
  * Accounts analytics - admin only.
  * Proxies to accounts.betterseqta.org export API.
- * Requires ACCOUNTS_API_KEY in env.
+ * Requires ACCOUNTS_API_KEY in env (Cloudflare: set via wrangler secret or [vars]).
  */
 import { getHeader } from 'h3';
+import { getAccountsApiCredentials } from '~/server/utils/accounts';
 
 interface AccountsApiResult {
   error: string | null;
@@ -11,16 +12,18 @@ interface AccountsApiResult {
   count?: number | null;
 }
 
-async function fetchAccountsApi(path: string, config: ReturnType<typeof useRuntimeConfig>): Promise<AccountsApiResult> {
-  const apiKey = config.accountsApiKey as string;
-  const baseUrl = ((config.accountsApiUrl as string) || 'https://accounts.betterseqta.org').replace(/\/$/, '');
+async function fetchAccountsApi(
+  path: string,
+  credentials: { apiKey: string; url: string }
+): Promise<AccountsApiResult> {
+  const { apiKey, url } = credentials;
 
   if (!apiKey) {
     return { error: 'ACCOUNTS_API_KEY not configured', total: null, count: null };
   }
 
   try {
-    const res = await $fetch<{ total?: number; count?: number }>(`${baseUrl}/api/export${path}`, {
+    const res = await $fetch<{ total?: number; count?: number }>(`${url}/api/export${path}`, {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'X-API-Key': apiKey,
@@ -47,11 +50,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
-  const config = useRuntimeConfig();
+  const credentials = getAccountsApiCredentials(event);
 
   const [usersCount, reservedClients]: [AccountsApiResult, AccountsApiResult] = await Promise.all([
-    fetchAccountsApi('/users/count', config),
-    fetchAccountsApi('/reserved-clients', config),
+    fetchAccountsApi('/users/count', credentials),
+    fetchAccountsApi('/reserved-clients', credentials),
   ]);
 
   return {
