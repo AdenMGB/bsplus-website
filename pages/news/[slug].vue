@@ -204,8 +204,8 @@ usePageSeo({
   title: p.title,
   description,
   ...(coverImage ? { image: coverImage, imageAlt: p.title } : {
-    ogImageComponent: 'PageOG',
-    ogImageProps: { title: p.title, description: description.slice(0, 120), headline: 'News' },
+    image: `${baseUrl}/favicon-96x96.png`,
+    imageAlt: 'BetterSEQTA News',
   }),
   canonical: `${baseUrl}/news/${route.params.slug}`,
   ogType: 'article',
