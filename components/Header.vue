@@ -87,31 +87,39 @@
         >
       </PopoverGroup>
 
-      <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-8">
+      <div class="hidden lg:flex lg:flex-1 lg:justify-end items-center">
         <template v-if="loading">
           <div class="h-5 w-12 bg-zinc-800/50 rounded animate-pulse"></div>
         </template>
         <template v-else-if="user">
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
+          <Menu as="div" class="relative">
+            <MenuButton class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-zinc-100 hover:bg-zinc-800/50 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
               <img 
                 v-if="user.pfpUrl" 
                 :src="user.pfpUrl" 
                 :alt="user.username" 
                 class="h-6 w-6 rounded-full ring-2 ring-zinc-800"
               />
-              <span class="text-sm font-semibold text-zinc-100">{{ user.displayName || user.username }}</span>
-            </div>
-            <button 
-              @click="logout" 
-              class="text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
-            >
-              Logout
-            </button>
-            <NuxtLink v-if="user.admin_level && user.admin_level >= 1" to="/admin" class="text-sm font-semibold text-green-400 hover:text-green-300 transition-colors">
-              Admin
-            </NuxtLink>
-          </div>
+              <span class="max-w-[120px] truncate">{{ user.displayName || user.username }}</span>
+              <ChevronDownIcon class="h-4 w-4 text-zinc-400" />
+            </MenuButton>
+            <transition enter-active-class="transition duration-100 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-75 ease-in" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+              <MenuItems class="absolute right-0 mt-2 w-48 origin-top-right rounded-lg bg-zinc-900 border border-zinc-700 shadow-xl ring-1 ring-black/5 focus:outline-none z-50">
+                <div class="py-1">
+                  <MenuItem v-if="user.admin_level && user.admin_level >= 1" v-slot="{ active }">
+                    <NuxtLink to="/admin" :class="[active ? 'bg-zinc-800' : '', 'block px-4 py-2 text-sm text-green-400']">
+                      Admin
+                    </NuxtLink>
+                  </MenuItem>
+                  <MenuItem v-slot="{ active }">
+                    <button @click="logout" :class="[active ? 'bg-zinc-800' : '', 'block w-full text-left px-4 py-2 text-sm text-zinc-300']">
+                      Logout
+                    </button>
+                  </MenuItem>
+                </div>
+              </MenuItems>
+            </transition>
+          </Menu>
         </template>
         <button 
           v-else 
@@ -226,6 +234,10 @@ import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
   Popover,
   PopoverButton,
   PopoverGroup,

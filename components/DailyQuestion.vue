@@ -4,8 +4,8 @@
       <!-- Minimized State -->
       <div v-if="isMinimized" class="p-3 cursor-pointer" @click="isMinimized = false">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-white truncate flex-1">{{ question.question }}</span>
-          <button @click.stop="dismissPoll" class="text-zinc-400 hover:text-white transition-colors flex-shrink-0 ml-2">
+          <span class="text-sm font-medium text-white truncate flex-1">{{ hasVoted ? 'Thanks for voting!' : question.question }}</span>
+          <button @click.stop="dismissPoll" class="text-zinc-400 hover:text-white transition-colors flex-shrink-0 ml-2" :title="hasVoted ? 'Dismiss until next question' : 'Dismiss'">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
@@ -177,6 +177,7 @@ const question = computed(() => currentQuestion.value);
 
 const { user, login } = useAuth();
 
+const DISMISSED_KEY = 'daily-question-dismissed';
 const hasVoted = ref(false);
 const voting = ref(false);
 const showResults = ref(false);
@@ -190,6 +191,9 @@ const optimisticVotes = ref<Map<number, number>>(new Map());
 
 function dismissPoll() {
   isDismissed.value = true;
+  if (typeof sessionStorage !== 'undefined' && question.value) {
+    sessionStorage.setItem(DISMISSED_KEY, String(question.value.id));
+  }
 }
 
 const formatExpiration = computed(() => {
@@ -219,6 +223,7 @@ async function checkVoteStatus() {
     
     if (hasVoted.value) {
       await loadResults();
+      isMinimized.value = true; // Start minimized when returning to page after voting
     }
   } catch (e) {
     // Silently fail - user might not be logged in
@@ -267,6 +272,8 @@ async function handleVote(optionIndex: number) {
     await loadResults();
     // Clear optimistic votes after loading real results
     optimisticVotes.value.clear();
+    // Auto-minimize after voting so it's less intrusive
+    isMinimized.value = true;
   } catch (e: any) {
     // Revert optimistic update on error
     const currentOptimistic = optimisticVotes.value.get(optionIndex) || 0;
@@ -347,7 +354,13 @@ watch(() => question.value, (newQuestion) => {
     showResults.value = false;
     results.value = [];
     isMinimized.value = false;
-    isDismissed.value = false;
+    // Only restore dismissed if it was for a different question
+    if (typeof sessionStorage !== 'undefined') {
+      const dismissedId = sessionStorage.getItem(DISMISSED_KEY);
+      isDismissed.value = dismissedId === String(newQuestion.id);
+    } else {
+      isDismissed.value = false;
+    }
     checkVoteStatus();
   }
 }, { immediate: true });
