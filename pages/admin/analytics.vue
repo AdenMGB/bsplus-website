@@ -246,6 +246,138 @@
         </div>
       </section>
 
+      <!-- Theme Analytics -->
+      <section class="mb-12">
+        <h3 class="mb-6 text-xl font-semibold text-white">Theme Marketplace</h3>
+        <div v-if="themeLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
+          <div class="text-zinc-400">Loading theme analytics...</div>
+        </div>
+        <div v-else class="space-y-6">
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Total Themes</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ themeData.summary?.total ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Approved</dt>
+              <dd class="mt-1 text-2xl font-bold text-emerald-400">{{ themeData.summary?.approved ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Downloads</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ themeData.summary?.totalDownloads ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Favorites</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ themeData.summary?.totalFavorites ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Ratings</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ themeData.summary?.totalRatings ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Avg Rating</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ themeData.summary?.avgRating ?? 0 }}</dd>
+            </div>
+          </div>
+          <div class="grid gap-6 lg:grid-cols-2">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">By Category</h4>
+              <div v-if="!themeData.byCategory?.length" class="py-6 text-center text-sm text-zinc-500">No categories</div>
+              <div v-else class="space-y-2">
+                <div v-for="c in themeData.byCategory" :key="c.category" class="flex justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2">
+                  <span class="capitalize text-white">{{ c.category }}</span>
+                  <span class="text-zinc-400">{{ c.count }} themes · {{ c.downloads }} downloads</span>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">Top by Downloads</h4>
+              <div v-if="!themeData.topByDownloads?.length" class="py-6 text-center text-sm text-zinc-500">No themes</div>
+              <div v-else class="space-y-2">
+                <div v-for="t in themeData.topByDownloads" :key="t.id" class="flex justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2">
+                  <span class="truncate text-white">{{ t.name }}</span>
+                  <span class="ml-2 shrink-0 text-zinc-400">{{ t.download_count }} downloads</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Questionnaire Analytics -->
+      <section class="mb-12">
+        <h3 class="mb-6 text-xl font-semibold text-white">Daily Questions</h3>
+        <div v-if="questionnaireLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
+          <div class="text-zinc-400">Loading questionnaire analytics...</div>
+        </div>
+        <div v-else class="space-y-6">
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Total Questions</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ questionnaireData.summary?.totalQuestions ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Total Votes</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ questionnaireData.summary?.totalVotes ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Unique Voters</dt>
+              <dd class="mt-1 text-2xl font-bold text-white">{{ questionnaireData.summary?.uniqueVoters ?? 0 }}</dd>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-200 hover:scale-[1.02]">
+              <dt class="text-xs font-medium text-zinc-500">Buffered</dt>
+              <dd class="mt-1 text-2xl font-bold text-amber-400">{{ questionnaireData.summary?.bufferTotal ?? 0 }}</dd>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <h4 class="mb-4 text-lg font-semibold text-white">Recent Questions & Votes</h4>
+            <div v-if="!questionnaireData.questions?.length" class="py-6 text-center text-sm text-zinc-500">No questions</div>
+            <div v-else class="space-y-2">
+              <div v-for="q in questionnaireData.questions" :key="q.id" class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3">
+                <div class="min-w-0 flex-1">
+                  <span class="truncate font-medium text-white">{{ q.question }}</span>
+                  <span v-if="q.is_active" class="ml-2 text-xs text-emerald-400">Active</span>
+                </div>
+                <span class="ml-4 shrink-0 text-zinc-400">{{ q.total_votes }} votes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accounts Analytics (from accounts.betterseqta.org) -->
+      <section class="mb-12">
+        <h3 class="mb-6 text-xl font-semibold text-white">Accounts (BetterSEQTA Cloud)</h3>
+        <div v-if="accountsLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
+          <div class="text-zinc-400">Loading accounts...</div>
+        </div>
+        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium text-zinc-400">Total Users</dt>
+            <dd v-if="accountsData.users?.error" class="mt-2 text-sm text-amber-400">
+              {{ accountsData.users.error }}
+            </dd>
+            <dd v-else class="mt-2 text-3xl font-bold text-white">
+              {{ accountsData.users?.total ?? '—' }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">From accounts.betterseqta.org</dd>
+          </div>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium text-zinc-400">Reserved Clients</dt>
+            <dd v-if="accountsData.reservedClients?.error" class="mt-2 text-sm text-amber-400">
+              {{ accountsData.reservedClients.error }}
+            </dd>
+            <dd v-else class="mt-2 text-3xl font-bold text-white">
+              {{ accountsData.reservedClients?.count ?? '—' }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">DesQTA client instances</dd>
+          </div>
+        </div>
+        <p v-if="accountsData.users?.error || accountsData.reservedClients?.error" class="mt-4 text-sm text-zinc-500">
+          Set <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">ACCOUNTS_API_KEY</code> in env to enable. Use the same API key as in Admin → API Keys.
+        </p>
+      </section>
+
       <!-- Web Sessions (Hourly) -->
       <section>
         <h3 class="mb-6 text-xl font-semibold text-white">Web Sessions (Hourly)</h3>
@@ -289,9 +421,15 @@ const selectedHours = ref(24);
 const selectedUsageDays = ref(30);
 const hourlyLoading = ref(true);
 const usageLoading = ref(true);
+const themeLoading = ref(true);
+const questionnaireLoading = ref(true);
+const accountsLoading = ref(true);
 const flushing = ref(false);
 const chartData = ref<any[]>([]);
 const stats = ref<any>({});
+const themeData = ref<any>({ summary: {}, byCategory: [], topByDownloads: [] });
+const questionnaireData = ref<any>({ summary: {}, questions: [] });
+const accountsData = ref<any>({ users: {}, reservedClients: {} });
 const usageData = ref<{
   daily: any[];
   byPlatform: any[];
@@ -384,6 +522,39 @@ async function loadHourlyData() {
   }
 }
 
+async function loadThemeData() {
+  themeLoading.value = true;
+  try {
+    themeData.value = await $fetch<any>('/api/analytics/themes');
+  } catch {
+    themeData.value = { summary: {}, byCategory: [], topByDownloads: [] };
+  } finally {
+    themeLoading.value = false;
+  }
+}
+
+async function loadQuestionnaireData() {
+  questionnaireLoading.value = true;
+  try {
+    questionnaireData.value = await $fetch<any>('/api/analytics/questionnaire');
+  } catch {
+    questionnaireData.value = { summary: {}, questions: [] };
+  } finally {
+    questionnaireLoading.value = false;
+  }
+}
+
+async function loadAccountsData() {
+  accountsLoading.value = true;
+  try {
+    accountsData.value = await $fetch<any>('/api/analytics/accounts');
+  } catch {
+    accountsData.value = { users: {}, reservedClients: {} };
+  } finally {
+    accountsLoading.value = false;
+  }
+}
+
 async function loadUsageData() {
   usageLoading.value = true;
   try {
@@ -439,5 +610,8 @@ onMounted(() => {
   loadStats();
   loadHourlyData();
   loadUsageData();
+  loadThemeData();
+  loadQuestionnaireData();
+  loadAccountsData();
 });
 </script>
