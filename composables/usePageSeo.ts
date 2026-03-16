@@ -21,22 +21,16 @@ export function usePageSeo(options: {
   const canonical = options.canonical ?? (options.noIndex ? undefined : `${baseUrl}${route.path}`);
   const ogImage = options.image?.startsWith('http') ? options.image : options.image ? `${baseUrl}${options.image}` : undefined;
 
-  // Dynamic OG image - generates at runtime when crawlers request it
-  if (options.ogImageComponent) {
-    defineOgImage({
-      component: options.ogImageComponent,
-      ...options.ogImageProps,
-      alt: options.imageAlt ?? options.description?.slice(0, 100),
-    });
-  }
-
+  // Dynamic OG image disabled: Cloudflare Workers return 500 for runtime OG generation.
+  // Use static image instead (pass image or rely on layout default).
+  const effectiveImage = ogImage ?? (options.ogImageComponent ? `${baseUrl}/favicon-96x96.png` : undefined);
   const imageAlt = options.imageAlt ?? options.description?.slice(0, 100);
 
   useSeoMeta({
     description: options.description,
     ogDescription: options.description,
     ogTitle: options.title,
-    ...(ogImage && { ogImage, ogImageAlt: imageAlt }),
+    ...(effectiveImage && { ogImage: effectiveImage, ogImageAlt: imageAlt }),
     ogUrl: canonical,
     ogType: options.ogType ?? 'website',
     ogSiteName: 'BetterSEQTA Plus',
@@ -44,7 +38,7 @@ export function usePageSeo(options: {
     twitterCard: 'summary_large_image',
     twitterTitle: options.title,
     twitterDescription: options.description,
-    ...(ogImage && { twitterImage: ogImage, twitterImageAlt: imageAlt }),
+    ...(effectiveImage && { twitterImage: effectiveImage, twitterImageAlt: imageAlt }),
     ...(options.noIndex && { robots: 'noindex, nofollow' }),
   });
 

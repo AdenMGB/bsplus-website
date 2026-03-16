@@ -56,10 +56,10 @@ export default defineNuxtConfig({
     },
 
   ogImage: {
-    zeroRuntime: false, // Enable runtime for dynamic OG images (news, etc.)
+    zeroRuntime: false,
     defaults: {
       width: 1200,
-      height: 630, // Standard OG 1.91:1 ratio
+      height: 630,
     },
   },
 
