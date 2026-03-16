@@ -112,6 +112,11 @@
                     </NuxtLink>
                   </MenuItem>
                   <MenuItem v-slot="{ active }">
+                    <a href="https://accounts.betterseqta.org" target="_blank" rel="noopener noreferrer" :class="[active ? 'bg-zinc-800' : '', 'block px-4 py-2 text-sm text-zinc-300']">
+                      Account
+                    </a>
+                  </MenuItem>
+                  <MenuItem v-slot="{ active }">
                     <button @click="logout" :class="[active ? 'bg-zinc-800' : '', 'block w-full text-left px-4 py-2 text-sm text-zinc-300']">
                       Logout
                     </button>
@@ -204,6 +209,14 @@
                 >
                   Admin
                 </NuxtLink>
+                <a
+                  href="https://accounts.betterseqta.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-300 hover:text-white hover:bg-zinc-800"
+                >
+                  Account
+                </a>
                 <button
                   @click="logout"
                   class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800"
