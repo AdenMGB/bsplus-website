@@ -203,7 +203,7 @@
                   class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 transition-all duration-200 hover:scale-[1.01]"
                 >
                   <div class="flex items-center gap-3">
-                    <span class="text-xl" :title="p.platform">{{ platformIcon(p.platform) }}</span>
+                    <admin-platform-icon :platform="p.platform" />
                     <div>
                       <span class="font-medium capitalize text-white">{{ p.platform }}</span>
                       <span class="ml-2 text-xs text-zinc-500">{{ p.report_count }} reports</span>
@@ -362,16 +362,6 @@ const usageChartData = computed(() =>
     anonymous_sessions: d.anonymous_sessions ?? 0,
   }))
 );
-
-function platformIcon(platform: string): string {
-  const p = (platform || '').toLowerCase();
-  if (p.includes('windows')) return '🪟';
-  if (p.includes('mac') || p.includes('darwin')) return '🍎';
-  if (p.includes('linux')) return '🐧';
-  if (p.includes('android')) return '🤖';
-  if (p.includes('ios') || p.includes('iphone')) return '📱';
-  return '💻';
-}
 
 async function loadStats() {
   try {

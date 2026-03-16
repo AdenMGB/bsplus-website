@@ -2,6 +2,7 @@
 /**
  * Generic OG image template for any page.
  * 1200x630 - standard OG dimensions.
+ * Full bleed, site-themed, with logo.
  */
 const {
   title: propTitle = 'BetterSEQTA Plus',
@@ -20,28 +21,33 @@ defineOgImageComponent('PageOG');
 </script>
 
 <template>
-  <div class="flex h-full w-full flex-col justify-center bg-[#0f0f0f] p-16">
+  <div
+    class="relative flex flex-col justify-between bg-[#09090b] p-16"
+    style="width: 1200px; height: 630px;"
+  >
+    <!-- Full-bleed background gradient + orbs -->
     <svg
-      class="absolute inset-0 h-full w-full opacity-30"
+      class="absolute inset-0 h-full w-full"
       viewBox="0 0 1200 630"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <radialGradient id="grad1" cx="0%" cy="0%" r="50%">
-          <stop offset="0%" style="stop-color:#27272a" />
-          <stop offset="100%" style="stop-color:#18181b" />
+        <radialGradient id="pageog-grad" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" style="stop-color:#18181b" />
+          <stop offset="100%" style="stop-color:#09090b" />
         </radialGradient>
-        <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="80" />
+        <filter id="pageog-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="100" />
         </filter>
       </defs>
-      <rect width="1200" height="630" fill="url(#grad1)" />
-      <circle cx="1000" cy="100" r="200" fill="#3b82f6" filter="url(#blur)" opacity="0.15" />
-      <circle cx="200" cy="500" r="180" fill="#22c55e" filter="url(#blur)" opacity="0.1" />
+      <rect width="1200" height="630" fill="url(#pageog-grad)" />
+      <circle cx="1100" cy="80" r="220" fill="#10b981" filter="url(#pageog-blur)" opacity="0.12" />
+      <circle cx="100" cy="550" r="200" fill="#3b82f6" filter="url(#pageog-blur)" opacity="0.08" />
+      <circle cx="600" cy="315" r="150" fill="#27272a" filter="url(#pageog-blur)" opacity="0.2" />
     </svg>
 
-    <div class="relative z-10 max-w-[800px]">
+    <div class="relative z-10 flex flex-1 flex-col justify-center">
       <p
         v-if="headline"
         class="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-400"
@@ -54,9 +60,18 @@ defineOgImageComponent('PageOG');
       <p v-if="desc" class="mt-4 text-2xl leading-snug text-zinc-400">
         {{ desc }}
       </p>
-      <div class="mt-8 flex items-center gap-3">
-        <span class="text-xl font-medium text-zinc-300">BetterSEQTA Plus</span>
-      </div>
+    </div>
+
+    <!-- Bottom bar with logo and site name -->
+    <div class="relative z-10 mt-8 flex items-center gap-4">
+      <img
+        src="/favicon-96x96.png"
+        alt="BetterSEQTA Plus"
+        width="48"
+        height="48"
+        class="rounded-lg"
+      />
+      <span class="text-xl font-semibold text-zinc-300">BetterSEQTA Plus</span>
     </div>
   </div>
 </template>
