@@ -33,7 +33,7 @@
     "echarts": "^6.0.0",
     "markdown-it": "^14.1.0",
     "nuxt": "^3.16.2",
-    "vite": "6.3.2",
+    "vite": "^8.0.0",
     "vue": "latest",
     "vue-echarts": "^8.0.1",
     "vue-router": "latest",

@@ -58,51 +58,196 @@
         </div>
       </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 gap-4 mb-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
-          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
-            {{ stats.sessions?.total ?? 0 }}
-          </dd>
-          <dd v-if="stats.sessions?.buffer" class="mt-1 text-xs text-zinc-500">
-            {{ stats.sessions.buffer.totalBuffered }} buffered
-          </dd>
-        </div>
+      <!-- Stats Cards - Row 1: Web/Extension -->
+      <div class="mb-8">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">Web & Extension</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ stats.sessions?.total ?? 0 }}
+            </dd>
+            <dd v-if="stats.sessions?.buffer" class="mt-1 text-xs text-zinc-500">
+              {{ stats.sessions.buffer.totalBuffered }} buffered
+            </dd>
+          </div>
 
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">DesQTA Web Sessions</dt>
-          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
-            {{ stats.desqtaSessions?.total ?? 0 }}
-          </dd>
-          <dd v-if="stats.desqtaSessions?.buffer" class="mt-1 text-xs text-zinc-500">
-            {{ stats.desqtaSessions.buffer.totalBuffered }} buffered
-          </dd>
-        </div>
-
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">App Usage Reports</dt>
-          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
-            {{ usageSummary.totalReports ?? 0 }}
-          </dd>
-          <dd class="mt-1 text-xs text-zinc-500">
-            {{ usageSummary.totalSessions ?? 0 }} total sessions reported
-          </dd>
-        </div>
-
-        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">Cloud Sign-ins</dt>
-          <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
-            {{ usageSummary.signedInReports ?? 0 }}
-          </dd>
-          <dd class="mt-1 text-xs text-zinc-500">
-            {{ signedInPercent }}% of reports
-          </dd>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">DesQTA Web Sessions</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ stats.desqtaSessions?.total ?? 0 }}
+            </dd>
+            <dd v-if="stats.desqtaSessions?.buffer" class="mt-1 text-xs text-zinc-500">
+              {{ stats.desqtaSessions.buffer.totalBuffered }} buffered
+            </dd>
+          </div>
         </div>
       </div>
 
-      <!-- Web Sessions (Hourly) -->
+      <!-- Stats Cards - Row 2: App Usage (DesQTA) -->
+      <div class="mb-12">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">App Usage (DesQTA / BetterSEQTA Cloud)</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Total Reports</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageSummary.totalReports ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              {{ usageSummary.totalSessions ?? 0 }} sessions reported
+            </dd>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Cloud Signed-in</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageSummary.signedInReports ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              {{ signedInPercent }}% of reports · {{ usageSummary.signedInSessions ?? 0 }} sessions
+            </dd>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Anonymous</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageSummary.anonymousSessions ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              sessions (not signed in)
+            </dd>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Unique Devices</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageSummary.uniqueClients ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              distinct client IDs
+            </dd>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Unique Users</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageSummary.uniqueUsers ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              signed-in accounts
+            </dd>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">App Versions</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
+              {{ usageData.byVersion?.length ?? 0 }}
+            </dd>
+            <dd class="mt-1 text-xs text-zinc-500">
+              versions in use
+            </dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Usage (DesQTA Desktop) - Primary Section -->
       <section class="mb-12">
+        <h3 class="mb-6 text-xl font-semibold text-white">App Usage (DesQTA / BetterSEQTA Cloud)</h3>
+        <div v-if="usageLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24">
+          <div class="text-zinc-400">Loading app usage...</div>
+        </div>
+        <div
+          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length"
+          class="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24 text-center"
+        >
+          <p class="text-zinc-400">No app usage data yet</p>
+          <p class="mt-2 text-sm text-zinc-500">
+            Data appears when DesQTA sends usage reports to <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">POST /api/analytics/usage</code>
+          </p>
+        </div>
+        <div v-else class="space-y-6">
+          <!-- Daily Sessions (Total) -->
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <h4 class="mb-4 text-lg font-semibold text-white">Daily Sessions</h4>
+            <AreaChart
+              :data="usageChartData"
+              :chart-config="usageChartConfig"
+              x-axis-key="timestamp"
+              container-class="min-h-[300px]"
+            />
+          </div>
+
+          <!-- Signed-in vs Anonymous (Stacked) -->
+          <div v-if="hasSignedInData" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <h4 class="mb-4 text-lg font-semibold text-white">Cloud Signed-in vs Anonymous Sessions</h4>
+            <AreaChart
+              :data="usageChartData"
+              :chart-config="signedInChartConfig"
+              x-axis-key="timestamp"
+              stack="auth"
+              container-class="min-h-[300px]"
+            />
+          </div>
+
+          <div class="grid gap-6 lg:grid-cols-2">
+            <!-- Platform Breakdown -->
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">Platform Breakdown</h4>
+              <div v-if="!usageData.byPlatform?.length" class="py-8 text-center text-sm text-zinc-500">
+                No platform data in selected period
+              </div>
+              <div v-else class="space-y-3">
+                <div
+                  v-for="p in usageData.byPlatform"
+                  :key="p.platform"
+                  class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 transition-all duration-200 hover:scale-[1.01]"
+                >
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl" :title="p.platform">{{ platformIcon(p.platform) }}</span>
+                    <div>
+                      <span class="font-medium capitalize text-white">{{ p.platform }}</span>
+                      <span class="ml-2 text-xs text-zinc-500">{{ p.report_count }} reports</span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-lg font-semibold text-white">{{ p.total_sessions }}</span>
+                    <span class="ml-1 text-sm text-zinc-500">sessions</span>
+                    <div v-if="p.signed_in_sessions != null" class="mt-0.5 text-xs text-zinc-500">
+                      <span class="text-emerald-400">{{ p.signed_in_sessions }} signed-in</span>
+                      <span v-if="p.anonymous_sessions" class="text-zinc-500"> · {{ p.anonymous_sessions }} anon</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Version Breakdown -->
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">Version Adoption</h4>
+              <div v-if="!usageData.byVersion?.length" class="py-8 text-center text-sm text-zinc-500">
+                No version data in selected period
+              </div>
+              <div v-else class="space-y-3">
+                <div
+                  v-for="v in usageData.byVersion"
+                  :key="v.app_version"
+                  class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 transition-all duration-200 hover:scale-[1.01]"
+                >
+                  <span class="font-mono text-sm font-medium text-white">{{ v.app_version }}</span>
+                  <div class="text-right">
+                    <span class="text-lg font-semibold text-white">{{ v.total_sessions }}</span>
+                    <span class="ml-1 text-sm text-zinc-500">sessions</span>
+                    <span class="block text-xs text-zinc-500">{{ v.report_count }} reports</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Web Sessions (Hourly) -->
+      <section>
         <h3 class="mb-6 text-xl font-semibold text-white">Web Sessions (Hourly)</h3>
         <div v-if="hourlyLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24">
           <div class="text-zinc-400">Loading hourly data...</div>
@@ -128,52 +273,6 @@
           </div>
         </div>
       </section>
-
-      <!-- App Usage (DesQTA Desktop) -->
-      <section>
-        <h3 class="mb-6 text-xl font-semibold text-white">App Usage (DesQTA Desktop)</h3>
-        <div v-if="usageLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24">
-          <div class="text-zinc-400">Loading app usage...</div>
-        </div>
-        <div
-          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length"
-          class="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24 text-center"
-        >
-          <p class="text-zinc-400">No app usage data yet</p>
-          <p class="mt-2 text-sm text-zinc-500">
-            Data appears when DesQTA sends usage reports to <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">POST /api/analytics/usage</code>
-          </p>
-        </div>
-        <div v-else class="space-y-6">
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-            <h4 class="mb-4 text-lg font-semibold text-white">Daily Sessions (from app reports)</h4>
-            <AreaChart
-              :data="usageChartData"
-              :chart-config="usageChartConfig"
-              x-axis-key="timestamp"
-              container-class="min-h-[300px]"
-            />
-          </div>
-
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-            <h4 class="mb-4 text-lg font-semibold text-white">Platform Breakdown</h4>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div
-                v-for="p in usageData.byPlatform"
-                :key="p.platform"
-                class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3"
-              >
-                <span class="font-medium capitalize text-white">{{ p.platform }}</span>
-                <div class="text-right">
-                  <span class="text-lg font-semibold text-white">{{ p.total_sessions }}</span>
-                  <span class="ml-1 text-sm text-zinc-500">sessions</span>
-                  <span class="block text-xs text-zinc-500">{{ p.report_count }} reports</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   </div>
 </template>
@@ -196,8 +295,30 @@ const stats = ref<any>({});
 const usageData = ref<{
   daily: any[];
   byPlatform: any[];
-  summary: { totalReports: number; totalSessions: number; signedInReports: number };
-}>({ daily: [], byPlatform: [], summary: { totalReports: 0, totalSessions: 0, signedInReports: 0 } });
+  byVersion: any[];
+  summary: {
+    totalReports: number;
+    totalSessions: number;
+    signedInReports: number;
+    signedInSessions?: number;
+    anonymousSessions?: number;
+    uniqueClients?: number;
+    uniqueUsers?: number;
+  };
+}>({
+  daily: [],
+  byPlatform: [],
+  byVersion: [],
+  summary: {
+    totalReports: 0,
+    totalSessions: 0,
+    signedInReports: 0,
+    signedInSessions: 0,
+    anonymousSessions: 0,
+    uniqueClients: 0,
+    uniqueUsers: 0,
+  },
+});
 
 const extensionConfig = {
   extension_sessions: { label: 'Extension Sessions', color: '#4ade80' },
@@ -212,6 +333,10 @@ const combinedConfig = {
 const usageChartConfig = {
   total_sessions: { label: 'Sessions', color: '#a78bfa' },
 };
+const signedInChartConfig = {
+  signed_in_sessions: { label: 'Cloud Signed-in', color: '#34d399' },
+  anonymous_sessions: { label: 'Anonymous', color: '#64748b' },
+};
 
 const usageSummary = computed(() => usageData.value.summary || {});
 
@@ -222,12 +347,31 @@ const signedInPercent = computed(() => {
   return Math.round((signed / total) * 100);
 });
 
+const hasSignedInData = computed(() => {
+  const daily = usageData.value.daily || [];
+  return daily.some(
+    (d) => (d.signed_in_sessions ?? 0) > 0 || (d.anonymous_sessions ?? 0) > 0
+  );
+});
+
 const usageChartData = computed(() =>
   (usageData.value.daily || []).map((d) => ({
     timestamp: d.timestamp,
     total_sessions: d.total_sessions,
+    signed_in_sessions: d.signed_in_sessions ?? 0,
+    anonymous_sessions: d.anonymous_sessions ?? 0,
   }))
 );
+
+function platformIcon(platform: string): string {
+  const p = (platform || '').toLowerCase();
+  if (p.includes('windows')) return '🪟';
+  if (p.includes('mac') || p.includes('darwin')) return '🍎';
+  if (p.includes('linux')) return '🐧';
+  if (p.includes('android')) return '🤖';
+  if (p.includes('ios') || p.includes('iphone')) return '📱';
+  return '💻';
+}
 
 async function loadStats() {
   try {
@@ -254,9 +398,35 @@ async function loadUsageData() {
   usageLoading.value = true;
   try {
     const data = await $fetch<any>(`/api/analytics/usage?days=${selectedUsageDays.value}`);
-    usageData.value = data || { daily: [], byPlatform: [], summary: { totalReports: 0, totalSessions: 0, signedInReports: 0 } };
+    usageData.value = data || {
+      daily: [],
+      byPlatform: [],
+      byVersion: [],
+      summary: {
+        totalReports: 0,
+        totalSessions: 0,
+        signedInReports: 0,
+        signedInSessions: 0,
+        anonymousSessions: 0,
+        uniqueClients: 0,
+        uniqueUsers: 0,
+      },
+    };
   } catch {
-    usageData.value = { daily: [], byPlatform: [], summary: { totalReports: 0, totalSessions: 0, signedInReports: 0 } };
+    usageData.value = {
+      daily: [],
+      byPlatform: [],
+      byVersion: [],
+      summary: {
+        totalReports: 0,
+        totalSessions: 0,
+        signedInReports: 0,
+        signedInSessions: 0,
+        anonymousSessions: 0,
+        uniqueClients: 0,
+        uniqueUsers: 0,
+      },
+    };
   } finally {
     usageLoading.value = false;
   }
