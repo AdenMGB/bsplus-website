@@ -27,17 +27,17 @@
         </div>
       </div>
 
-      <!-- Stats Cards - App Usage -->
+      <!-- Stats Cards - BetterSEQTA Cloud (App Usage + Accounts) -->
       <div class="mb-12">
-        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">App Usage (DesQTA / BetterSEQTA Cloud)</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">BetterSEQTA Cloud (App Usage + Accounts)</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-10">
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-            <dt class="text-sm font-medium leading-6 text-zinc-400">Total Reports</dt>
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Daily Reports</dt>
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
               {{ usageSummary.totalReports ?? 0 }}
             </dd>
             <dd class="mt-1 text-xs text-zinc-500">
-              {{ usageSummary.totalSessions ?? 0 }} sessions reported
+              daily usage reports from app · {{ usageSummary.totalSessions ?? 0 }} app sessions
             </dd>
           </div>
 
@@ -57,7 +57,7 @@
               {{ usageSummary.anonymousSessions ?? 0 }}
             </dd>
             <dd class="mt-1 text-xs text-zinc-500">
-              sessions (not signed in)
+              app sessions (not signed in)
             </dd>
           </div>
 
@@ -67,7 +67,7 @@
               {{ usageSummary.uniqueClients ?? 0 }}
             </dd>
             <dd class="mt-1 text-xs text-zinc-500">
-              distinct client IDs
+              distinct devices
             </dd>
           </div>
 
@@ -90,6 +90,33 @@
               versions in use
             </dd>
           </div>
+
+          <!-- Accounts (from accounts.betterseqta.org) -->
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Total Users</dt>
+            <dd v-if="accountsData.users?.error" class="mt-2 text-sm text-amber-400">{{ accountsData.users.error }}</dd>
+            <dd v-else class="mt-2 text-3xl font-bold tracking-tight text-white">{{ accountsData.users?.total ?? '—' }}</dd>
+            <dd class="mt-1 text-xs text-zinc-500">all-time (accounts.betterseqta.org)</dd>
+          </div>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Users in Period</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ accountsUsersData.total ?? '—' }}</dd>
+            <dd class="mt-1 text-xs text-zinc-500">signed up in selected period</dd>
+          </div>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Reserved Clients</dt>
+            <dd v-if="accountsData.reservedClients?.error" class="mt-2 text-sm text-amber-400">{{ accountsData.reservedClients.error }}</dd>
+            <dd v-else class="mt-2 text-3xl font-bold tracking-tight text-white">{{ accountsData.reservedClients?.count ?? '—' }}</dd>
+            <dd class="mt-1 text-xs text-zinc-500">DesQTA instances (all-time)</dd>
+          </div>
+          <div
+            v-if="accountsUsersData.total != null"
+            class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]"
+          >
+            <dt class="text-sm font-medium leading-6 text-zinc-400">Admins</dt>
+            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ accountsUsersData.adminCount ?? '—' }}</dd>
+            <dd class="mt-1 text-xs text-zinc-500">in selected period</dd>
+          </div>
         </div>
       </div>
 
@@ -100,17 +127,59 @@
           <div class="text-zinc-400">Loading app usage...</div>
         </div>
         <div
-          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length"
+          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length && !accountsUsersData.signupsOverTime?.length && !accountsUsersData.topDomains?.length"
           class="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24 text-center"
         >
-          <p class="text-zinc-400">No app usage data yet</p>
+          <p class="text-zinc-400">No app usage or accounts data yet</p>
           <p class="mt-2 text-sm text-zinc-500">
-            Data appears when DesQTA sends usage reports to <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">POST /api/analytics/usage</code>
+            App usage appears when DesQTA sends reports. Accounts data requires <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">ACCOUNTS_API_KEY</code>.
           </p>
         </div>
         <div v-else class="space-y-6">
-          <!-- Daily Sessions (Total) -->
-          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+          <!-- User Signups & Email Domains (from accounts.betterseqta.org, filtered by period) -->
+          <div v-if="!accountsUsersData.error && (signupsChartData.length || accountsUsersData.topDomains?.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">User Signups Over Time</h4>
+              <p class="mb-2 text-xs text-zinc-500">Filtered by selected period</p>
+              <div v-if="!signupsChartData.length" class="flex min-h-[240px] items-center justify-center text-zinc-500">No signup data</div>
+              <div v-else class="space-y-6">
+                <div>
+                  <p class="mb-2 text-sm text-zinc-400">Daily signups</p>
+                  <AreaChart
+                    :data="signupsChartData"
+                    :chart-config="signupsChartConfig"
+                    container-class="min-h-[240px]"
+                  />
+                </div>
+                <div>
+                  <p class="mb-2 text-sm text-zinc-400">Cumulative users</p>
+                  <AreaChart
+                    :data="signupsChartData"
+                    :chart-config="cumulativeChartConfig"
+                    container-class="min-h-[240px]"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h4 class="mb-4 text-lg font-semibold text-white">Most Used Email Domains</h4>
+              <p class="mb-2 text-xs text-zinc-500">Filtered by selected period</p>
+              <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] items-center justify-center text-zinc-500">No domain data</div>
+              <div v-else class="space-y-2 max-h-[320px] overflow-y-auto pr-2">
+                <div
+                  v-for="d in accountsUsersData.topDomains"
+                  :key="d.domain"
+                  class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3"
+                >
+                  <span class="font-mono text-sm text-white">{{ d.domain }}</span>
+                  <span class="ml-4 shrink-0 text-zinc-400">{{ d.count }} users</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Sessions (Total) - App Usage only -->
+          <div v-if="usageData.daily?.length" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h4 class="mb-4 text-lg font-semibold text-white">Daily Sessions</h4>
             <AreaChart
               :data="usageChartData"
@@ -120,8 +189,8 @@
             />
           </div>
 
-          <!-- Signed-in vs Anonymous (Stacked) -->
-          <div v-if="hasSignedInData" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+          <!-- Signed-in vs Anonymous (Stacked) - App Usage only -->
+          <div v-if="hasSignedInData && usageData.daily?.length" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h4 class="mb-4 text-lg font-semibold text-white">Cloud Signed-in vs Anonymous Sessions</h4>
             <AreaChart
               :data="usageChartData"
@@ -132,7 +201,7 @@
             />
           </div>
 
-          <div class="grid gap-6 lg:grid-cols-2">
+          <div v-if="usageData.byPlatform?.length || usageData.byVersion?.length" class="grid gap-6 lg:grid-cols-2">
             <!-- Platform Breakdown -->
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
               <h4 class="mb-4 text-lg font-semibold text-white">Platform Breakdown</h4>
@@ -276,7 +345,7 @@
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h4 class="mb-4 text-lg font-semibold text-white">Recent Questions & Votes</h4>
             <div v-if="!questionnaireData.questions?.length" class="py-6 text-center text-sm text-zinc-500">No questions</div>
-            <div v-else class="space-y-2">
+            <div v-else class="space-y-2 max-h-[280px] overflow-y-auto pr-2">
               <div v-for="q in questionnaireData.questions" :key="q.id" class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3">
                 <div class="min-w-0 flex-1">
                   <span class="truncate font-medium text-white">{{ q.question }}</span>
@@ -289,105 +358,9 @@
         </div>
       </section>
 
-      <!-- Accounts Analytics (from accounts.betterseqta.org) -->
-      <section class="mb-12">
-        <h3 class="mb-6 text-xl font-semibold text-white">Accounts (BetterSEQTA Cloud)</h3>
-        <div v-if="accountsLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
-          <div class="text-zinc-400">Loading accounts...</div>
-        </div>
-        <div v-else class="space-y-6">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-              <dt class="text-sm font-medium text-zinc-400">Total Users</dt>
-              <dd v-if="accountsData.users?.error" class="mt-2 text-sm text-amber-400">
-                {{ accountsData.users.error }}
-              </dd>
-              <dd v-else class="mt-2 text-3xl font-bold text-white">
-                {{ accountsData.users?.total ?? '—' }}
-              </dd>
-              <dd class="mt-1 text-xs text-zinc-500">From accounts.betterseqta.org</dd>
-            </div>
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
-              <dt class="text-sm font-medium text-zinc-400">Reserved Clients</dt>
-              <dd v-if="accountsData.reservedClients?.error" class="mt-2 text-sm text-amber-400">
-                {{ accountsData.reservedClients.error }}
-              </dd>
-              <dd v-else class="mt-2 text-3xl font-bold text-white">
-                {{ accountsData.reservedClients?.count ?? '—' }}
-              </dd>
-              <dd class="mt-1 text-xs text-zinc-500">DesQTA client instances</dd>
-            </div>
-            <div
-              v-if="accountsUsersData.total != null"
-              class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]"
-            >
-              <dt class="text-sm font-medium text-zinc-400">Admins</dt>
-              <dd class="mt-2 text-3xl font-bold text-white">{{ accountsUsersData.adminCount ?? '—' }}</dd>
-              <dd class="mt-1 text-xs text-zinc-500">From full user export</dd>
-            </div>
-            <div
-              v-if="accountsUsersData.topDomains?.length"
-              class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]"
-            >
-              <dt class="text-sm font-medium text-zinc-400">Top Domain</dt>
-              <dd class="mt-2 text-xl font-bold text-white truncate" :title="accountsUsersData.topDomains[0]?.domain">
-                {{ accountsUsersData.topDomains[0]?.domain ?? '—' }}
-              </dd>
-              <dd class="mt-1 text-xs text-zinc-500">{{ accountsUsersData.topDomains[0]?.count ?? 0 }} users</dd>
-            </div>
-          </div>
-
-          <!-- Signups over time & email domains -->
-          <div v-if="accountsUsersLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
-            <div class="text-zinc-400">Loading user analytics...</div>
-          </div>
-          <div v-else-if="!accountsUsersData.error" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-              <h4 class="mb-4 text-lg font-semibold text-white">User Signups Over Time</h4>
-              <div v-if="!signupsChartData.length" class="flex min-h-[300px] items-center justify-center text-zinc-500">
-                No signup data
-              </div>
-              <div v-else class="space-y-6">
-                <div>
-                  <p class="mb-2 text-sm text-zinc-400">Daily signups</p>
-                  <AreaChart
-                    :data="signupsChartData"
-                    :chart-config="signupsChartConfig"
-                    container-class="min-h-[240px]"
-                  />
-                </div>
-                <div>
-                  <p class="mb-2 text-sm text-zinc-400">Cumulative users</p>
-                  <AreaChart
-                    :data="signupsChartData"
-                    :chart-config="cumulativeChartConfig"
-                    container-class="min-h-[240px]"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-              <h4 class="mb-4 text-lg font-semibold text-white">Most Used Email Domains</h4>
-              <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] items-center justify-center text-zinc-500">
-                No domain data
-              </div>
-              <div v-else class="space-y-2">
-                <div
-                  v-for="d in accountsUsersData.topDomains"
-                  :key="d.domain"
-                  class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3"
-                >
-                  <span class="font-mono text-sm text-white">{{ d.domain }}</span>
-                  <span class="ml-4 shrink-0 text-zinc-400">{{ d.count }} users</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <p v-if="accountsData.users?.error || accountsData.reservedClients?.error" class="mt-4 text-sm text-zinc-500">
-          Set <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">ACCOUNTS_API_KEY</code> in env to enable. Use the same API key as in Admin → API Keys.
-        </p>
-      </section>
+      <p v-if="accountsData.users?.error || accountsData.reservedClients?.error" class="mt-4 text-sm text-zinc-500">
+        Set <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">ACCOUNTS_API_KEY</code> in env to enable accounts data from accounts.betterseqta.org.
+      </p>
 
     </div>
   </div>

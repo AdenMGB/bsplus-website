@@ -83,7 +83,7 @@
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">App Usage (30d)</dt>
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ usageSummary.totalReports ?? 0 }}</dd>
-          <dd class="mt-1 text-sm text-zinc-500">{{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices</dd>
+          <dd class="mt-1 text-sm text-zinc-500">daily reports · {{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices</dd>
           <NuxtLink to="/admin/analytics" class="mt-4 inline-flex items-center gap-2 rounded-md bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-600/20 hover:border-emerald-600/40 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-all hover:scale-105">
             Full Analytics
           </NuxtLink>
@@ -293,6 +293,9 @@
             <h3 class="text-base font-semibold leading-7 text-white">App Usage (Last 30 Days)</h3>
           </div>
           <div class="p-6">
+            <p v-if="usageData?.byPlatform?.length" class="mb-4 text-sm text-zinc-500">
+              {{ usageSummary.totalReports ?? 0 }} daily reports · {{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices
+            </p>
             <div v-if="usageData?.byPlatform?.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               <div
                 v-for="p in usageData.byPlatform"
