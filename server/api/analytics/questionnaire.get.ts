@@ -15,15 +15,38 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
+  const query = getQuery(event);
+  const daysParam = query.days;
+  const allTime =
+    daysParam === 'all' ||
+    daysParam === '0' ||
+    daysParam === '' ||
+    (typeof daysParam === 'string' && daysParam.toLowerCase() === 'all');
+  const days = allTime ? null : Math.min(Math.max(Number(daysParam) || 30, 1), 365);
+
   const db = getDB(event);
 
   try {
+    const cutoffSec =
+      days != null
+        ? Math.floor(Date.now() / 1000) - days * 86400
+        : 0;
+
+    const voteFilter =
+      days != null
+        ? `WHERE created_at >= ${cutoffSec}`
+        : '';
+    const questionFilter =
+      days != null
+        ? `WHERE dq.expires_at >= ${cutoffSec}`
+        : '';
+
     const summary = await db
       .prepare(
         `SELECT 
-          (SELECT COUNT(*) FROM daily_questions) as total_questions,
-          (SELECT COUNT(*) FROM question_votes) as total_votes,
-          (SELECT COUNT(DISTINCT user_id) FROM question_votes) as unique_voters,
+          (SELECT COUNT(*) FROM daily_questions ${days != null ? `WHERE expires_at >= ${cutoffSec}` : ''}) as total_questions,
+          (SELECT COUNT(*) FROM question_votes ${voteFilter}) as total_votes,
+          (SELECT COUNT(DISTINCT user_id) FROM question_votes ${voteFilter}) as unique_voters,
           (SELECT COALESCE(SUM(total_votes), 0) FROM question_results) as votes_in_results`
       )
       .first() as any;
@@ -40,6 +63,7 @@ export default defineEventHandler(async (event) => {
           COALESCE(qr.total_votes, 0) as total_votes
          FROM daily_questions dq
          LEFT JOIN question_results qr ON dq.id = qr.question_id
+         ${questionFilter}
          ORDER BY dq.expires_at DESC
          LIMIT 20`
       )

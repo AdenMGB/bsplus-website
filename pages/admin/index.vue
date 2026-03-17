@@ -65,29 +65,6 @@
         </div>
 
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Sessions</dt>
-          <div class="flex items-baseline gap-2">
-            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.sessions?.total || 0 }}</dd>
-            <button @click="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              Refresh
-            </button>
-          </div>
-          <p v-if="stats.sessions?.buffer" class="text-xs text-zinc-500 mt-2">
-            Next update: {{ getTimeUntil(stats.sessions.buffer.nextFlushEstimate) }}
-            ({{ stats.sessions.buffer.totalBuffered }} buffered)
-          </p>
-          <NuxtLink to="/admin/analytics" class="mt-4 inline-flex items-center gap-2 rounded-md bg-green-600/10 hover:bg-green-600/20 border border-green-600/20 hover:border-green-600/40 px-3 py-1.5 text-xs font-medium text-green-400 transition-all hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-            </svg>
-            View Charts
-          </NuxtLink>
-        </div>
-
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Daily Questions</dt>
           <div class="flex items-baseline gap-2">
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.questions?.total || 0 }}</dd>
@@ -104,32 +81,9 @@
         </div>
 
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
-          <dt class="text-sm font-medium leading-6 text-zinc-400">DesQTA Sessions</dt>
-          <div class="flex items-baseline gap-2">
-            <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ stats.desqtaSessions?.total || 0 }}</dd>
-            <button @click="flushSessions" class="text-xs text-green-500 hover:text-green-400 font-medium flex items-center gap-1" title="Force update from buffer">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              Refresh
-            </button>
-          </div>
-          <p v-if="stats.desqtaSessions?.buffer" class="text-xs text-zinc-500 mt-2">
-            Next update: {{ getTimeUntil(stats.desqtaSessions.buffer.nextFlushEstimate) }}
-            ({{ stats.desqtaSessions.buffer.totalBuffered }} buffered)
-          </p>
-          <NuxtLink to="/admin/analytics" class="mt-4 inline-flex items-center gap-2 rounded-md bg-blue-600/10 hover:bg-blue-600/20 border border-blue-600/20 hover:border-blue-600/40 px-3 py-1.5 text-xs font-medium text-blue-400 transition-all hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-            </svg>
-            View Charts
-          </NuxtLink>
-        </div>
-
-        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">App Usage (30d)</dt>
           <dd class="mt-2 text-3xl font-bold tracking-tight text-white">{{ usageSummary.totalReports ?? 0 }}</dd>
-          <dd class="mt-1 text-sm text-zinc-500">{{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices</dd>
+          <dd class="mt-1 text-sm text-zinc-500">daily reports · {{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices</dd>
           <NuxtLink to="/admin/analytics" class="mt-4 inline-flex items-center gap-2 rounded-md bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-600/20 hover:border-emerald-600/40 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-all hover:scale-105">
             Full Analytics
           </NuxtLink>
@@ -339,6 +293,9 @@
             <h3 class="text-base font-semibold leading-7 text-white">App Usage (Last 30 Days)</h3>
           </div>
           <div class="p-6">
+            <p v-if="usageData?.byPlatform?.length" class="mb-4 text-sm text-zinc-500">
+              {{ usageSummary.totalReports ?? 0 }} daily reports · {{ usageSummary.totalSessions ?? 0 }} sessions · {{ usageSummary.uniqueClients ?? 0 }} devices
+            </p>
             <div v-if="usageData?.byPlatform?.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               <div
                 v-for="p in usageData.byPlatform"
@@ -502,9 +459,7 @@ const stats = computed(() => {
     questions: {
       total: questions.value?.length || 0,
       active: questions.value?.filter(q => q.is_active && q.expires_at * 1000 > Date.now()).length || 0
-    },
-    sessions: analyticsStats.value?.sessions || { total: 0 },
-    desqtaSessions: analyticsStats.value?.desqtaSessions || { total: 0 }
+    }
   };
 });
 
@@ -523,15 +478,6 @@ async function syncVotes() {
   } finally {
     syncingVotes.value = false;
   }
-}
-
-function getTimeUntil(timestamp: number) {
-  const diff = timestamp - Date.now();
-  if (diff <= 0) return 'Any moment';
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '< 1 min';
-  if (minutes > 60) return `~${Math.floor(minutes / 60)} hrs`;
-  return `~${minutes} mins`;
 }
 
 function formatDate(timestamp: number) {
@@ -570,13 +516,5 @@ async function deletePost(id: number) {
   }
 }
 
-async function flushSessions() {
-  try {
-    await $fetch('/api/analytics/flush', { method: 'POST' });
-    refreshNuxtData(); // Refreshes all useFetch data
-  } catch (e) {
-    alert('Failed to flush sessions');
-  }
-}
 </script>
 
