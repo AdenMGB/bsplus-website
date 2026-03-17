@@ -30,7 +30,7 @@
       <!-- Stats Cards - BetterSEQTA Cloud (App Usage + Accounts) -->
       <div class="mb-12">
         <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">BetterSEQTA Cloud (App Usage + Accounts)</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-10">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 transition-all duration-200 hover:scale-[1.02]">
             <dt class="text-sm font-medium leading-6 text-zinc-400">Daily Reports</dt>
             <dd class="mt-2 text-3xl font-bold tracking-tight text-white">
