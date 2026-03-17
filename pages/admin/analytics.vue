@@ -24,6 +24,16 @@
             <option :value="90">Last 90 Days</option>
             <option value="all">All Time</option>
           </select>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+            :disabled="exportingPdf"
+            @click="exportToPdf"
+          >
+            <DocumentArrowDownIcon v-if="!exportingPdf" class="h-5 w-5" />
+            <span v-else class="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            {{ exportingPdf ? 'Exporting...' : 'Export to PDF' }}
+          </button>
         </div>
       </div>
 
@@ -369,6 +379,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
+import { DocumentArrowDownIcon } from '@heroicons/vue/24/outline';
 import AreaChart from '~/components/charts/AreaChart.vue';
 
 definePageMeta({
@@ -376,6 +387,7 @@ definePageMeta({
 });
 
 const selectedPeriod = ref<number | 'all'>(30);
+const exportingPdf = ref(false);
 const usageLoading = ref(true);
 const themeLoading = ref(true);
 const questionnaireLoading = ref(true);
@@ -477,6 +489,163 @@ const signupsChartDataAllTime = computed(() =>
     cumulative_signups: d.cumulative_signups,
   }))
 );
+
+const periodLabel = computed(() => {
+  const p = selectedPeriod.value;
+  if (p === 'all') return 'All Time';
+  return `Last ${p} Days`;
+});
+
+async function exportToPdf() {
+  exportingPdf.value = true;
+  try {
+    const [jspdfModule, autoTableModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]);
+    const jsPDF = jspdfModule.default;
+    autoTableModule.applyPlugin(jsPDF);
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    let y = 20;
+    const addTitle = (text: string, size = 16) => {
+      doc.setFontSize(size);
+      doc.text(text, 14, y);
+      y += size / 2 + 4;
+    };
+    const addText = (text: string, size = 10) => {
+      doc.setFontSize(size);
+      doc.text(text, 14, y);
+      y += 6;
+    };
+    const addSpace = (mm = 6) => { y += mm; };
+    const checkPage = () => {
+      if (y > 270) { doc.addPage(); y = 20; }
+    };
+
+    addTitle('Analytics Report', 18);
+    addText(`Period: ${periodLabel.value}`);
+    addText(`Generated: ${new Date().toLocaleString()}`);
+    addSpace(10);
+
+    addTitle('BetterSEQTA Cloud (App Usage + Accounts)', 12);
+    const us = usageSummary.value;
+    addText(`Daily Reports: ${us.totalReports ?? 0} (${us.totalSessions ?? 0} app sessions)`);
+    addText(`Cloud Signed-in: ${us.signedInReports ?? 0} (${us.signedInSessions ?? 0} sessions)`);
+    addText(`Anonymous: ${us.anonymousSessions ?? 0}`);
+    addText(`Unique Devices: ${us.uniqueClients ?? 0}`);
+    addText(`Unique Users: ${us.uniqueUsers ?? 0}`);
+    addText(`App Versions in use: ${usageData.value.byVersion?.length ?? 0}`);
+    addText(`Total Users (all-time): ${accountsData.value.users?.total ?? '—'}`);
+    addText(`Users in Period: ${accountsUsersData.value.total ?? '—'}`);
+    addText(`Reserved Clients: ${accountsData.value.reservedClients?.count ?? '—'}`);
+    addText(`Admins in Period: ${accountsUsersData.value.adminCount ?? '—'}`);
+    addSpace(8);
+
+    if (usageData.value.byPlatform?.length) {
+      checkPage();
+      addTitle('Platform Breakdown', 12);
+      doc.autoTable({
+        startY: y,
+        head: [['Platform', 'Reports', 'Sessions', 'Signed-in', 'Anonymous']],
+        body: usageData.value.byPlatform.map((p: any) => [
+          p.platform,
+          p.report_count ?? '',
+          p.total_sessions ?? '',
+          p.signed_in_sessions ?? '',
+          p.anonymous_sessions ?? '',
+        ]),
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    if (usageData.value.byVersion?.length) {
+      checkPage();
+      addTitle('Version Adoption', 12);
+      doc.autoTable({
+        startY: y,
+        head: [['Version', 'Sessions', 'Reports']],
+        body: usageData.value.byVersion.map((v: any) => [
+          v.app_version,
+          v.total_sessions ?? '',
+          v.report_count ?? '',
+        ]),
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    if (accountsUsersData.value.topDomains?.length) {
+      checkPage();
+      addTitle('Top Domains (Period)', 12);
+      doc.autoTable({
+        startY: y,
+        head: [['Domain', 'Users']],
+        body: accountsUsersData.value.topDomains.map((d: any) => [d.domain ?? '', d.count ?? '']),
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    addSpace(6);
+    addTitle('Theme Marketplace (All-time)', 12);
+    const ts = themeData.value.summary || {};
+    addText(`Total Themes: ${ts.total ?? 0}`);
+    addText(`Approved: ${ts.approved ?? 0}`);
+    addText(`Downloads: ${ts.totalDownloads ?? 0}`);
+    addText(`Favorites: ${ts.totalFavorites ?? 0}`);
+    addText(`Ratings: ${ts.totalRatings ?? 0}`);
+    addText(`Avg Rating: ${ts.avgRating ?? 0}`);
+    addSpace(6);
+
+    if (themeData.value.byCategory?.length) {
+      checkPage();
+      addTitle('By Category', 12);
+      doc.autoTable({
+        startY: y,
+        head: [['Category', 'Themes', 'Downloads']],
+        body: themeData.value.byCategory.map((c: any) => [c.category ?? '', c.count ?? '', c.downloads ?? '']),
+      });
+      y = doc.lastAutoTable.finalY + 6;
+    }
+    if (themeData.value.topByDownloads?.length) {
+      checkPage();
+      addTitle('Top Themes by Downloads', 12);
+      doc.autoTable({
+        startY: y,
+        head: [['Theme', 'Downloads']],
+        body: themeData.value.topByDownloads.map((t: any) => [t.name ?? '', t.download_count ?? '']),
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    addSpace(6);
+    addTitle('Daily Questions', 12);
+    const qs = questionnaireData.value.summary || {};
+    addText(`Total Questions: ${qs.totalQuestions ?? 0}`);
+    addText(`Total Votes: ${qs.totalVotes ?? 0}`);
+    addText(`Unique Voters: ${qs.uniqueVoters ?? 0}`);
+    addText(`Buffered: ${qs.bufferTotal ?? 0}`);
+    if (questionnaireData.value.questions?.length) {
+      checkPage();
+      addSpace(4);
+      doc.autoTable({
+        startY: y,
+        head: [['Question', 'Votes', 'Status']],
+        body: questionnaireData.value.questions.map((q: any) => [
+          (q.question ?? '').slice(0, 80) + ((q.question?.length ?? 0) > 80 ? '...' : ''),
+          q.total_votes ?? '',
+          q.is_active ? 'Active' : '',
+        ]),
+      });
+    }
+
+    const filename = `analytics-${periodLabel.value.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+  } catch (err) {
+    console.error('PDF export failed:', err);
+  } finally {
+    exportingPdf.value = false;
+  }
+}
 
 async function loadThemeData() {
   themeLoading.value = true;
