@@ -31,6 +31,8 @@
     "@tiptap/vue-3": "^3.11.1",
     "@zip.js/zip.js": "^2.8.16",
     "echarts": "^6.0.0",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "markdown-it": "^14.1.0",
     "nuxt": "^3.16.2",
     "vite": "^8.0.0",
