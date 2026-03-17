@@ -15,14 +15,14 @@
         </div>
         <div class="flex flex-wrap items-center gap-4">
           <select
-            v-model="selectedUsageDays"
-            @change="loadUsageData"
+            v-model="selectedPeriod"
             class="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900 transition-colors duration-200"
           >
             <option :value="7">Last 7 Days</option>
             <option :value="14">Last 14 Days</option>
             <option :value="30">Last 30 Days</option>
             <option :value="90">Last 90 Days</option>
+            <option value="all">All Time</option>
           </select>
         </div>
       </div>
@@ -192,6 +192,7 @@
       <!-- Theme Analytics -->
       <section class="mb-12">
         <h3 class="mb-6 text-xl font-semibold text-white">Theme Marketplace</h3>
+        <p class="mb-4 text-sm text-zinc-500">Theme stats are all-time (not filtered by period).</p>
         <div v-if="themeLoading" class="flex items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-12">
           <div class="text-zinc-400">Loading theme analytics...</div>
         </div>
@@ -393,14 +394,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import AreaChart from '~/components/charts/AreaChart.vue';
 
 definePageMeta({
   middleware: ['admin'],
 });
 
-const selectedUsageDays = ref(30);
+const selectedPeriod = ref<number | 'all'>(30);
 const usageLoading = ref(true);
 const themeLoading = ref(true);
 const questionnaireLoading = ref(true);
@@ -484,7 +485,7 @@ const usageChartData = computed(() =>
 );
 
 const signupsChartData = computed(() =>
-  (accountsUsersData.value.signupsOverTime || []).map((d) => ({
+  (accountsUsersData.value.signupsOverTime || []).map((d: { timestamp: number; daily_signups: number; cumulative_signups: number }) => ({
     timestamp: d.timestamp,
     daily_signups: d.daily_signups,
     cumulative_signups: d.cumulative_signups,
@@ -505,7 +506,11 @@ async function loadThemeData() {
 async function loadQuestionnaireData() {
   questionnaireLoading.value = true;
   try {
-    questionnaireData.value = await $fetch<any>('/api/analytics/questionnaire');
+    const daysParam =
+      selectedPeriod.value === 'all' ? 'all' : selectedPeriod.value;
+    questionnaireData.value = await $fetch<any>(
+      `/api/analytics/questionnaire?days=${daysParam}`
+    );
   } catch {
     questionnaireData.value = { summary: {}, questions: [] };
   } finally {
@@ -527,7 +532,11 @@ async function loadAccountsData() {
 async function loadAccountsUsersData() {
   accountsUsersLoading.value = true;
   try {
-    accountsUsersData.value = await $fetch<any>('/api/analytics/accounts/users');
+    const daysParam =
+      selectedPeriod.value === 'all' ? 'all' : selectedPeriod.value;
+    accountsUsersData.value = await $fetch<any>(
+      `/api/analytics/accounts/users?days=${daysParam}`
+    );
   } catch {
     accountsUsersData.value = {
       error: 'Failed to load',
@@ -544,7 +553,9 @@ async function loadAccountsUsersData() {
 async function loadUsageData() {
   usageLoading.value = true;
   try {
-    const data = await $fetch<any>(`/api/analytics/usage?days=${selectedUsageDays.value}`);
+    const daysParam =
+      selectedPeriod.value === 'all' ? 'all' : selectedPeriod.value;
+    const data = await $fetch<any>(`/api/analytics/usage?days=${daysParam}`);
     usageData.value = data || {
       daily: [],
       byPlatform: [],
@@ -578,6 +589,16 @@ async function loadUsageData() {
     usageLoading.value = false;
   }
 }
+
+function loadTimeFilteredData() {
+  loadUsageData();
+  loadQuestionnaireData();
+  loadAccountsUsersData();
+}
+
+watch(selectedPeriod, () => {
+  loadTimeFilteredData();
+});
 
 onMounted(() => {
   loadUsageData();

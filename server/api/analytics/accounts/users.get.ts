@@ -54,6 +54,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
+  const query = getQuery(event);
+  const daysParam = query.days;
+  const allTime =
+    daysParam === 'all' ||
+    daysParam === '0' ||
+    daysParam === '' ||
+    (typeof daysParam === 'string' && daysParam.toLowerCase() === 'all');
+  const days = allTime ? null : Math.min(Math.max(Number(daysParam) || 30, 1), 365);
+  const cutoffMs = days != null ? Date.now() - days * 86400 * 1000 : 0;
+
   const { apiKey, url: baseUrl } = getAccountsApiCredentials(event);
 
   if (!apiKey) {
@@ -74,7 +84,13 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    const users = res?.users || [];
+    let users = res?.users || [];
+    if (days != null) {
+      users = users.filter((u) => {
+        const date = getCreatedAtDate(u);
+        return date && date.getTime() >= cutoffMs;
+      });
+    }
     const total = users.length;
 
     // Daily signups: group by date (createdAt or created_at)
@@ -101,7 +117,7 @@ export default defineEventHandler(async (event) => {
       };
     });
 
-    // Top email domains
+    // Top email domains (from filtered users)
     const domainCount = new Map<string, number>();
     for (const u of users) {
       const domain = extractEmailDomain(u.email);

@@ -1,3 +1,5 @@
+import type { H3Event } from 'h3';
+
 /**
  * Get accounts API credentials from the request context.
  * Cloudflare-compatible: reads from event.context.cloudflare.env (Nitro v2)
