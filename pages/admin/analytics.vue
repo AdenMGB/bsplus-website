@@ -162,11 +162,11 @@
                 </div>
               </div>
             </div>
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <div class="flex min-h-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
               <h4 class="mb-4 text-lg font-semibold text-white">Most Used Email Domains</h4>
               <p class="mb-2 text-xs text-zinc-500">Filtered by selected period</p>
-              <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] items-center justify-center text-zinc-500">No domain data</div>
-              <div v-else class="scrollbar-sidebar space-y-2 max-h-[320px] overflow-y-auto pr-2">
+              <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] flex-1 items-center justify-center text-zinc-500">No domain data</div>
+              <div v-else class="scrollbar-sidebar min-h-0 flex-1 space-y-2 overflow-y-auto pr-2">
                 <div
                   v-for="d in accountsUsersData.topDomains"
                   :key="d.domain"
