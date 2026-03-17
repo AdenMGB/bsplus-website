@@ -127,7 +127,7 @@
           <div class="text-zinc-400">Loading app usage...</div>
         </div>
         <div
-          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length && !accountsUsersData.signupsOverTime?.length && !accountsUsersData.topDomains?.length"
+          v-else-if="!usageData.daily?.length && !usageData.byPlatform?.length && !signupsChartDataAllTime.length && !accountsUsersData.topDomains?.length && !accountsUsersAllTimeLoading && !accountsUsersLoading"
           class="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50 py-24 text-center"
         >
           <p class="text-zinc-400">No app usage or accounts data yet</p>
@@ -136,17 +136,18 @@
           </p>
         </div>
         <div v-else class="space-y-6">
-          <!-- User Signups & Email Domains (from accounts.betterseqta.org, filtered by period) -->
-          <div v-if="!accountsUsersData.error && (signupsChartData.length || accountsUsersData.topDomains?.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <!-- User Signups & Email Domains (from accounts.betterseqta.org) -->
+          <div v-if="!accountsUsersData.error && (signupsChartDataAllTime.length || accountsUsersData.topDomains?.length)" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-              <h4 class="mb-4 text-lg font-semibold text-white">User Signups Over Time</h4>
-              <p class="mb-2 text-xs text-zinc-500">Filtered by selected period</p>
-              <div v-if="!signupsChartData.length" class="flex min-h-[240px] items-center justify-center text-zinc-500">No signup data</div>
+              <h4 class="mb-4 text-lg font-semibold text-white">User Signups Over Time (All Time)</h4>
+              <p class="mb-2 text-xs text-zinc-500">Daily signups and cumulative users since launch</p>
+              <div v-if="accountsUsersAllTimeLoading" class="flex min-h-[240px] items-center justify-center text-zinc-500">Loading signup data...</div>
+              <div v-else-if="!signupsChartDataAllTime.length" class="flex min-h-[240px] items-center justify-center text-zinc-500">No signup data</div>
               <div v-else class="space-y-6">
                 <div>
                   <p class="mb-2 text-sm text-zinc-400">Daily signups</p>
                   <AreaChart
-                    :data="signupsChartData"
+                    :data="signupsChartDataAllTime"
                     :chart-config="signupsChartConfig"
                     container-class="min-h-[240px]"
                   />
@@ -154,7 +155,7 @@
                 <div>
                   <p class="mb-2 text-sm text-zinc-400">Cumulative users</p>
                   <AreaChart
-                    :data="signupsChartData"
+                    :data="signupsChartDataAllTime"
                     :chart-config="cumulativeChartConfig"
                     container-class="min-h-[240px]"
                   />
@@ -165,7 +166,7 @@
               <h4 class="mb-4 text-lg font-semibold text-white">Most Used Email Domains</h4>
               <p class="mb-2 text-xs text-zinc-500">Filtered by selected period</p>
               <div v-if="!accountsUsersData.topDomains?.length" class="flex min-h-[200px] items-center justify-center text-zinc-500">No domain data</div>
-              <div v-else class="space-y-2 max-h-[320px] overflow-y-auto pr-2">
+              <div v-else class="scrollbar-sidebar space-y-2 max-h-[320px] overflow-y-auto pr-2">
                 <div
                   v-for="d in accountsUsersData.topDomains"
                   :key="d.domain"
@@ -345,7 +346,7 @@
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h4 class="mb-4 text-lg font-semibold text-white">Recent Questions & Votes</h4>
             <div v-if="!questionnaireData.questions?.length" class="py-6 text-center text-sm text-zinc-500">No questions</div>
-            <div v-else class="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+            <div v-else class="scrollbar-sidebar space-y-2 max-h-[280px] overflow-y-auto pr-2">
               <div v-for="q in questionnaireData.questions" :key="q.id" class="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3">
                 <div class="min-w-0 flex-1">
                   <span class="truncate font-medium text-white">{{ q.question }}</span>
@@ -380,6 +381,7 @@ const themeLoading = ref(true);
 const questionnaireLoading = ref(true);
 const accountsLoading = ref(true);
 const accountsUsersLoading = ref(true);
+const accountsUsersAllTimeLoading = ref(true);
 const themeData = ref<any>({ summary: {}, byCategory: [], topByDownloads: [] });
 const questionnaireData = ref<any>({ summary: {}, questions: [] });
 const accountsData = ref<any>({ users: {}, reservedClients: {} });
@@ -389,6 +391,10 @@ const accountsUsersData = ref<any>({
   signupsOverTime: [],
   topDomains: [],
   adminCount: null,
+});
+const accountsUsersAllTimeData = ref<any>({
+  error: null,
+  signupsOverTime: [],
 });
 const usageData = ref<{
   daily: any[];
@@ -464,6 +470,13 @@ const signupsChartData = computed(() =>
     cumulative_signups: d.cumulative_signups,
   }))
 );
+const signupsChartDataAllTime = computed(() =>
+  (accountsUsersAllTimeData.value.signupsOverTime || []).map((d: { timestamp: number; daily_signups: number; cumulative_signups: number }) => ({
+    timestamp: d.timestamp,
+    daily_signups: d.daily_signups,
+    cumulative_signups: d.cumulative_signups,
+  }))
+);
 
 async function loadThemeData() {
   themeLoading.value = true;
@@ -523,6 +536,22 @@ async function loadAccountsUsersData() {
   }
 }
 
+async function loadAccountsUsersAllTimeData() {
+  accountsUsersAllTimeLoading.value = true;
+  try {
+    accountsUsersAllTimeData.value = await $fetch<any>(
+      '/api/analytics/accounts/users?days=all'
+    );
+  } catch {
+    accountsUsersAllTimeData.value = {
+      error: 'Failed to load',
+      signupsOverTime: [],
+    };
+  } finally {
+    accountsUsersAllTimeLoading.value = false;
+  }
+}
+
 async function loadUsageData() {
   usageLoading.value = true;
   try {
@@ -579,5 +608,6 @@ onMounted(() => {
   loadQuestionnaireData();
   loadAccountsData();
   loadAccountsUsersData();
+  loadAccountsUsersAllTimeData();
 });
 </script>
