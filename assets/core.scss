@@ -271,3 +271,23 @@ html {
   background: transparent;
   padding: 0;
 }
+
+/* Scrollbar styling - grey track like sidebar */
+.scrollbar-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(82 82 91) rgb(39 39 42); /* zinc-600 thumb, zinc-800 track */
+}
+.scrollbar-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-sidebar::-webkit-scrollbar-track {
+  background: rgb(39 39 42); /* zinc-800 */
+  border-radius: 4px;
+}
+.scrollbar-sidebar::-webkit-scrollbar-thumb {
+  background: rgb(82 82 91); /* zinc-600 */
+  border-radius: 4px;
+}
+.scrollbar-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgb(113 113 122); /* zinc-500 */
+}
