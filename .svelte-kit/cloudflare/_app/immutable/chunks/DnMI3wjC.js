@@ -1,0 +1,1 @@
+async function e(e,t){let n=await fetch(e,t);if(!n.ok){let e=await n.text();throw Error(e||`${n.status} ${n.statusText}`)}return n.json()}async function t(t,n,r){return e(t,{method:n,headers:{"content-type":`application/json`},body:r===void 0?void 0:JSON.stringify(r)})}export{t as n,e as t};

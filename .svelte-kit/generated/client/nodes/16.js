@@ -1,0 +1,1 @@
+export { default as component } from "../../../../src/routes/admin/themes/upload/+page.svelte";

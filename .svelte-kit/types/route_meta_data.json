@@ -1,0 +1,114 @@
+{
+	"/": [
+		"src/routes/+page.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/analytics": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/collections": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/collections/new": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/collections/[id]": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/news": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/news/create": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/news/edit/[slug]": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/questionnaire": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/questionnaire/create": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/questionnaire/edit/[id]": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/themes": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/themes/upload": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/themes/[id]": [
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/api/[...path]": [
+		"src/routes/api/[...path]/+server.ts"
+	],
+	"/changelogs": [
+		"src/routes/changelogs/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/changelogs/bqplus": [
+		"src/routes/changelogs/bqplus/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/changelogs/desqta": [
+		"src/routes/changelogs/desqta/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/comparison": [
+		"src/routes/comparison/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/desqta": [
+		"src/routes/desqta/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/download": [
+		"src/routes/download/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/minecraft": [
+		"src/routes/minecraft/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/news": [
+		"src/routes/news/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/news/[slug]": [
+		"src/routes/news/[slug]/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/privacy": [
+		"src/routes/privacy/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/robots.txt": [
+		"src/routes/robots.txt/+server.ts"
+	],
+	"/sitemap.xml": [
+		"src/routes/sitemap.xml/+server.ts"
+	]
+}

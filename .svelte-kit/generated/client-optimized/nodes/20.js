@@ -1,0 +1,1 @@
+export { default as component } from "../../../../src/routes/changelogs/desqta/+page.svelte";

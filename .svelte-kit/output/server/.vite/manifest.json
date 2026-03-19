@@ -1,0 +1,1363 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_server.js"
+    ]
+  },
+  "_Button.js": {
+    "file": "chunks/Button.js",
+    "name": "Button",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_Card.js": {
+    "file": "chunks/Card.js",
+    "name": "Card",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_accounts.js": {
+    "file": "chunks/accounts.js",
+    "name": "accounts"
+  },
+  "_admin.js": {
+    "file": "chunks/admin.js",
+    "name": "admin"
+  },
+  "_analytics.js": {
+    "file": "chunks/analytics.js",
+    "name": "analytics"
+  },
+  "_auth.js": {
+    "file": "chunks/auth.js",
+    "name": "auth"
+  },
+  "_auth2.js": {
+    "file": "chunks/auth2.js",
+    "name": "auth"
+  },
+  "_db.js": {
+    "file": "chunks/db.js",
+    "name": "db"
+  },
+  "_dist.js": {
+    "file": "chunks/dist.js",
+    "name": "dist",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_environment.js": {
+    "file": "chunks/environment.js",
+    "name": "environment"
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_github.js": {
+    "file": "chunks/github.js",
+    "name": "github"
+  },
+  "_index-server.js": {
+    "file": "chunks/index-server.js",
+    "name": "index-server",
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal",
+    "imports": [
+      "_index-server.js",
+      "_server.js"
+    ],
+    "dynamicImports": [
+      "src/hooks.server.ts"
+    ]
+  },
+  "_markdown.js": {
+    "file": "chunks/markdown.js",
+    "name": "markdown"
+  },
+  "_questionnaire.js": {
+    "file": "chunks/questionnaire.js",
+    "name": "questionnaire"
+  },
+  "_r2.js": {
+    "file": "chunks/r2.js",
+    "name": "r2"
+  },
+  "_server.js": {
+    "file": "chunks/server.js",
+    "name": "server"
+  },
+  "_shared.js": {
+    "file": "chunks/shared.js",
+    "name": "shared"
+  },
+  "_site.js": {
+    "file": "chunks/site.js",
+    "name": "site"
+  },
+  "_state.js": {
+    "file": "chunks/state.js",
+    "name": "state",
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_exports.js",
+      "_server.js"
+    ]
+  },
+  "_themes.js": {
+    "file": "chunks/themes.js",
+    "name": "themes"
+  },
+  "_timezone.js": {
+    "file": "chunks/timezone.js",
+    "name": "timezone"
+  },
+  "_utils.js": {
+    "file": "chunks/utils.js",
+    "name": "utils",
+    "imports": [
+      "_environment.js",
+      "_shared.js"
+    ]
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.55.0_@svelt_9206d0454335c2801330f2367153ad81/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+    "file": "remote-entry.js",
+    "name": "remote-entry",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.55.0_@svelt_9206d0454335c2801330f2367153ad81/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "isEntry": true,
+    "imports": [
+      "_environment.js",
+      "_utils.js",
+      "_shared.js"
+    ]
+  },
+  "node_modules/.pnpm/@sveltejs+kit@2.55.0_@svelt_9206d0454335c2801330f2367153ad81/node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.55.0_@svelt_9206d0454335c2801330f2367153ad81/node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_utils.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js"
+    ]
+  },
+  "server/api/__sitemap__/urls.ts": {
+    "file": "chunks/urls.js",
+    "name": "urls",
+    "src": "server/api/__sitemap__/urls.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/admin/collections/[id].delete.ts": {
+    "file": "chunks/_id_.delete.js",
+    "name": "_id_.delete",
+    "src": "server/api/admin/collections/[id].delete.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js",
+      "_r2.js"
+    ]
+  },
+  "server/api/admin/collections/[id].put.ts": {
+    "file": "chunks/_id_.put.js",
+    "name": "_id_.put",
+    "src": "server/api/admin/collections/[id].put.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/collections/index.get.ts": {
+    "file": "chunks/index.get.js",
+    "name": "index.get",
+    "src": "server/api/admin/collections/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/collections/index.post.ts": {
+    "file": "chunks/index.post.js",
+    "name": "index.post",
+    "src": "server/api/admin/collections/index.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js",
+      "_r2.js",
+      "_themes.js"
+    ]
+  },
+  "server/api/admin/themes/[id].delete.ts": {
+    "file": "chunks/_id_2.delete.js",
+    "name": "_id_.delete",
+    "src": "server/api/admin/themes/[id].delete.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js",
+      "_r2.js"
+    ]
+  },
+  "server/api/admin/themes/[id].get.ts": {
+    "file": "chunks/_id_.get.js",
+    "name": "_id_.get",
+    "src": "server/api/admin/themes/[id].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/themes/[id].put.ts": {
+    "file": "chunks/_id_2.put.js",
+    "name": "_id_.put",
+    "src": "server/api/admin/themes/[id].put.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/themes/[id]/approve.post.ts": {
+    "file": "chunks/approve.post.js",
+    "name": "approve.post",
+    "src": "server/api/admin/themes/[id]/approve.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/themes/[id]/reject.post.ts": {
+    "file": "chunks/reject.post.js",
+    "name": "reject.post",
+    "src": "server/api/admin/themes/[id]/reject.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/themes/[id]/update-files.post.ts": {
+    "file": "chunks/update-files.post.js",
+    "name": "update-files.post",
+    "src": "server/api/admin/themes/[id]/update-files.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js",
+      "_r2.js",
+      "_themes.js"
+    ]
+  },
+  "server/api/admin/themes/index.get.ts": {
+    "file": "chunks/index2.get.js",
+    "name": "index.get",
+    "src": "server/api/admin/themes/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/admin/themes/index.post.ts": {
+    "file": "chunks/index2.post.js",
+    "name": "index.post",
+    "src": "server/api/admin/themes/index.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js",
+      "_r2.js",
+      "_themes.js"
+    ]
+  },
+  "server/api/admin/themes/manifest-preview.post.ts": {
+    "file": "chunks/manifest-preview.post.js",
+    "name": "manifest-preview.post",
+    "src": "server/api/admin/themes/manifest-preview.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_themes.js"
+    ]
+  },
+  "server/api/analytics/accounts.get.ts": {
+    "file": "chunks/accounts.get.js",
+    "name": "accounts.get",
+    "src": "server/api/analytics/accounts.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_accounts.js"
+    ]
+  },
+  "server/api/analytics/accounts/users.get.ts": {
+    "file": "chunks/users.get.js",
+    "name": "users.get",
+    "src": "server/api/analytics/accounts/users.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_accounts.js"
+    ]
+  },
+  "server/api/analytics/desqta.get.ts": {
+    "file": "chunks/desqta.get.js",
+    "name": "desqta.get",
+    "src": "server/api/analytics/desqta.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_analytics.js",
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/flush.post.ts": {
+    "file": "chunks/flush.post.js",
+    "name": "flush.post",
+    "src": "server/api/analytics/flush.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_analytics.js",
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/hourly-stats.get.ts": {
+    "file": "chunks/hourly-stats.get.js",
+    "name": "hourly-stats.get",
+    "src": "server/api/analytics/hourly-stats.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/questionnaire.get.ts": {
+    "file": "chunks/questionnaire.get.js",
+    "name": "questionnaire.get",
+    "src": "server/api/analytics/questionnaire.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_questionnaire.js"
+    ]
+  },
+  "server/api/analytics/save-hourly-stats.ts": {
+    "file": "chunks/save-hourly-stats.js",
+    "name": "save-hourly-stats",
+    "src": "server/api/analytics/save-hourly-stats.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/stats.get.ts": {
+    "file": "chunks/stats.get.js",
+    "name": "stats.get",
+    "src": "server/api/analytics/stats.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_analytics.js",
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/test-hourly-stats.get.ts": {
+    "file": "chunks/test-hourly-stats.get.js",
+    "name": "test-hourly-stats.get",
+    "src": "server/api/analytics/test-hourly-stats.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_analytics.js",
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/themes.get.ts": {
+    "file": "chunks/themes.get.js",
+    "name": "themes.get",
+    "src": "server/api/analytics/themes.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/usage.get.ts": {
+    "file": "chunks/usage.get.js",
+    "name": "usage.get",
+    "src": "server/api/analytics/usage.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/analytics/usage.post.ts": {
+    "file": "chunks/usage.post.js",
+    "name": "usage.post",
+    "src": "server/api/analytics/usage.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/auth/callback.get.ts": {
+    "file": "chunks/callback.get.js",
+    "name": "callback.get",
+    "src": "server/api/auth/callback.get.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/auth/extension/login.post.ts": {
+    "file": "chunks/login.post.js",
+    "name": "login.post",
+    "src": "server/api/auth/extension/login.post.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/auth/login.get.ts": {
+    "file": "chunks/login.get.js",
+    "name": "login.get",
+    "src": "server/api/auth/login.get.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/auth/logout.post.ts": {
+    "file": "chunks/logout.post.js",
+    "name": "logout.post",
+    "src": "server/api/auth/logout.post.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/auth/me.get.ts": {
+    "file": "chunks/me.get.js",
+    "name": "me.get",
+    "src": "server/api/auth/me.get.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/changelogs/bqplus.get.ts": {
+    "file": "chunks/bqplus.get.js",
+    "name": "bqplus.get",
+    "src": "server/api/changelogs/bqplus.get.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/changelogs/desqta.get.ts": {
+    "file": "chunks/desqta2.get.js",
+    "name": "desqta.get",
+    "src": "server/api/changelogs/desqta.get.ts",
+    "isDynamicEntry": true
+  },
+  "server/api/collections/[id].get.ts": {
+    "file": "chunks/_id_2.get.js",
+    "name": "_id_.get",
+    "src": "server/api/collections/[id].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/collections/index.get.ts": {
+    "file": "chunks/index3.get.js",
+    "name": "index.get",
+    "src": "server/api/collections/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/images/[...path].get.ts": {
+    "file": "chunks/_...path_.get.js",
+    "name": "_...path_.get",
+    "src": "server/api/images/[...path].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_r2.js"
+    ]
+  },
+  "server/api/images/themes/[id]/[filename].get.ts": {
+    "file": "chunks/_filename_.get.js",
+    "name": "_filename_.get",
+    "src": "server/api/images/themes/[id]/[filename].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_r2.js"
+    ]
+  },
+  "server/api/news/[id].delete.ts": {
+    "file": "chunks/_id_3.delete.js",
+    "name": "_id_.delete",
+    "src": "server/api/news/[id].delete.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/[slug].get.ts": {
+    "file": "chunks/_slug_.get.js",
+    "name": "_slug_.get",
+    "src": "server/api/news/[slug].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/[slug].put.ts": {
+    "file": "chunks/_slug_.put.js",
+    "name": "_slug_.put",
+    "src": "server/api/news/[slug].put.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/index.get.ts": {
+    "file": "chunks/index4.get.js",
+    "name": "index.get",
+    "src": "server/api/news/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/index.post.ts": {
+    "file": "chunks/index3.post.js",
+    "name": "index.post",
+    "src": "server/api/news/index.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/preview.post.ts": {
+    "file": "chunks/preview.post.js",
+    "name": "preview.post",
+    "src": "server/api/news/preview.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/news/publish.patch.ts": {
+    "file": "chunks/publish.patch.js",
+    "name": "publish.patch",
+    "src": "server/api/news/publish.patch.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/policy/privacy.get.ts": {
+    "file": "chunks/privacy.get.js",
+    "name": "privacy.get",
+    "src": "server/api/policy/privacy.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_analytics.js",
+      "_db.js"
+    ]
+  },
+  "server/api/questionnaire/[id].delete.ts": {
+    "file": "chunks/_id_4.delete.js",
+    "name": "_id_.delete",
+    "src": "server/api/questionnaire/[id].delete.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_r2.js"
+    ]
+  },
+  "server/api/questionnaire/[id].get.ts": {
+    "file": "chunks/_id_3.get.js",
+    "name": "_id_.get",
+    "src": "server/api/questionnaire/[id].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_timezone.js"
+    ]
+  },
+  "server/api/questionnaire/[id].put.ts": {
+    "file": "chunks/_id_3.put.js",
+    "name": "_id_.put",
+    "src": "server/api/questionnaire/[id].put.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_r2.js",
+      "_timezone.js"
+    ]
+  },
+  "server/api/questionnaire/cleanup-images.post.ts": {
+    "file": "chunks/cleanup-images.post.js",
+    "name": "cleanup-images.post",
+    "src": "server/api/questionnaire/cleanup-images.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_r2.js"
+    ]
+  },
+  "server/api/questionnaire/create.post.ts": {
+    "file": "chunks/create.post.js",
+    "name": "create.post",
+    "src": "server/api/questionnaire/create.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_timezone.js"
+    ]
+  },
+  "server/api/questionnaire/current.get.ts": {
+    "file": "chunks/current.get.js",
+    "name": "current.get",
+    "src": "server/api/questionnaire/current.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/questionnaire/has-voted.get.ts": {
+    "file": "chunks/has-voted.get.js",
+    "name": "has-voted.get",
+    "src": "server/api/questionnaire/has-voted.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/questionnaire/index.get.ts": {
+    "file": "chunks/index5.get.js",
+    "name": "index.get",
+    "src": "server/api/questionnaire/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_timezone.js"
+    ]
+  },
+  "server/api/questionnaire/reorder.post.ts": {
+    "file": "chunks/reorder.post.js",
+    "name": "reorder.post",
+    "src": "server/api/questionnaire/reorder.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/questionnaire/results.get.ts": {
+    "file": "chunks/results.get.js",
+    "name": "results.get",
+    "src": "server/api/questionnaire/results.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_questionnaire.js"
+    ]
+  },
+  "server/api/questionnaire/sync-votes.post.ts": {
+    "file": "chunks/sync-votes.post.js",
+    "name": "sync-votes.post",
+    "src": "server/api/questionnaire/sync-votes.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_questionnaire.js"
+    ]
+  },
+  "server/api/questionnaire/vote.post.ts": {
+    "file": "chunks/vote.post.js",
+    "name": "vote.post",
+    "src": "server/api/questionnaire/vote.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id].get.ts": {
+    "file": "chunks/_id_4.get.js",
+    "name": "_id_.get",
+    "src": "server/api/themes/[id].get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id]/download.get.ts": {
+    "file": "chunks/download.get.js",
+    "name": "download.get",
+    "src": "server/api/themes/[id]/download.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id]/favorite.delete.ts": {
+    "file": "chunks/favorite.delete.js",
+    "name": "favorite.delete",
+    "src": "server/api/themes/[id]/favorite.delete.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id]/favorite.post.ts": {
+    "file": "chunks/favorite.post.js",
+    "name": "favorite.post",
+    "src": "server/api/themes/[id]/favorite.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id]/rating.post.ts": {
+    "file": "chunks/rating.post.js",
+    "name": "rating.post",
+    "src": "server/api/themes/[id]/rating.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/[id]/theme.json.get.ts": {
+    "file": "chunks/theme.json.get.js",
+    "name": "theme.json.get",
+    "src": "server/api/themes/[id]/theme.json.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js",
+      "_r2.js"
+    ]
+  },
+  "server/api/themes/[id]/user-status.get.ts": {
+    "file": "chunks/user-status.get.js",
+    "name": "user-status.get",
+    "src": "server/api/themes/[id]/user-status.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/favorites.get.ts": {
+    "file": "chunks/favorites.get.js",
+    "name": "favorites.get",
+    "src": "server/api/themes/favorites.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/index.get.ts": {
+    "file": "chunks/index6.get.js",
+    "name": "index.get",
+    "src": "server/api/themes/index.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/recalculate-stats.post.ts": {
+    "file": "chunks/recalculate-stats.post.js",
+    "name": "recalculate-stats.post",
+    "src": "server/api/themes/recalculate-stats.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "server/api/themes/search.get.ts": {
+    "file": "chunks/search.get.js",
+    "name": "search.get",
+    "src": "server/api/themes/search.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/themes/spotlight.get.ts": {
+    "file": "chunks/spotlight.get.js",
+    "name": "spotlight.get",
+    "src": "server/api/themes/spotlight.get.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth2.js",
+      "_db.js"
+    ]
+  },
+  "server/api/upload.post.ts": {
+    "file": "chunks/upload.post.js",
+    "name": "upload.post",
+    "src": "server/api/upload.post.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_r2.js"
+    ]
+  },
+  "src/hooks.server.ts": {
+    "file": "entries/hooks.server.js",
+    "name": "entries/hooks.server",
+    "src": "src/hooks.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_auth.js"
+    ]
+  },
+  "src/routes/+error.svelte": {
+    "file": "entries/pages/_error.svelte.js",
+    "name": "entries/pages/_error.svelte",
+    "src": "src/routes/+error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Button.js"
+    ]
+  },
+  "src/routes/+layout.server.ts": {
+    "file": "entries/pages/_layout.server.ts.js",
+    "name": "entries/pages/_layout.server.ts",
+    "src": "src/routes/+layout.server.ts",
+    "isEntry": true
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_dist.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js",
+      "_Button.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.D3xJVlDC.css"
+    ]
+  },
+  "src/routes/+page.server.ts": {
+    "file": "entries/pages/_page.server.ts.js",
+    "name": "entries/pages/_page.server.ts",
+    "src": "src/routes/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_github.js"
+    ]
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_dist.js",
+      "_server.js",
+      "_Button.js",
+      "_Card.js",
+      "_site.js"
+    ]
+  },
+  "src/routes/admin/+layout.server.ts": {
+    "file": "entries/pages/admin/_layout.server.ts.js",
+    "name": "entries/pages/admin/_layout.server.ts",
+    "src": "src/routes/admin/+layout.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_auth.js"
+    ]
+  },
+  "src/routes/admin/+layout.svelte": {
+    "file": "entries/pages/admin/_layout.svelte.js",
+    "name": "entries/pages/admin/_layout.svelte",
+    "src": "src/routes/admin/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js"
+    ]
+  },
+  "src/routes/admin/+page.svelte": {
+    "file": "entries/pages/admin/_page.svelte.js",
+    "name": "entries/pages/admin/_page.svelte",
+    "src": "src/routes/admin/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/analytics/+page.svelte": {
+    "file": "entries/pages/admin/analytics/_page.svelte.js",
+    "name": "entries/pages/admin/analytics/_page.svelte",
+    "src": "src/routes/admin/analytics/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/collections/+page.svelte": {
+    "file": "entries/pages/admin/collections/_page.svelte.js",
+    "name": "entries/pages/admin/collections/_page.svelte",
+    "src": "src/routes/admin/collections/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/collections/[id]/+page.svelte": {
+    "file": "entries/pages/admin/collections/_id_/_page.svelte.js",
+    "name": "entries/pages/admin/collections/_id_/_page.svelte",
+    "src": "src/routes/admin/collections/[id]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/collections/new/+page.svelte": {
+    "file": "entries/pages/admin/collections/new/_page.svelte.js",
+    "name": "entries/pages/admin/collections/new/_page.svelte",
+    "src": "src/routes/admin/collections/new/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/admin/news/+page.svelte": {
+    "file": "entries/pages/admin/news/_page.svelte.js",
+    "name": "entries/pages/admin/news/_page.svelte",
+    "src": "src/routes/admin/news/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/news/create/+page.svelte": {
+    "file": "entries/pages/admin/news/create/_page.svelte.js",
+    "name": "entries/pages/admin/news/create/_page.svelte",
+    "src": "src/routes/admin/news/create/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/admin/news/edit/[slug]/+page.svelte": {
+    "file": "entries/pages/admin/news/edit/_slug_/_page.svelte.js",
+    "name": "entries/pages/admin/news/edit/_slug_/_page.svelte",
+    "src": "src/routes/admin/news/edit/[slug]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/questionnaire/+page.svelte": {
+    "file": "entries/pages/admin/questionnaire/_page.svelte.js",
+    "name": "entries/pages/admin/questionnaire/_page.svelte",
+    "src": "src/routes/admin/questionnaire/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/questionnaire/create/+page.svelte": {
+    "file": "entries/pages/admin/questionnaire/create/_page.svelte.js",
+    "name": "entries/pages/admin/questionnaire/create/_page.svelte",
+    "src": "src/routes/admin/questionnaire/create/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/admin/questionnaire/edit/[id]/+page.svelte": {
+    "file": "entries/pages/admin/questionnaire/edit/_id_/_page.svelte.js",
+    "name": "entries/pages/admin/questionnaire/edit/_id_/_page.svelte",
+    "src": "src/routes/admin/questionnaire/edit/[id]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/themes/+page.svelte": {
+    "file": "entries/pages/admin/themes/_page.svelte.js",
+    "name": "entries/pages/admin/themes/_page.svelte",
+    "src": "src/routes/admin/themes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/themes/[id]/+page.svelte": {
+    "file": "entries/pages/admin/themes/_id_/_page.svelte.js",
+    "name": "entries/pages/admin/themes/_id_/_page.svelte",
+    "src": "src/routes/admin/themes/[id]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_environment.js",
+      "_internal.js",
+      "_state.js",
+      "_exports.js",
+      "_shared.js",
+      "_server.js",
+      "_Card.js",
+      "_admin.js"
+    ]
+  },
+  "src/routes/admin/themes/upload/+page.svelte": {
+    "file": "entries/pages/admin/themes/upload/_page.svelte.js",
+    "name": "entries/pages/admin/themes/upload/_page.svelte",
+    "src": "src/routes/admin/themes/upload/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/api/[...path]/+server.ts": {
+    "file": "entries/endpoints/api/_...path_/_server.ts.js",
+    "name": "entries/endpoints/api/_...path_/_server.ts",
+    "src": "src/routes/api/[...path]/+server.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "server/api/__sitemap__/urls.ts",
+      "server/api/admin/collections/[id].delete.ts",
+      "server/api/admin/collections/[id].put.ts",
+      "server/api/admin/collections/index.get.ts",
+      "server/api/admin/collections/index.post.ts",
+      "server/api/admin/themes/[id]/approve.post.ts",
+      "server/api/admin/themes/[id]/reject.post.ts",
+      "server/api/admin/themes/[id]/update-files.post.ts",
+      "server/api/admin/themes/[id].delete.ts",
+      "server/api/admin/themes/[id].get.ts",
+      "server/api/admin/themes/[id].put.ts",
+      "server/api/admin/themes/index.get.ts",
+      "server/api/admin/themes/index.post.ts",
+      "server/api/admin/themes/manifest-preview.post.ts",
+      "server/api/analytics/accounts/users.get.ts",
+      "server/api/analytics/accounts.get.ts",
+      "server/api/analytics/desqta.get.ts",
+      "server/api/analytics/flush.post.ts",
+      "server/api/analytics/hourly-stats.get.ts",
+      "server/api/analytics/questionnaire.get.ts",
+      "server/api/analytics/save-hourly-stats.ts",
+      "server/api/analytics/stats.get.ts",
+      "server/api/analytics/test-hourly-stats.get.ts",
+      "server/api/analytics/themes.get.ts",
+      "server/api/analytics/usage.get.ts",
+      "server/api/analytics/usage.post.ts",
+      "server/api/auth/callback.get.ts",
+      "server/api/auth/extension/login.post.ts",
+      "server/api/auth/login.get.ts",
+      "server/api/auth/logout.post.ts",
+      "server/api/auth/me.get.ts",
+      "server/api/changelogs/bqplus.get.ts",
+      "server/api/changelogs/desqta.get.ts",
+      "server/api/collections/[id].get.ts",
+      "server/api/collections/index.get.ts",
+      "server/api/images/[...path].get.ts",
+      "server/api/images/themes/[id]/[filename].get.ts",
+      "server/api/news/[id].delete.ts",
+      "server/api/news/[slug].get.ts",
+      "server/api/news/[slug].put.ts",
+      "server/api/news/index.get.ts",
+      "server/api/news/index.post.ts",
+      "server/api/news/preview.post.ts",
+      "server/api/news/publish.patch.ts",
+      "server/api/policy/privacy.get.ts",
+      "server/api/questionnaire/[id].delete.ts",
+      "server/api/questionnaire/[id].get.ts",
+      "server/api/questionnaire/[id].put.ts",
+      "server/api/questionnaire/cleanup-images.post.ts",
+      "server/api/questionnaire/create.post.ts",
+      "server/api/questionnaire/current.get.ts",
+      "server/api/questionnaire/has-voted.get.ts",
+      "server/api/questionnaire/index.get.ts",
+      "server/api/questionnaire/reorder.post.ts",
+      "server/api/questionnaire/results.get.ts",
+      "server/api/questionnaire/sync-votes.post.ts",
+      "server/api/questionnaire/vote.post.ts",
+      "server/api/themes/[id]/download.get.ts",
+      "server/api/themes/[id]/favorite.delete.ts",
+      "server/api/themes/[id]/favorite.post.ts",
+      "server/api/themes/[id]/rating.post.ts",
+      "server/api/themes/[id]/theme.json.get.ts",
+      "server/api/themes/[id]/user-status.get.ts",
+      "server/api/themes/[id].get.ts",
+      "server/api/themes/favorites.get.ts",
+      "server/api/themes/index.get.ts",
+      "server/api/themes/recalculate-stats.post.ts",
+      "server/api/themes/search.get.ts",
+      "server/api/themes/spotlight.get.ts",
+      "server/api/upload.post.ts"
+    ]
+  },
+  "src/routes/changelogs/+page.server.ts": {
+    "file": "entries/pages/changelogs/_page.server.ts.js",
+    "name": "entries/pages/changelogs/_page.server.ts",
+    "src": "src/routes/changelogs/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_markdown.js"
+    ]
+  },
+  "src/routes/changelogs/+page.svelte": {
+    "file": "entries/pages/changelogs/_page.svelte.js",
+    "name": "entries/pages/changelogs/_page.svelte",
+    "src": "src/routes/changelogs/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Button.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/changelogs/bqplus/+page.server.ts": {
+    "file": "entries/pages/changelogs/bqplus/_page.server.ts.js",
+    "name": "entries/pages/changelogs/bqplus/_page.server.ts",
+    "src": "src/routes/changelogs/bqplus/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_markdown.js"
+    ]
+  },
+  "src/routes/changelogs/bqplus/+page.svelte": {
+    "file": "entries/pages/changelogs/bqplus/_page.svelte.js",
+    "name": "entries/pages/changelogs/bqplus/_page.svelte",
+    "src": "src/routes/changelogs/bqplus/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/changelogs/desqta/+page.server.ts": {
+    "file": "entries/pages/changelogs/desqta/_page.server.ts.js",
+    "name": "entries/pages/changelogs/desqta/_page.server.ts",
+    "src": "src/routes/changelogs/desqta/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_markdown.js"
+    ]
+  },
+  "src/routes/changelogs/desqta/+page.svelte": {
+    "file": "entries/pages/changelogs/desqta/_page.svelte.js",
+    "name": "entries/pages/changelogs/desqta/_page.svelte",
+    "src": "src/routes/changelogs/desqta/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/comparison/+page.server.ts": {
+    "file": "entries/pages/comparison/_page.server.ts.js",
+    "name": "entries/pages/comparison/_page.server.ts",
+    "src": "src/routes/comparison/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/comparison/+page.svelte": {
+    "file": "entries/pages/comparison/_page.svelte.js",
+    "name": "entries/pages/comparison/_page.svelte",
+    "src": "src/routes/comparison/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js",
+      "_site.js"
+    ]
+  },
+  "src/routes/desqta/+page.server.ts": {
+    "file": "entries/pages/desqta/_page.server.ts.js",
+    "name": "entries/pages/desqta/_page.server.ts",
+    "src": "src/routes/desqta/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_site.js",
+      "_github.js"
+    ]
+  },
+  "src/routes/desqta/+page.svelte": {
+    "file": "entries/pages/desqta/_page.svelte.js",
+    "name": "entries/pages/desqta/_page.svelte",
+    "src": "src/routes/desqta/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Button.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/download/+page.server.ts": {
+    "file": "entries/pages/download/_page.server.ts.js",
+    "name": "entries/pages/download/_page.server.ts",
+    "src": "src/routes/download/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_github.js"
+    ]
+  },
+  "src/routes/download/+page.svelte": {
+    "file": "entries/pages/download/_page.svelte.js",
+    "name": "entries/pages/download/_page.svelte",
+    "src": "src/routes/download/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_dist.js",
+      "_server.js",
+      "_Button.js",
+      "_Card.js",
+      "_site.js"
+    ]
+  },
+  "src/routes/minecraft/+page.server.ts": {
+    "file": "entries/pages/minecraft/_page.server.ts.js",
+    "name": "entries/pages/minecraft/_page.server.ts",
+    "src": "src/routes/minecraft/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/minecraft/+page.svelte": {
+    "file": "entries/pages/minecraft/_page.svelte.js",
+    "name": "entries/pages/minecraft/_page.svelte",
+    "src": "src/routes/minecraft/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Button.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/news/+page.server.ts": {
+    "file": "entries/pages/news/_page.server.ts.js",
+    "name": "entries/pages/news/_page.server.ts",
+    "src": "src/routes/news/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/news/+page.svelte": {
+    "file": "entries/pages/news/_page.svelte.js",
+    "name": "entries/pages/news/_page.svelte",
+    "src": "src/routes/news/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/news/[slug]/+page.server.ts": {
+    "file": "entries/pages/news/_slug_/_page.server.ts.js",
+    "name": "entries/pages/news/_slug_/_page.server.ts",
+    "src": "src/routes/news/[slug]/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/news/[slug]/+page.svelte": {
+    "file": "entries/pages/news/_slug_/_page.svelte.js",
+    "name": "entries/pages/news/_slug_/_page.svelte",
+    "src": "src/routes/news/[slug]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "src/routes/privacy/+page.server.ts": {
+    "file": "entries/pages/privacy/_page.server.ts.js",
+    "name": "entries/pages/privacy/_page.server.ts",
+    "src": "src/routes/privacy/+page.server.ts",
+    "isEntry": true
+  },
+  "src/routes/privacy/+page.svelte": {
+    "file": "entries/pages/privacy/_page.svelte.js",
+    "name": "entries/pages/privacy/_page.svelte",
+    "src": "src/routes/privacy/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js",
+      "_Card.js"
+    ]
+  },
+  "src/routes/robots.txt/+server.ts": {
+    "file": "entries/endpoints/robots.txt/_server.ts.js",
+    "name": "entries/endpoints/robots.txt/_server.ts",
+    "src": "src/routes/robots.txt/+server.ts",
+    "isEntry": true
+  },
+  "src/routes/sitemap.xml/+server.ts": {
+    "file": "entries/endpoints/sitemap.xml/_server.ts.js",
+    "name": "entries/endpoints/sitemap.xml/_server.ts",
+    "src": "src/routes/sitemap.xml/+server.ts",
+    "isEntry": true
+  }
+}
