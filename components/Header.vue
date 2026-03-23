@@ -92,36 +92,61 @@
           <div class="h-5 w-12 bg-zinc-800/50 rounded animate-pulse"></div>
         </template>
         <template v-else-if="user">
-          <Menu as="div" class="relative">
-            <MenuButton class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-zinc-100 hover:bg-zinc-800/50 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
-              <img 
-                v-if="user.pfpUrl" 
-                :src="user.pfpUrl" 
-                :alt="user.username" 
-                class="h-6 w-6 rounded-full ring-2 ring-zinc-800"
+          <Menu as="div" class="relative" v-slot="{ open }">
+            <MenuButton
+              class="user-badge flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-zinc-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.96]"
+              :class="open ? 'bg-zinc-800/80' : 'hover:bg-zinc-800/50'"
+            >
+              <img
+                v-if="user.pfpUrl"
+                :src="user.pfpUrl"
+                :alt="user.username"
+                class="h-6 w-6 shrink-0 rounded-full ring-2 ring-zinc-800"
               />
-              <span class="max-w-[120px] truncate">{{ user.displayName || user.username }}</span>
-              <ChevronDownIcon class="h-4 w-4 text-zinc-400" />
+              <span class="max-w-[120px] truncate leading-normal">{{ user.displayName || user.username }}</span>
+              <ChevronDownIcon
+                class="user-badge-chevron h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                :class="open ? '-rotate-180' : ''"
+              />
             </MenuButton>
-            <transition enter-active-class="transition duration-100 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-75 ease-in" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
-              <MenuItems class="absolute right-0 mt-2 w-48 origin-top-right rounded-lg bg-zinc-900 border border-zinc-700 shadow-xl ring-1 ring-black/5 focus:outline-none z-50">
-                <div class="py-1">
-                  <MenuItem v-if="user.admin_level && user.admin_level >= 1" v-slot="{ active }">
-                    <NuxtLink to="/admin" :class="[active ? 'bg-zinc-800' : '', 'block px-4 py-2 text-sm text-green-400']">
-                      Admin
-                    </NuxtLink>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <a href="https://accounts.betterseqta.org" target="_blank" rel="noopener noreferrer" :class="[active ? 'bg-zinc-800' : '', 'block px-4 py-2 text-sm text-zinc-300']">
-                      Account
-                    </a>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <button @click="logout" :class="[active ? 'bg-zinc-800' : '', 'block w-full text-left px-4 py-2 text-sm text-zinc-300']">
-                      Logout
-                    </button>
-                  </MenuItem>
-                </div>
+            <transition name="user-menu">
+              <MenuItems
+                v-show="open"
+                class="user-menu-panel absolute right-0 z-50 mt-2 w-52 origin-top rounded-2xl border border-zinc-700/80 bg-zinc-900/85 p-2 shadow-xl backdrop-blur-xl ring-1 ring-black/5 focus:outline-none"
+              >
+                <MenuItem v-if="user.admin_level && user.admin_level >= 1" v-slot="{ active }">
+                  <NuxtLink
+                    to="/admin"
+                    class="user-menu-item block rounded-lg py-2 pl-3 pr-3 text-sm font-medium text-green-400 transition-all duration-200"
+                    :class="active ? 'bg-zinc-800 pl-[14px]' : 'hover:bg-zinc-800/80 hover:pl-[14px]'"
+                    :style="{ '--stagger-idx': 1 }"
+                  >
+                    Admin
+                  </NuxtLink>
+                </MenuItem>
+                <MenuItem v-slot="{ active }">
+                  <a
+                    href="https://accounts.betterseqta.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="user-menu-item block rounded-lg py-2 pl-3 pr-3 text-sm font-medium text-zinc-100 transition-all duration-200"
+                    :class="active ? 'bg-zinc-800 pl-[14px]' : 'hover:bg-zinc-800/80 hover:pl-[14px]'"
+                    :style="{ '--stagger-idx': user.admin_level && user.admin_level >= 1 ? 2 : 1 }"
+                  >
+                    Account
+                  </a>
+                </MenuItem>
+                <MenuItem v-slot="{ active }">
+                  <button
+                    type="button"
+                    class="user-menu-item block w-full rounded-lg py-2 pl-3 pr-3 text-left text-sm font-medium text-zinc-100 transition-all duration-200"
+                    :class="active ? 'bg-zinc-800 pl-[14px]' : 'hover:bg-zinc-800/80 hover:pl-[14px]'"
+                    :style="{ '--stagger-idx': user.admin_level && user.admin_level >= 1 ? 3 : 2 }"
+                    @click="logout"
+                  >
+                    Logout
+                  </button>
+                </MenuItem>
               </MenuItems>
             </transition>
           </Menu>
@@ -347,3 +372,77 @@ const mobileMenuOpen = ref(false);
 
 const { user, login, logout, loading } = useAuth();
 </script>
+
+<style scoped>
+/* User dropdown: springy panel + staggered items (enter) / damped fast exit */
+.user-menu-enter-active {
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.28s ease-in,
+    backdrop-filter 0.45s ease,
+    -webkit-backdrop-filter 0.45s ease;
+}
+
+.user-menu-enter-from {
+  transform: scale(0.8) translateY(-10px);
+  transform-origin: top center;
+  opacity: 0;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+}
+
+.user-menu-enter-to {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.user-menu-leave-active {
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.18s ease-out,
+    backdrop-filter 0.22s ease,
+    -webkit-backdrop-filter 0.22s ease;
+}
+
+.user-menu-leave-from {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.user-menu-leave-to {
+  transform: scale(0.82) translateY(-6px);
+  opacity: 0;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+}
+
+@keyframes user-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-menu-item {
+  animation: user-menu-item-in 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--stagger-idx, 0) * 30ms);
+}
+
+@keyframes user-menu-item-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.user-menu-leave-active .user-menu-item {
+  animation: user-menu-item-out 0.16s ease-out forwards !important;
+  animation-delay: 0ms !important;
+}
+</style>
