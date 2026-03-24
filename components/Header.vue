@@ -317,6 +317,10 @@ const routes = [
     href: "/download",
   },
   {
+    name: "Themes",
+    href: "/themes",
+  },
+  {
     name: "Privacy",
     href: "/privacy",
   },

@@ -49,6 +49,7 @@ const navigation = {
   main: [
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Download", href: "/download" },
+    { name: "Themes", href: "/themes" },
   ],
   social: [
     {
