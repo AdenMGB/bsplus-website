@@ -1,22 +1,24 @@
-import { getDB } from '../../utils/db';
-import { getOptionalUser } from '../../utils/auth';
-import { formatPublicThemeResponse } from '../../utils/formatPublicTheme';
+import { getDB } from '../../../utils/db';
+import { getOptionalUser } from '../../../utils/auth';
+import { formatPublicThemeResponse } from '../../../utils/formatPublicTheme';
 
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
-  const id = getRouterParam(event, 'id');
+  const rawSlug = getRouterParam(event, 'slug');
   const user = await getOptionalUser(event);
 
-  if (!id) {
+  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
+
+  if (!slug) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Theme ID is required'
+      statusMessage: 'Theme slug is required'
     });
   }
 
   const theme = (await db
-    .prepare('SELECT * FROM themes WHERE id = ? AND status = ?')
-    .bind(id, 'approved')
+    .prepare('SELECT * FROM themes WHERE slug = ? AND status = ?')
+    .bind(slug, 'approved')
     .first()) as Record<string, unknown> | null;
 
   if (!theme) {
@@ -30,7 +32,7 @@ export default defineEventHandler(async (event) => {
   if (user) {
     const favorite = await db
       .prepare('SELECT id FROM user_favorites WHERE user_id = ? AND theme_id = ?')
-      .bind(user.id, id)
+      .bind(user.id, theme.id as string)
       .first();
     isFavorited = !!favorite;
   }
