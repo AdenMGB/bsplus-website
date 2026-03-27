@@ -296,8 +296,6 @@ async function handleVote(optionIndex: number) {
     await loadResults();
     // Clear optimistic votes after loading real results
     optimisticVotes.value.clear();
-    // Auto-minimize after voting so it's less intrusive
-    isMinimized.value = true;
   } catch (e: any) {
     // Revert optimistic update on error
     const currentOptimistic = optimisticVotes.value.get(optionIndex) || 0;
