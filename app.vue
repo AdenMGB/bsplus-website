@@ -5,16 +5,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
 useHead({
   titleTemplate(title) {
-    return title ? `${title} | BetterSEQTA+` : "BetterSEQTA+";
+    return title ? `${title} | BetterSEQTA+` : 'BetterSEQTA+';
   },
 });
 
-const { fetchUser } = useAuth();
-onMounted(() => {
-  fetchUser();
-});
+const { accessToken, fetchUser } = useAuth();
+
+if (import.meta.client) {
+  const authTokenCookie = useCookie<string | null>('auth_token', {
+    default: () => null,
+  });
+
+  if (!accessToken.value && authTokenCookie.value) {
+    accessToken.value = authTokenCookie.value;
+  }
+
+  onMounted(() => {
+    fetchUser();
+  });
+}
 </script>
