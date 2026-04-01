@@ -1,9 +1,9 @@
-export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const query = getQuery(event);
-  const code = query.code;
+import { appendProxySetCookies, exchangeAccountsAuthorizationCode } from '../../utils/accounts';
 
-  // Use localhost for local dev, or get from env
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event);
+  const rawCode = query.code;
+  const code = typeof rawCode === 'string' ? rawCode : null;
   const redirectUri = process.env.NUXT_OAUTH_REDIRECT_URI || 'http://localhost:8787/api/auth/callback';
 
   if (!code) {
@@ -11,40 +11,24 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Exchange code for token
-    const tokenResponse: any = await $fetch('https://accounts.betterseqta.org/api/oauth/token', {
-      method: 'POST',
-      body: {
-        client_id: config.oauthClientId,
-        client_secret: config.oauthClientSecret,
-        code: code,
-        grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
-      }
-    });
-
-    if (tokenResponse.error) {
-      console.error('OAuth Error:', tokenResponse.error);
-      return sendRedirect(event, '/?error=oauth_failed');
-    }
-
+    const tokenResponse = await exchangeAccountsAuthorizationCode(event, code, redirectUri);
     const accessToken = tokenResponse.access_token;
     const expiresIn = tokenResponse.expires_in || 3600;
 
-    // Set HTTP-only cookie
     setCookie(event, 'auth_token', accessToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       maxAge: expiresIn,
       path: '/',
       sameSite: 'lax',
     });
 
-    // Use sendRedirect which properly handles cookies in Nitro
+    const forwardedCookies = Array.isArray(tokenResponse.setCookie) ? tokenResponse.setCookie : [];
+    appendProxySetCookies(event, forwardedCookies);
+
     return sendRedirect(event, '/');
   } catch (e) {
     console.error('OAuth Callback Error:', e);
     return sendRedirect(event, '/?error=server_error');
   }
 });
-
