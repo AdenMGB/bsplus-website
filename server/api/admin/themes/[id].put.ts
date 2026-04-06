@@ -1,12 +1,19 @@
 import { getDB } from '../../../utils/db';
 import { requireAdmin } from '../../../utils/auth';
+import { slugify } from '../../../utils/themes';
 
 interface UpdateThemeBody {
   name?: string;
+  slug?: string;
   description?: string;
-  category?: string;
+  author?: string;
+  license?: string;
+  version?: string;
+  category?: string | null;
   tags?: string[];
   featured?: boolean;
+  compatibility_min?: string | null;
+  compatibility_max?: string | null;
 }
 
 export default defineEventHandler(async (event) => {
@@ -43,9 +50,47 @@ export default defineEventHandler(async (event) => {
     params.push(body.name);
   }
 
+  if (body.slug !== undefined) {
+    const nextSlug = slugify(body.slug.trim());
+    if (!nextSlug) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid slug'
+      });
+    }
+    const slugTaken = await db.prepare(
+      'SELECT id FROM themes WHERE slug = ? AND id != ?'
+    )
+      .bind(nextSlug, id)
+      .first();
+    if (slugTaken) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: `Slug "${nextSlug}" is already in use`
+      });
+    }
+    updates.push('slug = ?');
+    params.push(nextSlug);
+  }
+
   if (body.description !== undefined) {
     updates.push('description = ?');
     params.push(body.description);
+  }
+
+  if (body.author !== undefined) {
+    updates.push('author = ?');
+    params.push(body.author);
+  }
+
+  if (body.license !== undefined) {
+    updates.push('license = ?');
+    params.push(body.license);
+  }
+
+  if (body.version !== undefined) {
+    updates.push('version = ?');
+    params.push(body.version);
   }
 
   if (body.category !== undefined) {
@@ -61,6 +106,21 @@ export default defineEventHandler(async (event) => {
   if (body.featured !== undefined) {
     updates.push('featured = ?');
     params.push(body.featured ? 1 : 0);
+  }
+
+  if (body.compatibility_min !== undefined) {
+    updates.push('compatibility_min = ?');
+    const min = typeof body.compatibility_min === 'string' ? body.compatibility_min.trim() : '';
+    params.push(min || '0.0.0');
+  }
+
+  if (body.compatibility_max !== undefined) {
+    updates.push('compatibility_max = ?');
+    const max =
+      typeof body.compatibility_max === 'string' && body.compatibility_max.trim()
+        ? body.compatibility_max.trim()
+        : null;
+    params.push(max);
   }
 
   if (updates.length === 0) {
@@ -100,7 +160,11 @@ export default defineEventHandler(async (event) => {
         download_count: theme.download_count,
         favorite_count: theme.favorite_count,
         rating_average: theme.rating_average,
-        rating_count: theme.rating_count
+        rating_count: theme.rating_count,
+        compatibility: {
+          min: theme.compatibility_min,
+          max: theme.compatibility_max || undefined
+        }
       }
     },
     error: null,

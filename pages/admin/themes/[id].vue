@@ -426,6 +426,40 @@
               />
             </div>
             <div>
+              <label class="block text-sm font-medium text-zinc-400 mb-1">Slug</label>
+              <input
+                v-model="editForm.slug"
+                type="text"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="url-friendly-name"
+              />
+              <p class="text-xs text-zinc-500 mt-1">Public URL: /themes/{{ editForm.slug || '…' }} — must stay unique</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-zinc-400 mb-1">Author</label>
+              <input
+                v-model="editForm.author"
+                type="text"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-zinc-400 mb-1">Version</label>
+              <input
+                v-model="editForm.version"
+                type="text"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-zinc-400 mb-1">License</label>
+              <input
+                v-model="editForm.license"
+                type="text"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
               <label class="block text-sm font-medium text-zinc-400 mb-1">Category</label>
               <select
                 v-model="editForm.category"
@@ -438,6 +472,26 @@
                 <option value="minimal">Minimal</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-zinc-400 mb-1">Compatibility (min)</label>
+                <input
+                  v-model="editForm.compatibilityMin"
+                  type="text"
+                  class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="e.g. 1.0.0"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-zinc-400 mb-1">Compatibility (max)</label>
+                <input
+                  v-model="editForm.compatibilityMax"
+                  type="text"
+                  class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="Optional upper bound"
+                />
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-zinc-400 mb-1">Tags (comma-separated)</label>
@@ -569,8 +623,14 @@ const canSubmitThemeUpdate = computed(() => {
 
 const editForm = ref({
   name: '',
+  slug: '',
   description: '',
+  author: '',
+  version: '',
+  license: '',
   category: '',
+  compatibilityMin: '',
+  compatibilityMax: '',
   tagsInput: '',
   featured: false
 });
@@ -578,12 +638,19 @@ const editForm = ref({
 // Initialize edit form when edit modal opens
 watch(showEditModal, (isOpen) => {
   if (isOpen && theme.value) {
+    const t = theme.value;
     editForm.value = {
-      name: theme.value.name || '',
-      description: theme.value.description || '',
-      category: theme.value.category || '',
-      tagsInput: theme.value.tags?.join(', ') || '',
-      featured: theme.value.featured || false
+      name: t.name || '',
+      slug: t.slug || '',
+      description: t.description || '',
+      author: t.author || '',
+      version: t.version || '',
+      license: t.license || '',
+      category: t.category || '',
+      compatibilityMin: t.compatibility?.min ?? '',
+      compatibilityMax: t.compatibility?.max ?? '',
+      tagsInput: t.tags?.join(', ') || '',
+      featured: t.featured || false
     };
   }
 });
@@ -640,10 +707,16 @@ async function saveTheme() {
       method: 'PUT',
       body: {
         name: editForm.value.name,
+        slug: editForm.value.slug.trim(),
         description: editForm.value.description,
+        author: editForm.value.author,
+        version: editForm.value.version,
+        license: editForm.value.license,
         category: editForm.value.category || null,
         tags: tags,
-        featured: editForm.value.featured
+        featured: editForm.value.featured,
+        compatibility_min: editForm.value.compatibilityMin.trim() || null,
+        compatibility_max: editForm.value.compatibilityMax.trim() || null
       }
     });
     
