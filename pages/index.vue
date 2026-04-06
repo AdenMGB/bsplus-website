@@ -31,19 +31,21 @@
                 Transform your SEQTA Learn experience with our powerful browser extension,
                 bringing beautiful themes, live wallpapers, and enhanced features to make SEQTA actually enjoyable!
               </p>
-              <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0">
+              <div
+                class="mt-8 sm:mt-10 flex w-full max-w-md mx-auto flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0"
+              >
                 <NuxtLink
                   href="/download"
-                  class="rounded-md bg-zinc-600 px-4 py-2.5 sm:px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200"
+                  class="inline-flex w-full items-center justify-center rounded-md bg-zinc-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200 sm:w-auto sm:px-3.5 sm:py-2.5"
                 >
                   Get BetterSEQTA+
-                  <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="ml-2 -mr-0.5 h-5 w-5 shrink-0 transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                 </NuxtLink>
                 <NuxtLink
                   href="#features"
-                  class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400"
+                  class="inline-flex w-full items-center justify-center rounded-md py-3 text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400 sm:inline sm:w-auto sm:py-0"
                 >
                   Learn more <span aria-hidden="true">→</span>
                 </NuxtLink>
@@ -81,19 +83,21 @@
               <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-200 flex-grow">
                 A powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features and performance.
               </p>
-              <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0">
+              <div
+                class="mt-8 sm:mt-10 flex w-full max-w-md mx-auto flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-x-6 animate-fade-in delay-300 flex-shrink-0"
+              >
                 <NuxtLink
                   href="/download"
-                  class="rounded-md bg-blue-600 px-4 py-2.5 sm:px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200"
+                  class="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200 sm:w-auto sm:px-3.5 sm:py-2.5"
                 >
                   Download DesQTA
-                  <svg class="ml-2 -mr-0.5 h-5 w-5 inline-block transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="ml-2 -mr-0.5 h-5 w-5 shrink-0 transition-transform duration-300 hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                 </NuxtLink>
                 <NuxtLink
                   href="/desqta"
-                  class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-blue-200"
+                  class="inline-flex w-full items-center justify-center rounded-md py-3 text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-blue-200 sm:inline sm:w-auto sm:py-0"
                 >
                   Learn more <span aria-hidden="true">→</span>
                 </NuxtLink>
@@ -173,14 +177,19 @@
         <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-300 animate-fade-in delay-100">
           Whether you prefer the browser extension or the full desktop experience, we've got you covered.
         </p>
-          <div class="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-x-6 animate-fade-in delay-200">
+          <div
+            class="mt-10 flex w-full max-w-md mx-auto flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-x-6 animate-fade-in delay-200"
+          >
             <NuxtLink
               href="/download"
-              class="rounded-md bg-zinc-600 px-4 py-2.5 sm:px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200 text-center"
+              class="inline-flex w-full items-center justify-center rounded-md bg-zinc-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 transition-all duration-200 sm:w-auto sm:px-3.5 sm:py-2.5"
             >
               Download Now
             </NuxtLink>
-            <NuxtLink href="/comparison" class="text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400 text-center">
+            <NuxtLink
+              href="/comparison"
+              class="inline-flex w-full items-center justify-center rounded-md py-3 text-sm font-semibold leading-6 text-white transition-colors duration-200 hover:text-zinc-400 sm:inline sm:w-auto sm:py-0"
+            >
               Compare Features <span aria-hidden="true">→</span>
             </NuxtLink>
           </div>

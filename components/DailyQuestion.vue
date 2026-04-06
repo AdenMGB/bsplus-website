@@ -1,5 +1,6 @@
 <template>
-  <div v-if="question">
+  <!-- Hide for signed-in users who already voted (server); still show after a fresh vote until refresh -->
+  <div v-if="question && !(user && serverHasVoted)">
     <!-- Main poll widget -->
     <div v-if="!isDismissed" class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 w-[calc(100%-1rem)] sm:w-auto sm:min-w-[400px] sm:max-w-md">
     <div class="bg-zinc-900/95 border border-zinc-800 rounded-lg backdrop-blur-sm shadow-xl transition-all duration-200">
@@ -194,6 +195,8 @@ const question = computed(() => currentQuestion.value);
 const { user, login } = useAuth();
 
 const DISMISSED_KEY = 'daily-question-dismissed';
+/** True after API says this user already voted (e.g. returning visitor). Used to hide the widget. */
+const serverHasVoted = ref(false);
 const hasVoted = ref(false);
 const voting = ref(false);
 const showResults = ref(false);
@@ -240,17 +243,23 @@ const formatExpiration = computed(() => {
 
 async function checkVoteStatus() {
   if (!question.value) return;
-  
+
+  if (!user.value) {
+    serverHasVoted.value = false;
+    hasVoted.value = false;
+    return;
+  }
+
   try {
     const data = await $fetch<{ hasVoted: boolean }>(`/api/questionnaire/has-voted?questionId=${question.value.id}`);
+    serverHasVoted.value = data.hasVoted;
     hasVoted.value = data.hasVoted;
-    
+
     if (hasVoted.value) {
       await loadResults();
-      isMinimized.value = true; // Start minimized when returning to page after voting
     }
-  } catch (e) {
-    // Silently fail - user might not be logged in
+  } catch {
+    serverHasVoted.value = false;
   }
 }
 
@@ -372,6 +381,7 @@ async function loadResults() {
 
 watch(() => question.value, (newQuestion) => {
   if (newQuestion) {
+    serverHasVoted.value = false;
     hasVoted.value = false;
     showResults.value = false;
     results.value = [];
@@ -386,6 +396,12 @@ watch(() => question.value, (newQuestion) => {
     checkVoteStatus();
   }
 }, { immediate: true });
+
+watch(user, () => {
+  if (question.value) {
+    checkVoteStatus();
+  }
+});
 
 onMounted(() => {
   if (question.value) {

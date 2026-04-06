@@ -1,6 +1,6 @@
 # Extension Themes API
 
-This document describes the API for BetterSEQTA extension themes, including admin upload, theme list/download, and authentication.
+This document describes the API for BetterSEQTA extension themes, including admin upload and metadata updates, public theme list/detail/download, and extension authentication.
 
 ## Overview
 
@@ -110,7 +110,70 @@ theme-folder/
 
 ---
 
-## 2. Theme List
+## 2. Admin Theme Metadata Update
+
+**Endpoint:** `PUT /api/admin/themes/[id]`
+
+**Authentication:** Admin (cookie or Bearer token)
+
+**Request body:** JSON — send only the fields you want to change. At least one field is required.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Display name |
+| `slug` | string | Public URL segment (`/themes/{slug}`). Normalized server-side; must be **unique** across all themes |
+| `description` | string | Full description |
+| `author` | string | Author / creator label |
+| `license` | string | License name (e.g. `MIT`) |
+| `version` | string | Theme version string |
+| `category` | string \| `null` | Category (or `null` to clear) |
+| `tags` | string[] | Array of tag strings (stored as JSON in the database) |
+| `featured` | boolean | Featured in the store |
+| `compatibility_min` | string \| `null` | Minimum app/extension version. If sent empty or whitespace-only, stored as `0.0.0` |
+| `compatibility_max` | string \| `null` | Maximum version cap, or `null` / empty to clear |
+
+**Behaviour**
+
+- **`slug`:** Processed with the same slug rules as new uploads. Returns **`409`** if another theme already uses that slug.
+- **`updated_at`** is set on successful update.
+- Theme packages and images are **not** changed by this endpoint — use **`POST /api/admin/themes/[id]/update-files`** to replace ZIPs or individual files.
+
+**Response (success):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "theme": {
+      "id": "...",
+      "name": "...",
+      "slug": "...",
+      "version": "...",
+      "description": "...",
+      "author": "...",
+      "license": "MIT",
+      "category": null,
+      "tags": ["tag1"],
+      "status": "approved",
+      "featured": false,
+      "download_count": 0,
+      "favorite_count": 0,
+      "rating_average": 0,
+      "rating_count": 0,
+      "compatibility": {
+        "min": "1.0.0",
+        "max": null
+      }
+    }
+  },
+  "error": null,
+  "meta": { "timestamp": 0, "version": "1.0.0" }
+}
+```
+
+---
+
+## 3. Theme List
 
 **Endpoint:** `GET /api/themes`
 
@@ -223,7 +286,7 @@ All themes include at least:
 
 ---
 
-## 3. Theme Detail
+## 4. Theme Detail
 
 Public detail responses use the same core shape for both theme types (`formatPublicTheme` on the server). **`updated_at`** / **`created_at`** / **`published_at`** are always included when present in the database.
 
@@ -328,7 +391,7 @@ Use URL encoding for the slug (e.g. spaces as `%20`). The response body matches 
 
 ---
 
-## 4. Theme Download
+## 5. Theme Download
 
 **Endpoint:** `GET /api/themes/[id]/download`
 
@@ -369,7 +432,7 @@ Use URL encoding for the slug (e.g. spaces as `%20`). The response body matches 
 
 ---
 
-## 5. Serve theme.json
+## 6. Serve theme.json
 
 **Endpoint:** `GET /api/themes/[id]/theme.json`
 
@@ -379,7 +442,7 @@ Use URL encoding for the slug (e.g. spaces as `%20`). The response body matches 
 
 ---
 
-## 6. Auth for Extension
+## 7. Auth for Extension
 
 Extensions (and DesQTA) use username/password to get a token directly — no OAuth redirect, no Discord.
 
@@ -416,10 +479,13 @@ Authorization: Bearer eyJ...
 
 ---
 
-## 7. Unified Theme APIs
+## 8. Unified Theme APIs
 
 | API | Notes |
 |-----|--------|
+| `POST /api/admin/themes` | Admin upload (multipart); see §1 |
+| `PUT /api/admin/themes/[id]` | Admin metadata only; see §2 |
+| `POST /api/admin/themes/[id]/update-files` | Admin replace or merge theme files (ZIP or loose files) |
 | `GET /api/themes` | `?type=betterseqta` \| `desqta`; list includes `theme_type`, timestamps, ratings, `updated_at`, etc. |
 | `GET /api/themes/[id]` | Full public theme object; BetterSEQTA: `coverImage`, `marqueeImage`, `theme_json_url` |
 | `GET /api/themes/by-slug/[slug]` | Same body as `GET /api/themes/[id]` |
@@ -436,7 +502,7 @@ Authorization: Bearer eyJ...
 
 ---
 
-## 8. Example Requests
+## 9. Example Requests
 
 ### List BetterSEQTA themes
 ```bash
@@ -469,4 +535,12 @@ curl -X POST "https://betterseqta.org/api/auth/extension/login" \
 ```bash
 curl "https://betterseqta.org/api/themes?type=betterseqta" \
   -H "Authorization: Bearer <access_token>"
+```
+
+### Admin metadata update (example)
+```bash
+curl -X PUT "https://betterseqta.org/api/admin/themes/<theme-id>" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: auth_token=..." \
+  -d '{"author":"Community","license":"MIT","version":"1.2.0","compatibility_min":"3.0.0"}'
 ```
