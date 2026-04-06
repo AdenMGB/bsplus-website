@@ -190,8 +190,8 @@
           <h2 class="text-xl font-semibold text-white mb-4">Update Theme Files</h2>
           <p class="text-zinc-400 mb-6">
             {{ theme.theme_type === 'betterseqta'
-              ? 'Upload a new ZIP file to update the theme files. This will replace theme.json and images (banner, marquee).'
-              : 'Upload a new ZIP file to update the theme files. This will replace the existing ZIP, preview image, and screenshots.' }}
+              ? 'Upload a full ZIP to replace everything, or individual files — for example only theme.json, or only banner/marquee images.'
+              : 'Upload a full ZIP to replace the package, or individual files (manifest, styles, previews). Partial uploads are merged with the existing theme package on the server.' }}
           </p>
           
           <div
@@ -206,14 +206,14 @@
             <input
               ref="fileInput"
               type="file"
-              accept=".zip"
+              accept=".zip,.json,.webp,.css,.png,.jpg,.jpeg"
               @change="handleFileSelect"
               class="hidden"
             />
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-zinc-500 mx-auto mb-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5m0 0l-4.5-4.5m4.5 4.5l4.5-4.5" />
             </svg>
-            <p class="text-white mb-2">Drag and drop your theme ZIP file here</p>
+            <p class="text-white mb-2">Drag and drop a theme ZIP or a single file (e.g. theme.json)</p>
             <p class="text-zinc-400 text-sm mb-4">or</p>
             <button
               @click="fileInput?.click()"
@@ -223,8 +223,8 @@
             </button>
             <p class="text-zinc-500 text-xs mt-4">
               {{ theme.theme_type === 'betterseqta'
-                ? 'ZIP must contain: theme.json (id, name, description, CustomCSS) and optionally images/banner.webp, images/marquee.webp'
-                : 'ZIP must contain: theme-manifest.json, styles/ directory, and preview.png (optional)' }}
+                ? 'BetterSEQTA: theme.json (id, name, description, CustomCSS) and optionally images/banner.webp, images/marquee.webp — or upload any of these files alone.'
+                : 'DesQTA: full ZIP with theme-manifest.json, styles/, and optional previews — or upload individual files to merge into the stored package.' }}
             </p>
           </div>
 
@@ -270,6 +270,13 @@
               </div>
             </div>
 
+            <p v-if="updateManifestPreview.imageOnly" class="text-sm text-zinc-300 mb-3">
+              Image-only update: cover and/or marquee images will be replaced; theme.json is unchanged.
+            </p>
+            <p v-if="updateManifestPreview.partialUpload" class="text-sm text-zinc-300 mb-3">
+              Partial DesQTA upload: files will be merged with the existing package on save.
+            </p>
+
             <div v-if="updateManifestPreview.manifest" class="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span class="text-zinc-400">Name:</span>
@@ -303,12 +310,12 @@
           <!-- ID mismatch warning (BetterSEQTA) -->
           <div v-if="theme.theme_type === 'betterseqta' && updateManifestPreview?.manifest?.id && updateManifestPreview.manifest.id !== themeId" class="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
             <p class="text-amber-400 text-sm">
-              Theme ID in ZIP ({{ updateManifestPreview.manifest.id }}) does not match this theme ({{ themeId }}). Upload a ZIP for the correct theme.
+              Theme ID in upload ({{ updateManifestPreview.manifest.id }}) does not match this theme ({{ themeId }}). Use files for the correct theme.
             </p>
           </div>
 
           <!-- Update Button -->
-          <div v-if="selectedUpdateFile && updateManifestPreview?.validation?.valid && (theme.theme_type !== 'betterseqta' || updateManifestPreview.manifest?.id === themeId)" class="mt-6 flex justify-end">
+          <div v-if="selectedUpdateFile && canSubmitThemeUpdate" class="mt-6 flex justify-end">
             <button
               @click="updateThemeFiles"
               :disabled="updatingFiles"
@@ -520,6 +527,14 @@ const theme = computed(() => {
   };
 });
 
+useHead({
+  title: computed(() => {
+    const n = theme.value?.name;
+    if (n) return `${n} (admin)`;
+    return 'Theme (admin)';
+  })
+});
+
 const showApproveModal = ref(false);
 const showRejectModal = ref(false);
 const showDeleteModal = ref(false);
@@ -535,6 +550,22 @@ const isDragging = ref(false);
 const selectedUpdateFile = ref<File | null>(null);
 const updateManifestPreview = ref<any>(null);
 const updatingFiles = ref(false);
+
+const canSubmitThemeUpdate = computed(() => {
+  const prev = updateManifestPreview.value as {
+    validation?: { valid?: boolean };
+    manifest?: { id?: string };
+    imageOnly?: boolean;
+  } | null;
+  if (!selectedUpdateFile.value || !prev?.validation?.valid) return false;
+  if (theme.value?.theme_type === 'betterseqta') {
+    if (prev.manifest?.id && prev.manifest.id !== themeId) return false;
+    if (prev.imageOnly) return true;
+    if (prev.manifest?.id === themeId) return true;
+    return false;
+  }
+  return true;
+});
 
 const editForm = ref({
   name: '',
@@ -670,30 +701,74 @@ function handleFileSelect(event: Event) {
 }
 
 async function handleUpdateFile(file: File) {
-  if (!file.name.endsWith('.zip')) {
-    alert('Please upload a ZIP file');
+  if (!/\.(zip|json|webp|css|png|jpg|jpeg)$/i.test(file.name)) {
+    alert('Please upload a .zip, .json, .webp, .css, or image file');
     return;
   }
-  
+
   selectedUpdateFile.value = file;
-  
-  // Preview manifest
+  updateManifestPreview.value = null;
+
   try {
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      const formData = new FormData();
+      formData.append('theme_zip', file);
+
+      const response = await $fetch<any>('/api/admin/themes/manifest-preview', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.success) {
+        updateManifestPreview.value = response.data;
+      } else {
+        alert('Failed to preview manifest: ' + (response.error?.message || 'Unknown error'));
+        selectedUpdateFile.value = null;
+        updateManifestPreview.value = null;
+      }
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('theme_zip', file);
-    
+    formData.append(file.name, file);
+
     const response = await $fetch<any>('/api/admin/themes/manifest-preview', {
       method: 'POST',
       body: formData
     });
-    
+
     if (response.success) {
       updateManifestPreview.value = response.data;
-    } else {
-      alert('Failed to preview manifest: ' + (response.error?.message || 'Unknown error'));
-      selectedUpdateFile.value = null;
-      updateManifestPreview.value = null;
+      return;
     }
+
+    if (theme.value?.theme_type === 'betterseqta' && /\.webp$/i.test(file.name)) {
+      updateManifestPreview.value = {
+        theme_type: 'betterseqta',
+        validation: { valid: true, warnings: [], errors: [] },
+        manifest: null,
+        imageOnly: true
+      };
+      return;
+    }
+
+    if (theme.value?.theme_type !== 'betterseqta') {
+      updateManifestPreview.value = {
+        theme_type: 'desqta',
+        validation: {
+          valid: true,
+          warnings: ['Partial upload — the server will merge these files with the existing theme package.'],
+          errors: []
+        },
+        manifest: null,
+        partialUpload: true
+      };
+      return;
+    }
+
+    alert('Failed to preview manifest: ' + (response.error?.message || 'Unknown error'));
+    selectedUpdateFile.value = null;
+    updateManifestPreview.value = null;
   } catch (e: any) {
     alert('Failed to preview manifest: ' + (e.data?.error?.message || e.message || 'Unknown error'));
     selectedUpdateFile.value = null;
@@ -703,12 +778,17 @@ async function handleUpdateFile(file: File) {
 
 async function updateThemeFiles() {
   if (!selectedUpdateFile.value) return;
-  
+
   updatingFiles.value = true;
   try {
     const formData = new FormData();
-    formData.append('theme_zip', selectedUpdateFile.value);
-    
+    const file = selectedUpdateFile.value;
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      formData.append('theme_zip', file);
+    } else {
+      formData.append(file.name, file);
+    }
+
     const response = await $fetch<any>(`/api/admin/themes/${themeId}/update-files`, {
       method: 'POST',
       body: formData

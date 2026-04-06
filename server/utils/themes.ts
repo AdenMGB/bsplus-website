@@ -260,3 +260,49 @@ export async function createZipArchive(
   const resultBlob = await zipWriter.close();
   return await resultBlob.arrayBuffer();
 }
+
+/** Extract a ZIP archive into a path → file map (same layout as upload handlers). */
+export async function extractZipToMap(zipBuffer: ArrayBuffer): Promise<Map<string, ArrayBuffer>> {
+  const out = new Map<string, ArrayBuffer>();
+  const zipJs = await import('@zip.js/zip.js');
+  const { ZipReader, BlobReader, BlobWriter } = zipJs;
+  const zipReader = new ZipReader(new BlobReader(new Blob([new Uint8Array(zipBuffer)])));
+  const entries = await zipReader.getEntries();
+
+  for (const entry of entries) {
+    if (!entry.directory) {
+      const data = await entry.getData(new BlobWriter());
+      const arrayBuffer = await data.arrayBuffer();
+      out.set(entry.filename, arrayBuffer);
+    }
+  }
+
+  await zipReader.close();
+  return out;
+}
+
+/** Directory prefix before theme-manifest.json in a DesQTA package (e.g. slug folder inside the zip). */
+export function inferThemeDirPrefix(files: Map<string, ArrayBuffer>): string {
+  const m = Array.from(files.keys()).find((k) => k.endsWith('theme-manifest.json'));
+  if (!m) return '';
+  const i = m.lastIndexOf('/');
+  return i === -1 ? '' : m.slice(0, i);
+}
+
+/** Overlay new files onto a base map; keys without the base prefix get prefixed (matches stored DesQTA zips). */
+export function mergeThemeFileMaps(
+  base: Map<string, ArrayBuffer>,
+  overlay: Map<string, ArrayBuffer>,
+  themeSlug: string
+): Map<string, ArrayBuffer> {
+  const merged = new Map(base);
+  const basePrefix = inferThemeDirPrefix(base) || themeSlug;
+  for (const [path, data] of overlay) {
+    let key = path.replace(/^\/+/, '');
+    if (basePrefix && !key.startsWith(`${basePrefix}/`)) {
+      key = `${basePrefix}/${key}`;
+    }
+    merged.set(key, data);
+  }
+  return merged;
+}

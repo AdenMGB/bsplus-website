@@ -9,8 +9,28 @@ import {
   calculateSHA256,
   inferCategory,
   createZipArchive,
-  slugify
+  slugify,
+  extractZipToMap,
+  mergeThemeFileMaps
 } from '../../../../utils/themes';
+
+function findThemeJsonPath(files: Map<string, ArrayBuffer>): string | null {
+  const keys = Array.from(files.keys());
+  const direct = keys.find((k) => k === 'theme.json' || k.endsWith('/theme.json'));
+  return direct ?? null;
+}
+
+function findBannerEntry(files: Map<string, ArrayBuffer>) {
+  return Array.from(files.entries()).find(([p]) =>
+    p.includes('images/banner.webp') || p.endsWith('banner.webp')
+  );
+}
+
+function findMarqueeEntry(files: Map<string, ArrayBuffer>) {
+  return Array.from(files.entries()).find(([p]) =>
+    p.includes('images/marquee.webp') || p.endsWith('marquee.webp')
+  );
+}
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
@@ -27,7 +47,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check if theme exists
   const existingTheme = await db.prepare(
     'SELECT * FROM themes WHERE id = ?'
   ).bind(id).first() as any;
@@ -47,50 +66,112 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Find the ZIP file
   let zipFile: { filename?: string; data: Uint8Array; type?: string } | null = null;
-  const themeFiles = new Map<string, ArrayBuffer>();
+  const looseFiles = new Map<string, ArrayBuffer>();
 
   for (const part of formData) {
     if (part.name === 'theme_zip' && part.filename) {
       zipFile = part;
     } else if (part.name === 'theme_folder' && part.filename?.endsWith('.zip')) {
       zipFile = part;
+    } else if (part.filename) {
+      const path = part.name || part.filename;
+      looseFiles.set(path, new Uint8Array(part.data).buffer);
     }
   }
 
-  if (!zipFile) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'ZIP file is required'
-    });
+  const themeFiles = new Map<string, ArrayBuffer>();
+
+  if (zipFile) {
+    try {
+      const extracted = await extractZipToMap(new Uint8Array(zipFile.data).buffer);
+      for (const [k, v] of extracted) themeFiles.set(k, v);
+    } catch (error: any) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Failed to extract ZIP: ${error.message}`
+      });
+    }
+  }
+  for (const [k, v] of looseFiles) {
+    themeFiles.set(k, v);
   }
 
-  // Extract ZIP
-  try {
-    const zipJs = await import('@zip.js/zip.js');
-    const { ZipReader, BlobReader, BlobWriter } = zipJs;
-    const zipReader = new ZipReader(new BlobReader(new Blob([new Uint8Array(zipFile.data)])));
-    const entries = await zipReader.getEntries();
-
-    for (const entry of entries) {
-      if (!entry.directory) {
-        const data = await entry.getData(new BlobWriter());
-        const arrayBuffer = await data.arrayBuffer();
-        themeFiles.set(entry.filename, arrayBuffer);
-      }
-    }
-
-    await zipReader.close();
-  } catch (error: any) {
+  if (themeFiles.size === 0) {
     throw createError({
       statusCode: 400,
-      statusMessage: `Failed to extract ZIP: ${error.message}`
+      statusMessage: 'ZIP file or at least one file is required'
     });
   }
 
   // --- BetterSEQTA update flow ---
   if (existingTheme.theme_type === 'betterseqta') {
+    const themeJsonPath = findThemeJsonPath(themeFiles);
+    const bannerEntry = findBannerEntry(themeFiles);
+    const marqueeEntry = findMarqueeEntry(themeFiles);
+
+    if (!themeJsonPath) {
+      if (!bannerEntry && !marqueeEntry) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: 'INVALID_THEME_STRUCTURE',
+            message:
+              'BetterSEQTA update requires theme.json and/or banner/marquee webp images (e.g. images/banner.webp).'
+          },
+          meta: { timestamp: Date.now(), version: '1.0.0' }
+        };
+      }
+
+      let coverImageUrl: string | null = existingTheme.cover_image_url;
+      let marqueeImageUrl: string | null = existingTheme.marquee_image_url;
+
+      if (bannerEntry) {
+        const bannerKey = `themes/${id}/images/banner.webp`;
+        await bucket.put(bannerKey, bannerEntry[1], {
+          httpMetadata: { contentType: 'image/webp' }
+        });
+        coverImageUrl = `${siteUrl}/api/images/${bannerKey}`;
+      }
+      if (marqueeEntry) {
+        const marqueeKey = `themes/${id}/images/marquee.webp`;
+        await bucket.put(marqueeKey, marqueeEntry[1], {
+          httpMetadata: { contentType: 'image/webp' }
+        });
+        marqueeImageUrl = `${siteUrl}/api/images/${marqueeKey}`;
+      }
+
+      const now = Date.now();
+      await db.prepare(
+        `UPDATE themes SET
+          cover_image_url = ?,
+          marquee_image_url = ?,
+          updated_at = ?
+        WHERE id = ?`
+      ).bind(coverImageUrl, marqueeImageUrl, now, id).run();
+
+      const theme = await db.prepare('SELECT * FROM themes WHERE id = ?').bind(id).first() as any;
+
+      return {
+        success: true,
+        data: {
+          theme: {
+            id: theme.id,
+            name: theme.name,
+            slug: theme.slug,
+            theme_type: 'betterseqta',
+            theme_json_url: theme.theme_json_url,
+            cover_image_url: theme.cover_image_url,
+            marquee_image_url: theme.marquee_image_url
+          },
+          validation: { valid: true, warnings: [], errors: [] }
+        },
+        error: null,
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
     const validation = validateBetterSeqtaStructure(themeFiles);
     if (!validation.valid) {
       return {
@@ -105,7 +186,6 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    const themeJsonPath = Array.from(themeFiles.keys()).find(k => k.endsWith('/theme.json')) ?? 'theme.json';
     const themeJsonContent = new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
     const bsTheme = await parseBetterSeqtaTheme(themeJsonContent);
 
@@ -115,13 +195,12 @@ export default defineEventHandler(async (event) => {
         data: null,
         error: {
           code: 'THEME_ID_MISMATCH',
-          message: `Theme ID in theme.json (${bsTheme.id}) does not match this theme (${id}). Upload a ZIP for the correct theme.`
+          message: `Theme ID in theme.json (${bsTheme.id}) does not match this theme (${id}). Upload files for the correct theme.`
         },
         meta: { timestamp: Date.now(), version: '1.0.0' }
       };
     }
 
-    // Upload theme.json
     const themeJsonKey = `themes/${id}/theme.json`;
     await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
       httpMetadata: { contentType: 'application/json' }
@@ -130,9 +209,6 @@ export default defineEventHandler(async (event) => {
     let coverImageUrl: string | null = existingTheme.cover_image_url;
     let marqueeImageUrl: string | null = existingTheme.marquee_image_url;
 
-    const bannerEntry = Array.from(themeFiles.entries()).find(([p]) =>
-      p.includes('images/banner.webp') || p.includes('banner.webp')
-    );
     if (bannerEntry) {
       const bannerKey = `themes/${id}/images/banner.webp`;
       await bucket.put(bannerKey, bannerEntry[1], {
@@ -141,9 +217,6 @@ export default defineEventHandler(async (event) => {
       coverImageUrl = `${siteUrl}/api/images/${bannerKey}`;
     }
 
-    const marqueeEntry = Array.from(themeFiles.entries()).find(([p]) =>
-      p.includes('images/marquee.webp') || p.includes('marquee.webp')
-    );
     if (marqueeEntry) {
       const marqueeKey = `themes/${id}/images/marquee.webp`;
       await bucket.put(marqueeKey, marqueeEntry[1], {
@@ -211,7 +284,36 @@ export default defineEventHandler(async (event) => {
   }
 
   // --- DesQTA update flow ---
-  const validation = validateThemeStructure(themeFiles);
+  let mergedFiles = themeFiles;
+  let validation = validateThemeStructure(mergedFiles);
+
+  if (!validation.valid) {
+    const zipKey =
+      (existingTheme.zip_download_url && existingTheme.zip_download_url.replace('/api/images/', '')) ||
+      `themes/${id}/theme.zip`;
+    const existingObj = await bucket.get(zipKey);
+    if (!existingObj) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'INVALID_THEME_STRUCTURE',
+          message: 'Theme validation failed and no existing theme package was found to merge with.',
+          details: {
+            errors: validation.errors,
+            warnings: validation.warnings
+          }
+        },
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
+    const zipBuf = await existingObj.arrayBuffer();
+    const baseMap = await extractZipToMap(zipBuf);
+    mergedFiles = mergeThemeFileMaps(baseMap, themeFiles, existingTheme.slug);
+    validation = validateThemeStructure(mergedFiles);
+  }
+
   if (!validation.valid) {
     return {
       success: false,
@@ -231,8 +333,7 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  // Find and parse manifest
-  const manifestEntry = Array.from(themeFiles.entries()).find(([path]) => 
+  const manifestEntry = Array.from(mergedFiles.entries()).find(([path]) =>
     path.endsWith('theme-manifest.json')
   );
 
@@ -246,11 +347,10 @@ export default defineEventHandler(async (event) => {
   const manifestContent = new TextDecoder().decode(manifestEntry[1]);
   const manifest = await parseManifest(manifestContent);
 
-  // Find preview image
   let previewImage: { path: string; data: ArrayBuffer } | null = null;
   const previewPaths = ['preview.png', 'preview.jpg', 'preview.jpeg'];
   for (const path of previewPaths) {
-    const entry = Array.from(themeFiles.entries()).find(([p]) => 
+    const entry = Array.from(mergedFiles.entries()).find(([p]) =>
       p.includes(path) && (p.endsWith('.png') || p.endsWith('.jpg') || p.endsWith('.jpeg'))
     );
     if (entry) {
@@ -259,24 +359,22 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Upload/update preview image
   let previewUrl: string | null = existingTheme.preview_thumbnail_url;
   if (previewImage) {
     const previewKey = `themes/${id}/preview.png`;
     await bucket.put(previewKey, previewImage.data, {
       httpMetadata: {
-        contentType: 'image/png',
-      },
+        contentType: 'image/png'
+      }
     });
     previewUrl = `/api/images/${previewKey}`;
   }
 
-  // Find screenshots
   const screenshots: Array<{ path: string; data: ArrayBuffer }> = [];
   let screenshotIndex = 1;
   while (true) {
     const screenshotPath = `screenshot${screenshotIndex}.png`;
-    const entry = Array.from(themeFiles.entries()).find(([p]) => 
+    const entry = Array.from(mergedFiles.entries()).find(([p]) =>
       p.includes(screenshotPath) || p.includes(`screenshot${screenshotIndex}.jpg`)
     );
     if (!entry) break;
@@ -284,10 +382,8 @@ export default defineEventHandler(async (event) => {
     screenshotIndex++;
   }
 
-  // Delete old screenshots if new ones are provided
   let screenshotUrls: string[] = [];
   if (screenshots.length > 0) {
-    // Delete old screenshots
     if (existingTheme.preview_screenshots) {
       try {
         const oldScreenshots = JSON.parse(existingTheme.preview_screenshots) as string[];
@@ -295,53 +391,48 @@ export default defineEventHandler(async (event) => {
           const screenshotKey = screenshotUrl.replace('/api/images/', '');
           await bucket.delete(screenshotKey).catch(() => {});
         }
-      } catch (e) {
-        // Ignore errors
+      } catch {
+        // ignore
       }
     }
 
-    // Upload new screenshots
     for (let i = 0; i < screenshots.length; i++) {
       const screenshot = screenshots[i];
       const screenshotKey = `themes/${id}/screenshot${i + 1}.png`;
       await bucket.put(screenshotKey, screenshot.data, {
         httpMetadata: {
-          contentType: 'image/png',
-        },
+          contentType: 'image/png'
+        }
       });
       screenshotUrls.push(`/api/images/${screenshotKey}`);
     }
   } else {
-    // Keep existing screenshots if no new ones provided
     if (existingTheme.preview_screenshots) {
       try {
         screenshotUrls = JSON.parse(existingTheme.preview_screenshots) as string[];
-      } catch (e) {
+      } catch {
         screenshotUrls = [];
       }
     }
   }
 
-  // Create new ZIP archive
-  const zipBuffer = await createZipArchive(themeFiles, existingTheme.slug);
+  const zipBuffer = await createZipArchive(mergedFiles, existingTheme.slug);
   const zipSize = zipBuffer.byteLength;
   const zipChecksum = await calculateSHA256(zipBuffer);
 
-  // Delete old ZIP and upload new one
-  const zipKey = `themes/${id}/theme.zip`;
+  const newZipKey = `themes/${id}/theme.zip`;
   if (existingTheme.zip_download_url) {
     const oldZipKey = existingTheme.zip_download_url.replace('/api/images/', '');
     await bucket.delete(oldZipKey).catch(() => {});
   }
-  
-  await bucket.put(zipKey, zipBuffer, {
-    httpMetadata: {
-      contentType: 'application/zip',
-    },
-  });
-  const zipUrl = `/api/images/${zipKey}`;
 
-  // Update database record
+  await bucket.put(newZipKey, zipBuffer, {
+    httpMetadata: {
+      contentType: 'application/zip'
+    }
+  });
+  const zipUrl = `/api/images/${newZipKey}`;
+
   const now = Date.now();
   await db.prepare(
     `UPDATE themes SET
@@ -378,7 +469,6 @@ export default defineEventHandler(async (event) => {
     id
   ).run();
 
-  // Get updated theme
   const theme = await db.prepare(
     'SELECT * FROM themes WHERE id = ?'
   ).bind(id).first() as any;
