@@ -24,10 +24,17 @@ export const useAuth = () => {
     user.value = null;
   };
 
-  const refreshAccessToken = async () => {
+  /**
+   * On SSR, `credentials: 'include'` does not forward the browser cookie to the internal
+   * `/api/auth/refresh` call — pass `forwardHeaders` from `useRequestHeaders(['cookie'])` (e.g. from admin middleware).
+   */
+  const refreshAccessToken = async (forwardHeaders?: Record<string, string>) => {
     const response = await $fetch<RefreshResponse>('/api/auth/refresh', {
       method: 'POST',
       credentials: 'include',
+      ...(forwardHeaders && Object.keys(forwardHeaders).length > 0
+        ? { headers: forwardHeaders }
+        : {}),
     });
 
     accessToken.value = response.access_token;
@@ -52,10 +59,10 @@ export const useAuth = () => {
     try {
       if (!accessToken.value && !hasProvidedAuthContext) {
         try {
-          await refreshAccessToken();
+          await refreshAccessToken(headers);
         } catch (refreshError: any) {
           const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
-          if (refreshStatus === 401) {
+          if (refreshStatus === 401 || refreshStatus === 400) {
             clearAuthState();
             return null;
           }
@@ -71,11 +78,11 @@ export const useAuth = () => {
       }
 
       try {
-        await refreshAccessToken();
+        await refreshAccessToken(headers);
         return await fetchMe();
       } catch (refreshError: any) {
         const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
-        if (refreshStatus === 401) {
+        if (refreshStatus === 401 || refreshStatus === 400) {
           clearAuthState();
           return null;
         }
