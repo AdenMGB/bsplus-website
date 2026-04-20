@@ -11,7 +11,8 @@ import {
   generateUUID,
   calculateSHA256,
   inferCategory,
-  createZipArchive
+  createZipArchive,
+  normalizeAndValidateExternalThemeJsonUrl
 } from '../../../utils/themes';
 
 export default defineEventHandler(async (event) => {
@@ -28,6 +29,17 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'No files uploaded'
     });
   }
+
+  const getMultipartText = (name: string): string | undefined => {
+    const part = formData.find((p) => p.name === name && !p.filename);
+    if (!part?.data) return undefined;
+    return new TextDecoder().decode(part.data).trim();
+  };
+
+  const pseudoThemeRequested = ['1', 'true', 'on', 'yes'].includes(
+    (getMultipartText('pseudo_theme') ?? '').toLowerCase()
+  );
+  const externalThemeJsonUrlRaw = getMultipartText('external_theme_json_url');
 
   // Find the ZIP file or theme folder
   let zipFile: { filename?: string; data: Uint8Array; type?: string } | null = null;
@@ -113,11 +125,31 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Upload theme.json to R2
-    const themeJsonKey = `themes/${themeId}/theme.json`;
-    await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
-      httpMetadata: { contentType: 'application/json' }
-    });
+    let themeJsonUrl: string;
+    let isPseudoTheme = 0;
+
+    if (pseudoThemeRequested) {
+      const ext = normalizeAndValidateExternalThemeJsonUrl(externalThemeJsonUrlRaw);
+      if (!ext.ok) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: 'INVALID_EXTERNAL_THEME_JSON_URL',
+            message: ext.error
+          },
+          meta: { timestamp: Date.now(), version: '1.0.0' }
+        };
+      }
+      themeJsonUrl = ext.url;
+      isPseudoTheme = 1;
+    } else {
+      const themeJsonKey = `themes/${themeId}/theme.json`;
+      await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
+        httpMetadata: { contentType: 'application/json' }
+      });
+      themeJsonUrl = `${siteUrl}/api/themes/${themeId}/theme.json`;
+    }
 
     let coverImageUrl: string | null = null;
     let marqueeImageUrl: string | null = null;
@@ -144,7 +176,6 @@ export default defineEventHandler(async (event) => {
       marqueeImageUrl = `${siteUrl}/api/images/${marqueeKey}`;
     }
 
-    const themeJsonUrl = `${siteUrl}/api/themes/${themeId}/theme.json`;
     const now = Date.now();
 
     await db.prepare(
@@ -152,7 +183,7 @@ export default defineEventHandler(async (event) => {
         id, name, slug, version, description, author, license,
         category, tags, status, theme_type, theme_json_url,
         cover_image_url, marquee_image_url, zip_download_url,
-        compatibility_min, compatibility_max, created_at, updated_at
+        compatibility_min, compatibility_max, is_pseudo_theme, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       themeId,
@@ -172,6 +203,7 @@ export default defineEventHandler(async (event) => {
       null,
       null,
       null,
+      isPseudoTheme,
       now,
       now
     ).run();
@@ -192,6 +224,7 @@ export default defineEventHandler(async (event) => {
           name: theme.name,
           slug: theme.slug,
           theme_type: 'betterseqta',
+          is_pseudo_theme: Boolean(theme.is_pseudo_theme),
           theme_json_url: theme.theme_json_url,
           cover_image_url: theme.cover_image_url,
           marquee_image_url: theme.marquee_image_url
