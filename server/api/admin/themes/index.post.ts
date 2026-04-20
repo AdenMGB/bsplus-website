@@ -184,7 +184,7 @@ export default defineEventHandler(async (event) => {
         category, tags, status, theme_type, theme_json_url,
         cover_image_url, marquee_image_url, zip_download_url,
         compatibility_min, compatibility_max, is_pseudo_theme, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       themeId,
       bsTheme.name,
