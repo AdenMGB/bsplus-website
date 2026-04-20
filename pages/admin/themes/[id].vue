@@ -70,6 +70,12 @@
                 >
                   {{ theme.theme_type === 'betterseqta' ? 'BetterSEQTA' : 'DesQTA' }}
                 </span>
+                <span
+                  v-if="theme.theme_type === 'betterseqta' && theme.is_pseudo_theme"
+                  class="inline-flex items-center rounded-md bg-amber-500/10 text-amber-400 ring-amber-500/20 px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                >
+                  Pseudo
+                </span>
               </div>
               <p class="text-zinc-400 mb-4">{{ theme.description }}</p>
               <div class="flex flex-wrap gap-4 text-sm">
@@ -189,9 +195,14 @@
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
           <h2 class="text-xl font-semibold text-white mb-4">Update Theme Files</h2>
           <p class="text-zinc-400 mb-6">
-            {{ theme.theme_type === 'betterseqta'
-              ? 'Upload a full ZIP to replace everything, or individual files — for example only theme.json, or only banner/marquee images.'
-              : 'Upload a full ZIP to replace the package, or individual files (manifest, styles, previews). Partial uploads are merged with the existing theme package on the server.' }}
+            <template v-if="theme.theme_type === 'betterseqta' && theme.is_pseudo_theme">
+              Pseudo theme: the real <code class="text-zinc-500">theme.json</code> is hosted at the external URL below (not on R2). You can replace banner/marquee images here. To change the JSON contents, edit the file on GitHub (or your host). To use a different raw URL, set it in Edit → External theme.json URL.
+            </template>
+            <template v-else>
+              {{ theme.theme_type === 'betterseqta'
+                ? 'Upload a full ZIP to replace everything, or individual files — for example only theme.json, or only banner/marquee images.'
+                : 'Upload a full ZIP to replace the package, or individual files (manifest, styles, previews). Partial uploads are merged with the existing theme package on the server.' }}
+            </template>
           </p>
           
           <div
@@ -222,9 +233,14 @@
               Browse Files
             </button>
             <p class="text-zinc-500 text-xs mt-4">
-              {{ theme.theme_type === 'betterseqta'
-                ? 'BetterSEQTA: theme.json (id, name, description, CustomCSS) and optionally images/banner.webp, images/marquee.webp — or upload any of these files alone.'
-                : 'DesQTA: full ZIP with theme-manifest.json, styles/, and optional previews — or upload individual files to merge into the stored package.' }}
+              <template v-if="theme.theme_type === 'betterseqta' && theme.is_pseudo_theme">
+                Images only: <code class="text-zinc-600">images/banner.webp</code> / <code class="text-zinc-600">images/marquee.webp</code> (or a ZIP containing them). Do not upload a full theme.json here — it is loaded from the external URL.
+              </template>
+              <template v-else>
+                {{ theme.theme_type === 'betterseqta'
+                  ? 'BetterSEQTA: theme.json (id, name, description, CustomCSS) and optionally images/banner.webp, images/marquee.webp — or upload any of these files alone.'
+                  : 'DesQTA: full ZIP with theme-manifest.json, styles/, and optional previews — or upload individual files to merge into the stored package.' }}
+              </template>
             </p>
           </div>
 
@@ -493,6 +509,16 @@
                 />
               </div>
             </div>
+            <div v-if="theme.is_pseudo_theme">
+              <label class="block text-sm font-medium text-zinc-400 mb-1">External theme.json URL (HTTPS)</label>
+              <input
+                v-model="editForm.themeJsonUrl"
+                type="url"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="https://raw.githubusercontent.com/..."
+              />
+              <p class="text-xs text-zinc-500 mt-1">BS Plus uses this URL to download theme.json (e.g. GitHub raw).</p>
+            </div>
             <div>
               <label class="block text-sm font-medium text-zinc-400 mb-1">Tags (comma-separated)</label>
               <input
@@ -632,7 +658,8 @@ const editForm = ref({
   compatibilityMin: '',
   compatibilityMax: '',
   tagsInput: '',
-  featured: false
+  featured: false,
+  themeJsonUrl: ''
 });
 
 // Initialize edit form when edit modal opens
@@ -650,7 +677,8 @@ watch(showEditModal, (isOpen) => {
       compatibilityMin: t.compatibility?.min ?? '',
       compatibilityMax: t.compatibility?.max ?? '',
       tagsInput: t.tags?.join(', ') || '',
-      featured: t.featured || false
+      featured: t.featured || false,
+      themeJsonUrl: t.theme_json_url || ''
     };
   }
 });
@@ -703,21 +731,26 @@ async function saveTheme() {
       ? editForm.value.tagsInput.split(',').map(t => t.trim()).filter(Boolean)
       : [];
 
+    const body: Record<string, unknown> = {
+      name: editForm.value.name,
+      slug: editForm.value.slug.trim(),
+      description: editForm.value.description,
+      author: editForm.value.author,
+      version: editForm.value.version,
+      license: editForm.value.license,
+      category: editForm.value.category || null,
+      tags: tags,
+      featured: editForm.value.featured,
+      compatibility_min: editForm.value.compatibilityMin.trim() || null,
+      compatibility_max: editForm.value.compatibilityMax.trim() || null
+    };
+    if (theme.value?.is_pseudo_theme) {
+      body.theme_json_url = editForm.value.themeJsonUrl.trim();
+    }
+
     await $fetch(`/api/admin/themes/${themeId}`, {
       method: 'PUT',
-      body: {
-        name: editForm.value.name,
-        slug: editForm.value.slug.trim(),
-        description: editForm.value.description,
-        author: editForm.value.author,
-        version: editForm.value.version,
-        license: editForm.value.license,
-        category: editForm.value.category || null,
-        tags: tags,
-        featured: editForm.value.featured,
-        compatibility_min: editForm.value.compatibilityMin.trim() || null,
-        compatibility_max: editForm.value.compatibilityMax.trim() || null
-      }
+      body
     });
     
     showEditModal.value = false;
@@ -776,6 +809,17 @@ function handleFileSelect(event: Event) {
 async function handleUpdateFile(file: File) {
   if (!/\.(zip|json|webp|css|png|jpg|jpeg)$/i.test(file.name)) {
     alert('Please upload a .zip, .json, .webp, .css, or image file');
+    return;
+  }
+
+  if (
+    theme.value?.theme_type === 'betterseqta' &&
+    theme.value?.is_pseudo_theme &&
+    file.name.toLowerCase() === 'theme.json'
+  ) {
+    alert(
+      'Pseudo themes host theme.json on an external URL. Update the file on GitHub, or change the URL under Edit → External theme.json URL.'
+    );
     return;
   }
 

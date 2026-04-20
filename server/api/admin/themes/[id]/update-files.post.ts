@@ -110,6 +110,19 @@ export default defineEventHandler(async (event) => {
     const bannerEntry = findBannerEntry(themeFiles);
     const marqueeEntry = findMarqueeEntry(themeFiles);
 
+    if (existingTheme.is_pseudo_theme && themeJsonPath) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'PSEUDO_THEME_JSON_EXTERNAL',
+          message:
+            'Pseudo BetterSEQTA themes host theme.json at an external URL. Update images only here, change metadata via Edit, update the JSON on GitHub, or change the external URL with PUT /api/admin/themes/[id] (theme_json_url).'
+        },
+        meta: { timestamp: Date.now(), version: '1.0.0' }
+      };
+    }
+
     if (!themeJsonPath) {
       if (!bannerEntry && !marqueeEntry) {
         return {

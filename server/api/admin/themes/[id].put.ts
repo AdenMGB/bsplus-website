@@ -1,6 +1,6 @@
 import { getDB } from '../../../utils/db';
 import { requireAdmin } from '../../../utils/auth';
-import { slugify } from '../../../utils/themes';
+import { slugify, normalizeAndValidateExternalThemeJsonUrl } from '../../../utils/themes';
 
 interface UpdateThemeBody {
   name?: string;
@@ -14,6 +14,8 @@ interface UpdateThemeBody {
   featured?: boolean;
   compatibility_min?: string | null;
   compatibility_max?: string | null;
+  /** Only for pseudo BetterSEQTA themes: external HTTPS URL for theme.json (e.g. GitHub raw). */
+  theme_json_url?: string;
 }
 
 export default defineEventHandler(async (event) => {
@@ -31,8 +33,10 @@ export default defineEventHandler(async (event) => {
 
   // Check if theme exists
   const existing = await db.prepare(
-    'SELECT id FROM themes WHERE id = ?'
-  ).bind(id).first();
+    'SELECT id, theme_type, is_pseudo_theme FROM themes WHERE id = ?'
+  ).bind(id).first() as
+    | { id: string; theme_type?: string; is_pseudo_theme?: number }
+    | undefined;
 
   if (!existing) {
     throw createError({
@@ -44,6 +48,24 @@ export default defineEventHandler(async (event) => {
   // Build update query
   const updates: string[] = [];
   const params: any[] = [];
+
+  if (body.theme_json_url !== undefined) {
+    if (existing.theme_type !== 'betterseqta' || !existing.is_pseudo_theme) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'theme_json_url may only be updated for pseudo BetterSEQTA themes'
+      });
+    }
+    const v = normalizeAndValidateExternalThemeJsonUrl(body.theme_json_url);
+    if (!v.ok) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: v.error
+      });
+    }
+    updates.push('theme_json_url = ?');
+    params.push(v.url);
+  }
 
   if (body.name !== undefined) {
     updates.push('name = ?');
@@ -164,7 +186,9 @@ export default defineEventHandler(async (event) => {
         compatibility: {
           min: theme.compatibility_min,
           max: theme.compatibility_max || undefined
-        }
+        },
+        theme_json_url: theme.theme_json_url,
+        is_pseudo_theme: Boolean(theme.is_pseudo_theme)
       }
     },
     error: null,

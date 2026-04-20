@@ -9,11 +9,20 @@ export default defineEventHandler(async (event) => {
 
   const db = getDB(event);
   const theme = await db.prepare(
-    'SELECT theme_type, theme_json_url FROM themes WHERE id = ?'
-  ).bind(id).first() as { theme_type?: string; theme_json_url?: string } | undefined;
+    'SELECT theme_type, theme_json_url, is_pseudo_theme FROM themes WHERE id = ?'
+  ).bind(id).first() as {
+    theme_type?: string;
+    theme_json_url?: string;
+    is_pseudo_theme?: number;
+  } | undefined;
 
   if (!theme || theme.theme_type !== 'betterseqta') {
     throw createError({ statusCode: 404, message: 'Theme not found or not a BetterSEQTA theme' });
+  }
+
+  if (theme.is_pseudo_theme && theme.theme_json_url) {
+    setHeader(event, 'Cache-Control', 'public, max-age=300');
+    return sendRedirect(event, theme.theme_json_url, 302);
   }
 
   const bucket = getBucket(event);

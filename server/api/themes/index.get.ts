@@ -174,7 +174,8 @@ export default defineEventHandler(async (event) => {
         theme_type: 'betterseqta',
         coverImage: theme.cover_image_url,
         marqueeImage: theme.marquee_image_url,
-        theme_json_url: theme.theme_json_url
+        theme_json_url: theme.theme_json_url,
+        is_pseudo_theme: Boolean(theme.is_pseudo_theme)
       };
     }
     return { ...base, theme_type: theme.theme_type || 'desqta' };

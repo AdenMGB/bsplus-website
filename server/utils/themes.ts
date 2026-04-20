@@ -147,6 +147,31 @@ export async function parseBetterSeqtaTheme(themeJsonContent: string): Promise<B
   return parsed;
 }
 
+const MAX_EXTERNAL_THEME_JSON_URL_LEN = 4096;
+
+/** HTTPS URL for externally hosted theme.json (e.g. GitHub raw). Used for pseudo BetterSEQTA themes. */
+export function normalizeAndValidateExternalThemeJsonUrl(
+  raw: string | undefined | null
+): { ok: true; url: string } | { ok: false; error: string } {
+  const trimmed = (raw ?? '').trim();
+  if (!trimmed) {
+    return { ok: false, error: 'external_theme_json_url is required for pseudo themes' };
+  }
+  if (trimmed.length > MAX_EXTERNAL_THEME_JSON_URL_LEN) {
+    return { ok: false, error: 'external_theme_json_url is too long' };
+  }
+  let u: URL;
+  try {
+    u = new URL(trimmed);
+  } catch {
+    return { ok: false, error: 'external_theme_json_url must be a valid URL' };
+  }
+  if (u.protocol !== 'https:') {
+    return { ok: false, error: 'external_theme_json_url must use HTTPS' };
+  }
+  return { ok: true, url: u.href };
+}
+
 export function validateThemeStructure(files: Map<string, ArrayBuffer>): ThemeValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];

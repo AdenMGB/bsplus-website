@@ -50,6 +50,31 @@
             </p>
           </div>
 
+          <div class="mt-6 space-y-4">
+            <label class="flex items-start gap-3 cursor-pointer rounded-lg border border-zinc-800 bg-zinc-950/50 p-4 transition-colors hover:border-zinc-700">
+              <input
+                v-model="pseudoTheme"
+                type="checkbox"
+                class="mt-1 h-4 w-4 rounded border-zinc-700 bg-zinc-800 text-green-500 focus:ring-green-500"
+              />
+              <span>
+                <span class="block text-sm font-medium text-white">Pseudo BetterSEQTA theme</span>
+                <span class="block text-xs text-zinc-500 mt-1">
+                  Host <code class="text-zinc-400">theme.json</code> externally (e.g. GitHub raw) when the file is too large for R2. Upload a normal ZIP with a small stub <code class="text-zinc-400">theme.json</code> for id/name/description validation; BS Plus will download the JSON from the URL below.
+                </span>
+              </span>
+            </label>
+            <div v-if="pseudoTheme">
+              <label class="block text-sm font-medium text-zinc-400 mb-1">External theme.json URL (HTTPS)</label>
+              <input
+                v-model="externalThemeJsonUrl"
+                type="url"
+                placeholder="https://raw.githubusercontent.com/..."
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 font-mono"
+              />
+            </div>
+          </div>
+
           <div v-if="selectedFile" class="mt-4 p-4 bg-zinc-800 rounded-lg">
             <div class="flex items-center justify-between">
               <div>
@@ -57,7 +82,7 @@
                 <p class="text-zinc-400 text-sm">{{ formatFileSize(selectedFile.size) }}</p>
               </div>
               <button
-                @click="selectedFile = null"
+                @click="selectedFile = null; pseudoTheme = false; externalThemeJsonUrl = ''"
                 class="text-red-400 hover:text-red-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
@@ -141,7 +166,7 @@
         </div>
 
         <!-- Upload Button -->
-        <div v-if="selectedFile && manifestPreview?.validation?.valid" class="flex justify-end">
+        <div v-if="selectedFile && manifestPreview?.validation?.valid && canSubmitUpload" class="flex justify-end">
           <button
             @click="uploadTheme"
             :disabled="uploading"
@@ -150,6 +175,9 @@
             {{ uploading ? 'Uploading...' : 'Upload Theme' }}
           </button>
         </div>
+        <p v-if="selectedFile && manifestPreview?.validation?.valid && pseudoTheme && !externalThemeJsonUrl.trim()" class="text-amber-400 text-sm text-right">
+          Enter an HTTPS URL for the external theme.json to upload a pseudo theme.
+        </p>
       </div>
     </div>
   </div>
@@ -165,6 +193,12 @@ const isDragging = ref(false);
 const selectedFile = ref<File | null>(null);
 const manifestPreview = ref<any>(null);
 const uploading = ref(false);
+const pseudoTheme = ref(false);
+const externalThemeJsonUrl = ref('');
+
+const canSubmitUpload = computed(
+  () => !pseudoTheme.value || externalThemeJsonUrl.value.trim().length > 0
+);
 
 function handleDrop(event: DragEvent) {
   isDragging.value = false;
@@ -216,7 +250,11 @@ async function uploadTheme() {
   try {
     const formData = new FormData();
     formData.append('theme_zip', selectedFile.value);
-    
+    if (pseudoTheme.value) {
+      formData.append('pseudo_theme', '1');
+      formData.append('external_theme_json_url', externalThemeJsonUrl.value.trim());
+    }
+
     const response = await $fetch<any>('/api/admin/themes', {
       method: 'POST',
       body: formData

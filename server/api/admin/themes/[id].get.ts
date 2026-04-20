@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
         preview_screenshots: theme.preview_screenshots,
         theme_type: theme.theme_type || 'desqta',
         theme_json_url: theme.theme_json_url,
+        is_pseudo_theme: Boolean(theme.is_pseudo_theme),
         cover_image_url: theme.cover_image_url,
         marquee_image_url: theme.marquee_image_url,
         zip_download_url: theme.zip_download_url,
