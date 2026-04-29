@@ -16,6 +16,12 @@ interface UpdateThemeBody {
   compatibility_max?: string | null;
   /** Only for pseudo BetterSEQTA themes: external HTTPS URL for theme.json (e.g. GitHub raw). */
   theme_json_url?: string;
+  /**
+   * BetterSEQTA only: set another theme id to list this variant under that master`s `flavours` (hidden from grid); null clears.
+   */
+  flavour_master_id?: string | null;
+  /** Order under master (BetterSEQTA slave only). Default 0. */
+  flavour_sort_order?: number;
 }
 
 export default defineEventHandler(async (event) => {
@@ -33,9 +39,16 @@ export default defineEventHandler(async (event) => {
 
   // Check if theme exists
   const existing = await db.prepare(
-    'SELECT id, theme_type, is_pseudo_theme FROM themes WHERE id = ?'
+    `SELECT id, theme_type, is_pseudo_theme, flavour_master_id,
+            flavour_sort_order FROM themes WHERE id = ?`
   ).bind(id).first() as
-    | { id: string; theme_type?: string; is_pseudo_theme?: number }
+    | {
+        id: string;
+        theme_type?: string;
+        is_pseudo_theme?: number;
+        flavour_master_id?: string | null;
+        flavour_sort_order?: number;
+      }
     | undefined;
 
   if (!existing) {
@@ -143,6 +156,104 @@ export default defineEventHandler(async (event) => {
         ? body.compatibility_max.trim()
         : null;
     params.push(max);
+  }
+
+  if (body.flavour_master_id !== undefined || body.flavour_sort_order !== undefined) {
+    if (existing.theme_type !== 'betterseqta') {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'flavour_master_id / flavour_sort_order apply only to BetterSEQTA themes'
+      });
+    }
+  }
+
+  if (body.flavour_master_id !== undefined) {
+    const fid = body.flavour_master_id;
+    if (fid === null || fid === '') {
+      updates.push('flavour_master_id = ?');
+      params.push(null);
+      updates.push('flavour_sort_order = ?');
+      params.push(0);
+    } else {
+      const mid = String(fid).trim();
+      if (mid === id) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'A theme cannot be its own flavour master'
+        });
+      }
+
+      const hasSlaves = await db
+        .prepare('SELECT COUNT(*) as n FROM themes WHERE flavour_master_id = ?')
+        .bind(id)
+        .first() as { n: number };
+      if (hasSlaves?.n && hasSlaves.n > 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage:
+            'Detach or re-home existing flavour variants before this theme can become a slave of another master'
+        });
+      }
+
+      const masterRow = await db
+        .prepare(
+          'SELECT id, theme_type, flavour_master_id FROM themes WHERE id = ?'
+        )
+        .bind(mid)
+        .first() as
+        | {
+            id: string;
+            theme_type?: string;
+            flavour_master_id?: string | null;
+          }
+        | null;
+
+      if (!masterRow) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Flavour master theme not found'
+        });
+      }
+      if (masterRow.theme_type !== 'betterseqta') {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Flavour master must be a BetterSEQTA theme'
+        });
+      }
+      if (masterRow.flavour_master_id) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Flavour master must be a standalone or master theme (not a slave)'
+        });
+      }
+
+      updates.push('flavour_master_id = ?');
+      params.push(mid);
+
+      const nextSortRaw =
+        body.flavour_sort_order !== undefined
+          ? Number(body.flavour_sort_order)
+          : existing.flavour_master_id === mid
+            ? Number(existing.flavour_sort_order ?? 0)
+            : 0;
+
+      updates.push('flavour_sort_order = ?');
+      params.push(Number.isFinite(nextSortRaw) ? nextSortRaw : 0);
+    }
+  } else if (body.flavour_sort_order !== undefined) {
+    const n = Number(body.flavour_sort_order);
+    if (existing.theme_type !== 'betterseqta') {
+      throw createError({ statusCode: 400, statusMessage: 'flavour_sort_order applies only to BetterSEQTA themes' });
+    }
+    const mid = typeof existing.flavour_master_id === 'string' ? existing.flavour_master_id.trim() : '';
+    if (!mid) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'flavour_sort_order applies only when this theme is a flavour slave (set flavour_master_id first)'
+      });
+    }
+    updates.push('flavour_sort_order = ?');
+    params.push(Number.isFinite(n) ? n : 0);
   }
 
   if (updates.length === 0) {

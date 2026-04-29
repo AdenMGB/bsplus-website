@@ -1,5 +1,10 @@
 import { getDB } from '../../utils/db';
 import { getOptionalUser } from '../../utils/auth';
+import {
+  type ThemeFlavourEntry,
+  loadFlavoursForMasters,
+  betterseqtaThemeRole
+} from '../../utils/themeFlavours';
 
 interface ThemeQuery {
   page?: string;
@@ -32,8 +37,8 @@ export default defineEventHandler(async (event) => {
   const compatibleVersion = query.compatible_version;
   const themeType = query.type; // 'betterseqta' | 'desqta'
 
-  // Build WHERE clause
-  const conditions: string[] = ["status = 'approved'"];
+  // Build WHERE clause — hide BS+ slave/flavour variants from top-level listing
+  const conditions: string[] = ["status = 'approved'", '(flavour_master_id IS NULL)'];
   const params: any[] = [];
   if (themeType === 'betterseqta' || themeType === 'desqta') {
     conditions.push('theme_type = ?');
@@ -134,8 +139,14 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  const rows = themesResult.results as Record<string, unknown>[];
+  const bsMasterIds = rows
+    .filter((t) => t.theme_type === 'betterseqta' && !t.flavour_master_id)
+    .map((t) => t.id as string);
+  const flavoursByMaster = await loadFlavoursForMasters(db, bsMasterIds);
+
   // Format themes
-  const themes = themesResult.results.map((theme: Record<string, unknown>) => {
+  const themes = rows.map((theme: Record<string, unknown>) => {
     const userRating = userRatings.get(theme.id as string);
     const base = {
       id: theme.id,
@@ -169,13 +180,18 @@ export default defineEventHandler(async (event) => {
       user_rating: userRating || null
     };
     if (theme.theme_type === 'betterseqta') {
+      const fList: ThemeFlavourEntry[] =
+        flavoursByMaster.get(theme.id as string) ?? [];
+      const theme_role = betterseqtaThemeRole(theme, fList);
       return {
         ...base,
         theme_type: 'betterseqta',
         coverImage: theme.cover_image_url,
         marqueeImage: theme.marquee_image_url,
         theme_json_url: theme.theme_json_url,
-        is_pseudo_theme: Boolean(theme.is_pseudo_theme)
+        is_pseudo_theme: Boolean(theme.is_pseudo_theme),
+        theme_role,
+        ...(fList.length > 0 ? { flavours: fList } : {})
       };
     }
     return { ...base, theme_type: theme.theme_type || 'desqta' };

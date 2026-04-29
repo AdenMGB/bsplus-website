@@ -1,7 +1,19 @@
+import {
+  type ThemeFlavourEntry,
+  betterseqtaThemeRole
+} from './themeFlavours';
+
 /**
  * Shared JSON shape for GET /api/themes/:id and GET /api/themes/by-slug/:slug
  */
-export function formatPublicThemeResponse(theme: Record<string, unknown>, isFavorited: boolean) {
+export function formatPublicThemeResponse(
+  theme: Record<string, unknown>,
+  isFavorited: boolean,
+  options?: {
+    /** Approved slave flavours for masters; omit — loaded by caller via loadFlavoursForMasters */
+    flavours?: ThemeFlavourEntry[];
+  }
+) {
   const themeType = (theme.theme_type as string) || 'desqta';
 
   const manifest =
@@ -58,6 +70,9 @@ export function formatPublicThemeResponse(theme: Record<string, unknown>, isFavo
     theme_type: themeType
   };
 
+  const flavoursResolved = options?.flavours ?? [];
+  const slaveId = typeof theme.flavour_master_id === 'string' ? theme.flavour_master_id.trim() || null : null;
+
   const themeData =
     themeType === 'betterseqta'
       ? {
@@ -65,7 +80,15 @@ export function formatPublicThemeResponse(theme: Record<string, unknown>, isFavo
           coverImage: theme.cover_image_url,
           marqueeImage: theme.marquee_image_url,
           theme_json_url: theme.theme_json_url,
-          is_pseudo_theme: Boolean(theme.is_pseudo_theme)
+          is_pseudo_theme: Boolean(theme.is_pseudo_theme),
+          theme_role: betterseqtaThemeRole(
+            theme,
+            slaveId ? undefined : flavoursResolved
+          ),
+          ...(slaveId ? { master_id: slaveId } : {}),
+          ...(slaveId === null && flavoursResolved.length > 0
+            ? { flavours: flavoursResolved }
+            : {})
         }
       : {
           ...baseTheme,

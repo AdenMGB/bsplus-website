@@ -241,6 +241,11 @@ export default defineEventHandler(async (event) => {
     const newSlug = slugify(bsTheme.name);
     const now = Date.now();
 
+    const accentUpdate =
+      typeof bsTheme.defaultColour === 'string' && bsTheme.defaultColour.trim()
+        ? bsTheme.defaultColour.trim()
+        : null;
+
     try {
       await db.prepare(
         `UPDATE themes SET
@@ -249,6 +254,7 @@ export default defineEventHandler(async (event) => {
           description = ?,
           cover_image_url = ?,
           marquee_image_url = ?,
+          default_colour = ?,
           updated_at = ?
         WHERE id = ?`
       ).bind(
@@ -257,6 +263,7 @@ export default defineEventHandler(async (event) => {
         bsTheme.description,
         coverImageUrl,
         marqueeImageUrl,
+        accentUpdate,
         now,
         id
       ).run();

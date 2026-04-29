@@ -178,13 +178,19 @@ export default defineEventHandler(async (event) => {
 
     const now = Date.now();
 
+    const accent =
+      typeof bsTheme.defaultColour === 'string' && bsTheme.defaultColour.trim()
+        ? bsTheme.defaultColour.trim()
+        : null;
+
     await db.prepare(
       `INSERT INTO themes (
         id, name, slug, version, description, author, license,
         category, tags, status, theme_type, theme_json_url,
         cover_image_url, marquee_image_url, zip_download_url,
-        compatibility_min, compatibility_max, is_pseudo_theme, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        compatibility_min, compatibility_max, is_pseudo_theme, default_colour,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       themeId,
       bsTheme.name,
@@ -204,6 +210,7 @@ export default defineEventHandler(async (event) => {
       null,
       null,
       isPseudoTheme,
+      accent,
       now,
       now
     ).run();

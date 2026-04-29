@@ -69,11 +69,13 @@ export default defineEventHandler(async (event) => {
   const total = countResult?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
-  // Get themes
+  // Get themes (flavour_master = BS+ slave-of link for store variants)
   const themesResult = await db.prepare(
-    `SELECT t.*, ts.submission_notes, ts.reviewed_by, ts.reviewed_at, ts.rejection_reason 
+    `SELECT t.*, ts.submission_notes, ts.reviewed_by, ts.reviewed_at, ts.rejection_reason,
+            fm.name AS flavour_master_name
      FROM themes t
      LEFT JOIN theme_submissions ts ON t.id = ts.theme_id
+     LEFT JOIN themes fm ON t.flavour_master_id = fm.id
      ${whereClause}
      ORDER BY ${sortBy} ${sortOrder}
      LIMIT ? OFFSET ?`
@@ -110,6 +112,10 @@ export default defineEventHandler(async (event) => {
     cover_image_url: theme.cover_image_url,
     marquee_image_url: theme.marquee_image_url,
     is_pseudo_theme: Boolean(theme.is_pseudo_theme),
+    flavour_master_id: theme.flavour_master_id ?? null,
+    flavour_master_name: theme.flavour_master_name ?? null,
+    flavour_sort_order: theme.flavour_sort_order ?? 0,
+    default_colour: theme.default_colour ?? null,
     file_size: theme.file_size,
     checksum: theme.checksum,
     created_at: theme.created_at,
