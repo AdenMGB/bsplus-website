@@ -76,6 +76,13 @@
                 >
                   Pseudo
                 </span>
+                <span
+                  v-if="theme.theme_type === 'betterseqta' && theme.flavour_master_id"
+                  class="inline-flex items-center rounded-md bg-fuchsia-500/10 text-fuchsia-300 ring-fuchsia-500/20 px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                  :title="'Variant under store master ' + (theme.flavour_master_name || '')"
+                >
+                  Flavour of {{ theme.flavour_master_name || '…' }}
+                </span>
               </div>
               <p class="text-zinc-400 mb-4">{{ theme.description }}</p>
               <div class="flex flex-wrap gap-4 text-sm">
@@ -509,6 +516,36 @@
                 />
               </div>
             </div>
+            <div v-if="theme.theme_type === 'betterseqta'">
+              <label class="block text-sm font-medium text-zinc-400 mb-1">Store grouping (BS Plus)</label>
+              <select
+                v-model="editForm.flavourMasterId"
+                class="block w-full rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Standalone — shown in main theme grid</option>
+                <option
+                  v-for="m in masterThemes"
+                  :key="m.id"
+                  :value="m.id"
+                >
+                  {{ m.name }} ({{ m.id }})
+                </option>
+              </select>
+              <p class="text-xs text-zinc-500 mt-2">
+                When this theme is grouped under another BS Plus theme, it installs as a colour variant only (not a top-level store row). The master must already exist and cannot be a variant itself.
+              </p>
+              <div v-if="editForm.flavourMasterId" class="mt-3">
+                <label class="block text-sm font-medium text-zinc-400 mb-1">Variant order</label>
+                <input
+                  v-model.number="editForm.flavourSortOrder"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="block w-full max-w-[12rem] rounded-md bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <p class="text-xs text-zinc-500 mt-1">Lower numbers appear first in flavour lists and carousels.</p>
+              </div>
+            </div>
             <div v-if="theme.is_pseudo_theme">
               <label class="block text-sm font-medium text-zinc-400 mb-1">External theme.json URL (HTTPS)</label>
               <input
@@ -659,26 +696,48 @@ const editForm = ref({
   compatibilityMax: '',
   tagsInput: '',
   featured: false,
-  themeJsonUrl: ''
+  themeJsonUrl: '',
+  flavourMasterId: '',
+  flavourSortOrder: 0
 });
 
+const masterThemes = ref<{ id: string; name: string }[]>([]);
+
 // Initialize edit form when edit modal opens
-watch(showEditModal, (isOpen) => {
-  if (isOpen && theme.value) {
-    const t = theme.value;
+watch(showEditModal, async (isOpen) => {
+  if (!isOpen) return;
+  if (theme.value?.theme_type === 'betterseqta') {
+    try {
+      const r = await $fetch<{ data?: { themes?: Record<string, unknown>[] } }>(
+        `/api/admin/themes?type=betterseqta&limit=500&sort=name&order=asc`
+      );
+      const list = r?.data?.themes ?? [];
+      masterThemes.value = list
+        .filter((t) => !(t.flavour_master_id ?? null) && t.id !== themeId)
+        .map((t) => ({ id: String(t.id), name: String(t.name ?? '') }));
+    } catch {
+      masterThemes.value = [];
+    }
+  }
+
+  if (theme.value) {
+    const t = theme.value as Record<string, unknown>;
     editForm.value = {
-      name: t.name || '',
-      slug: t.slug || '',
-      description: t.description || '',
-      author: t.author || '',
-      version: t.version || '',
-      license: t.license || '',
-      category: t.category || '',
-      compatibilityMin: t.compatibility?.min ?? '',
-      compatibilityMax: t.compatibility?.max ?? '',
-      tagsInput: t.tags?.join(', ') || '',
-      featured: t.featured || false,
-      themeJsonUrl: t.theme_json_url || ''
+      name: String(t.name || ''),
+      slug: String(t.slug || ''),
+      description: String(t.description || ''),
+      author: String(t.author || ''),
+      version: String(t.version || ''),
+      license: String(t.license || ''),
+      category: String(t.category || ''),
+      compatibilityMin: String((t as { compatibility?: { min?: string } }).compatibility?.min ?? ''),
+      compatibilityMax: String((t as { compatibility?: { max?: string } }).compatibility?.max ?? ''),
+      tagsInput: Array.isArray(t.tags) ? (t.tags as string[]).join(', ') : '',
+      featured: Boolean(t.featured),
+      themeJsonUrl: String(t.theme_json_url || ''),
+      flavourMasterId: typeof t.flavour_master_id === 'string' ? t.flavour_master_id : '',
+      flavourSortOrder:
+        typeof t.flavour_sort_order === 'number' ? t.flavour_sort_order : 0
     };
   }
 });
@@ -746,6 +805,12 @@ async function saveTheme() {
     };
     if (theme.value?.is_pseudo_theme) {
       body.theme_json_url = editForm.value.themeJsonUrl.trim();
+    }
+
+    if (theme.value?.theme_type === 'betterseqta') {
+      body.flavour_master_id =
+        editForm.value.flavourMasterId.trim() === '' ? null : editForm.value.flavourMasterId.trim();
+      body.flavour_sort_order = editForm.value.flavourSortOrder;
     }
 
     await $fetch(`/api/admin/themes/${themeId}`, {

@@ -1,5 +1,10 @@
 import { getDB } from '../../utils/db';
 import { getOptionalUser } from '../../utils/auth';
+import {
+  type ThemeFlavourEntry,
+  loadFlavoursForMasters,
+  betterseqtaThemeRole
+} from '../../utils/themeFlavours';
 
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
@@ -8,7 +13,7 @@ export default defineEventHandler(async (event) => {
   // Get featured themes
   const themesResult = await db.prepare(
     `SELECT * FROM themes 
-     WHERE status = 'approved' AND featured = 1 
+     WHERE status = 'approved' AND featured = 1 AND (flavour_master_id IS NULL)
      ORDER BY (download_count * 2 + favorite_count + rating_count) DESC 
      LIMIT 20`
   ).all();
@@ -38,9 +43,15 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const themes = themesResult.results.map((theme: any) => {
-    const userRating = userRatings.get(theme.id);
-    return {
+  const rows = themesResult.results as Record<string, unknown>[];
+  const bsMasterIds = rows
+    .filter((t) => t.theme_type === 'betterseqta' && !t.flavour_master_id)
+    .map((t) => t.id as string);
+  const flavoursByMaster = await loadFlavoursForMasters(db, bsMasterIds);
+
+  const themes = rows.map((theme: Record<string, unknown>) => {
+    const userRating = userRatings.get(theme.id as string);
+    const base = {
       id: theme.id,
       name: theme.name,
       slug: theme.slug,
@@ -49,7 +60,7 @@ export default defineEventHandler(async (event) => {
       author: theme.author,
       license: theme.license,
       category: theme.category,
-      tags: theme.tags ? JSON.parse(theme.tags) : [],
+      tags: theme.tags ? JSON.parse(theme.tags as string) : [],
       status: theme.status,
       featured: Boolean(theme.featured),
       download_count: theme.download_count,
@@ -62,15 +73,32 @@ export default defineEventHandler(async (event) => {
       },
       preview: {
         thumbnail: theme.preview_thumbnail_url,
-        screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots) : []
+        screenshots: theme.preview_screenshots ? JSON.parse(theme.preview_screenshots as string) : []
       },
       created_at: theme.created_at,
       updated_at: theme.updated_at,
       published_at: theme.published_at,
       file_size: theme.file_size,
-      is_favorited: favoriteThemeIds.has(theme.id),
+      is_favorited: favoriteThemeIds.has(theme.id as string),
       user_rating: userRating || null
     };
+
+    if (theme.theme_type === 'betterseqta') {
+      const fList: ThemeFlavourEntry[] =
+        flavoursByMaster.get(theme.id as string) ?? [];
+      return {
+        ...base,
+        theme_type: 'betterseqta',
+        coverImage: theme.cover_image_url,
+        marqueeImage: theme.marquee_image_url,
+        theme_json_url: theme.theme_json_url,
+        is_pseudo_theme: Boolean(theme.is_pseudo_theme),
+        theme_role: betterseqtaThemeRole(theme, fList),
+        ...(fList.length > 0 ? { flavours: fList } : {})
+      };
+    }
+
+    return { ...base, theme_type: theme.theme_type || 'desqta' };
   });
 
   return {

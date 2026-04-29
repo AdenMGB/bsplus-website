@@ -1,6 +1,7 @@
 import { getDB } from '../../../utils/db';
 import { getOptionalUser } from '../../../utils/auth';
 import { formatPublicThemeResponse } from '../../../utils/formatPublicTheme';
+import { loadFlavoursForMasters } from '../../../utils/themeFlavours';
 
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
@@ -37,5 +38,13 @@ export default defineEventHandler(async (event) => {
     isFavorited = !!favorite;
   }
 
-  return formatPublicThemeResponse(theme, isFavorited);
+  const tid = theme.id as string;
+  const flavoursOpts =
+    theme.theme_type === 'betterseqta' && !theme.flavour_master_id
+      ? {
+          flavours: (await loadFlavoursForMasters(db, [tid])).get(tid) ?? []
+        }
+      : undefined;
+
+  return formatPublicThemeResponse(theme, isFavorited, flavoursOpts);
 });

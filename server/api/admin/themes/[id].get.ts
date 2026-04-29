@@ -13,11 +13,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Get theme with submission data
+  // Get theme with submission data + BS+ flavour master label
   const theme = await db.prepare(
-    `SELECT t.*, ts.submission_notes, ts.reviewed_by, ts.reviewed_at, ts.rejection_reason 
+    `SELECT t.*, ts.submission_notes, ts.reviewed_by, ts.reviewed_at, ts.rejection_reason,
+            fm.name AS flavour_master_name
      FROM themes t
      LEFT JOIN theme_submissions ts ON t.id = ts.theme_id
+     LEFT JOIN themes fm ON t.flavour_master_id = fm.id
      WHERE t.id = ?`
   ).bind(id).first() as any;
 
@@ -62,6 +64,10 @@ export default defineEventHandler(async (event) => {
         is_pseudo_theme: Boolean(theme.is_pseudo_theme),
         cover_image_url: theme.cover_image_url,
         marquee_image_url: theme.marquee_image_url,
+        flavour_master_id: theme.flavour_master_id ?? null,
+        flavour_master_name: theme.flavour_master_name ?? null,
+        flavour_sort_order: theme.flavour_sort_order ?? 0,
+        default_colour: theme.default_colour ?? null,
         zip_download_url: theme.zip_download_url,
         file_size: theme.file_size,
         checksum: theme.checksum,
