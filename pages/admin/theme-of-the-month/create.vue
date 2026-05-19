@@ -23,11 +23,7 @@
     <main class="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
       <div class="space-y-2">
         <label class="block text-sm font-medium text-zinc-400">Month</label>
-        <input
-          v-model="form.month"
-          type="month"
-          class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
-        />
+        <ThemeOfTheMonthMonthPicker v-model="form.month" />
         <p class="text-xs text-zinc-500">Only one entry is allowed per calendar month (UTC).</p>
       </div>
 
