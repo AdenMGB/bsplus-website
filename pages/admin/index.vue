@@ -22,6 +22,9 @@
           <NuxtLink to="/admin/questionnaire" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 px-3 py-2 text-sm font-medium text-indigo-400 transition-all duration-200 hover:scale-105">
             Questions
           </NuxtLink>
+          <NuxtLink to="/admin/theme-of-the-month" class="inline-flex items-center gap-2 rounded-lg bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 px-3 py-2 text-sm font-medium text-pink-400 transition-all duration-200 hover:scale-105">
+            Theme of the Month
+          </NuxtLink>
         </div>
       </div>
 
