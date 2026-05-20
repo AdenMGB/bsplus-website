@@ -1,4 +1,5 @@
 import { appendProxySetCookies, fetchAccountsSessionEndpoint } from '../../utils/accounts';
+import { getAuthTokenCookieSetOptions } from '~/utils/auth-session';
 
 interface RefreshResponse {
   access_token: string;
@@ -15,13 +16,7 @@ export default defineEventHandler(async (event): Promise<RefreshResponse> => {
   appendProxySetCookies(event, proxiedCookies);
 
   if (data.access_token) {
-    setCookie(event, 'auth_token', data.access_token, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: data.expires_in || 3600,
-    });
+    setCookie(event, 'auth_token', data.access_token, getAuthTokenCookieSetOptions());
   }
 
   return data;
