@@ -18,6 +18,9 @@ export default defineNuxtConfig({
     oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
     accountsApiKey: process.env.ACCOUNTS_API_KEY ?? '',
     accountsApiUrl: process.env.ACCOUNTS_API_URL ?? 'https://accounts.betterseqta.org',
+    groqApiKey: process.env.NUXT_GROQ_API_KEY ?? process.env.GROQ_API_KEY ?? '',
+    groqModel: process.env.NUXT_GROQ_MODEL ?? 'meta-llama/llama-4-scout-17b-16e-instruct',
+    groqTotmMaxImages: process.env.NUXT_GROQ_TOTM_MAX_IMAGES ?? '5',
     public: {
       siteUrl: 'https://betterseqta.org',
     },

@@ -42,6 +42,15 @@
           />
         </div>
 
+        <ThemeOfTheMonthThemePicker v-model="form.theme_id" :initial-theme="initialTheme" />
+
+        <ThemeOfTheMonthAiCopyGenerator
+          v-model:title="form.title"
+          v-model:description="form.description"
+          :theme-id="form.theme_id"
+          :cover-image="form.cover_image"
+        />
+
         <div class="space-y-2">
           <label class="block text-sm font-medium text-zinc-400">Title</label>
           <input
@@ -59,8 +68,6 @@
             class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
           ></textarea>
         </div>
-
-        <ThemeOfTheMonthThemePicker v-model="form.theme_id" :initial-theme="initialTheme" />
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-zinc-400">Cover Image</label>
