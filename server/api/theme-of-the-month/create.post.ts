@@ -28,9 +28,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (theme_id) {
-      const existsTheme = await db.prepare('SELECT id FROM themes WHERE id = ? LIMIT 1').bind(theme_id).first();
-      if (!existsTheme) {
+      const linkedTheme = await db.prepare('SELECT id, theme_type FROM themes WHERE id = ? LIMIT 1')
+        .bind(theme_id).first() as { id: string; theme_type?: string } | null;
+      if (!linkedTheme) {
         throw createError({ statusCode: 400, message: 'Linked theme does not exist' });
+      }
+      if (linkedTheme.theme_type !== 'betterseqta') {
+        throw createError({ statusCode: 400, message: 'Theme of the month can only link to BetterSEQTA+ themes' });
       }
     }
 

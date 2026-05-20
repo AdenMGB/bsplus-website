@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const entries = await db.prepare(`
-      SELECT t.*, th.name AS theme_name, th.slug AS theme_slug
+      SELECT t.*, th.name AS theme_name, th.slug AS theme_slug, th.theme_type AS theme_type
       FROM theme_of_the_month t
       LEFT JOIN themes th ON th.id = t.theme_id
       ORDER BY t.month DESC
@@ -29,7 +29,9 @@ export default defineEventHandler(async (event) => {
       cover_image: e.cover_image,
       cover_image_uploaded_at: e.cover_image_uploaded_at,
       theme_id: e.theme_id,
-      theme: e.theme_id ? { id: e.theme_id, name: e.theme_name, slug: e.theme_slug } : null,
+      theme: e.theme_id
+        ? { id: e.theme_id, name: e.theme_name, slug: e.theme_slug, theme_type: e.theme_type }
+        : null,
       created_at: e.created_at,
       updated_at: e.updated_at
     }));
