@@ -1,7 +1,11 @@
 <template>
   <div class="space-y-2">
     <label class="block text-sm font-medium text-zinc-400">Linked Theme (Optional)</label>
-    <p class="text-xs text-zinc-500 -mt-1">Pick a theme from the store. The extension's popup will deep-link to it.</p>
+    <p class="text-xs text-zinc-500 -mt-1">Pick a BetterSEQTA+ theme from the store. The extension popup will deep-link to it.</p>
+
+    <p v-if="invalidLinkedTheme" class="text-xs text-amber-400">
+      The previously linked theme is not a BetterSEQTA+ theme. Clear it and choose a BetterSEQTA+ theme.
+    </p>
 
     <div v-if="selected" class="flex items-center gap-3 p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg">
       <div class="flex-1 min-w-0">
@@ -21,7 +25,7 @@
       <input
         v-model="query"
         type="text"
-        placeholder="Search themes by name, description, or author..."
+        placeholder="Search BetterSEQTA+ themes by name, description, or author..."
         @input="onQueryInput"
         class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:ring-2 focus:ring-green-500 focus:border-green-500"
       />
@@ -55,7 +59,7 @@ interface ThemeOption {
 
 const props = defineProps<{
   modelValue: string;
-  initialTheme?: { id: string; name: string; slug: string } | null;
+  initialTheme?: { id: string; name: string; slug: string; theme_type?: string } | null;
 }>();
 
 const emit = defineEmits<{
@@ -66,19 +70,30 @@ const query = ref('');
 const results = ref<ThemeOption[]>([]);
 const searching = ref(false);
 const selected = ref<ThemeOption | null>(null);
+const invalidLinkedTheme = ref(false);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 onMounted(async () => {
-  if (props.initialTheme) {
-    selected.value = { ...props.initialTheme };
-  } else if (props.modelValue) {
+  if (props.modelValue) {
     await loadSelectedById(props.modelValue);
+  } else if (props.initialTheme) {
+    applyInitialTheme(props.initialTheme);
   }
 });
+
+function applyInitialTheme(theme: NonNullable<typeof props.initialTheme>) {
+  if (theme.theme_type && theme.theme_type !== 'betterseqta') {
+    invalidLinkedTheme.value = true;
+    selected.value = { id: theme.id, name: theme.name, slug: theme.slug };
+    return;
+  }
+  selected.value = { id: theme.id, name: theme.name, slug: theme.slug };
+}
 
 watch(() => props.modelValue, async (newVal) => {
   if (!newVal) {
     selected.value = null;
+    invalidLinkedTheme.value = false;
     return;
   }
   if (selected.value?.id === newVal) return;
@@ -86,14 +101,28 @@ watch(() => props.modelValue, async (newVal) => {
 });
 
 async function loadSelectedById(id: string) {
+  invalidLinkedTheme.value = false;
   try {
     const res: any = await $fetch(`/api/themes/${id}`);
     const theme = res?.data?.theme;
-    if (theme) {
-      selected.value = { id: theme.id, name: theme.name, slug: theme.slug, author: theme.author };
+    if (!theme) return;
+
+    if (theme.theme_type !== 'betterseqta') {
+      invalidLinkedTheme.value = true;
+      selected.value = props.initialTheme?.id === id
+        ? { id: theme.id, name: theme.name, slug: theme.slug, author: theme.author }
+        : null;
+      if (!selected.value) {
+        emit('update:modelValue', '');
+      }
+      return;
     }
+
+    selected.value = { id: theme.id, name: theme.name, slug: theme.slug, author: theme.author };
   } catch {
-    // ignore - leave selected blank
+    if (props.initialTheme?.id === id) {
+      applyInitialTheme(props.initialTheme);
+    }
   }
 }
 
@@ -109,7 +138,7 @@ function onQueryInput() {
   searchTimer = setTimeout(async () => {
     try {
       const res: any = await $fetch('/api/themes/search', {
-        params: { q, limit: 10 }
+        params: { q, limit: 10, type: 'betterseqta' }
       });
       const themes = res?.data?.themes ?? [];
       results.value = themes.map((t: any) => ({
@@ -127,6 +156,7 @@ function onQueryInput() {
 }
 
 function select(theme: ThemeOption) {
+  invalidLinkedTheme.value = false;
   selected.value = theme;
   emit('update:modelValue', theme.id);
   query.value = '';
@@ -135,6 +165,7 @@ function select(theme: ThemeOption) {
 
 function clearSelection() {
   selected.value = null;
+  invalidLinkedTheme.value = false;
   emit('update:modelValue', '');
 }
 </script>

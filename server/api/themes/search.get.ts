@@ -12,6 +12,7 @@ interface SearchQuery {
   page?: string;
   limit?: string;
   sort?: string;
+  type?: string; // 'betterseqta' | 'desqta' | omit for all
 }
 
 interface SearchFilters {
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
   const limit = Math.min(parseInt(query.limit || '20', 10), 100);
   const offset = (page - 1) * limit;
   const sort = query.sort || 'popular';
+  const themeType = query.type;
 
   // Parse filters
   let filters: SearchFilters = {};
@@ -52,6 +54,11 @@ export default defineEventHandler(async (event) => {
   // Build WHERE clause (exclude BS+ slave/flavour variants from top-level discovery)
   const conditions: string[] = ["status = 'approved'", '(flavour_master_id IS NULL)'];
   const params: any[] = [];
+
+  if (themeType === 'betterseqta' || themeType === 'desqta') {
+    conditions.push('theme_type = ?');
+    params.push(themeType);
+  }
 
   // Search query
   const searchPattern = `%${query.q}%`;
