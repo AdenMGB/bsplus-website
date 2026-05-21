@@ -15,10 +15,10 @@ const SYSTEM_PROMPT = `You write short marketing copy for BetterSEQTA+ "Theme of
 You will receive some or all of the following, in this order:
 1. Theme metadata (name, author, tags, colours, etc.)
 2. A theme.json summary describing supported features
-3. Images, in this order:
+3. Images (you may get ANY of these, guaranteed Theme marquee/banner art):
    - Popup/cover art (the main hero image shown in the extension popup)
    - Theme cover art
-   - Theme marquee/banner art
+   - Theme marquee/banner art (this is guaranteed to be sent, and is the first image sent)
    - One or more in-app preview screenshots
 
 Use all provided inputs together. The screenshots show what the theme actually looks like — do not describe features or visual elements you cannot see in the images or metadata.
