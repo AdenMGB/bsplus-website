@@ -212,9 +212,9 @@ export async function buildTotmGenerateContext(
     imageUrls.push(url!);
   };
 
-  addUrl(totmCoverImage);
-  addUrl(theme.cover_image_url as string);
   addUrl(theme.marquee_image_url as string);
+  addUrl(theme.cover_image_url as string);
+  addUrl(totmCoverImage);
   for (const shot of screenshots) {
     addUrl(shot);
     if (imageUrls.length >= maxImages) break;
