@@ -25,7 +25,7 @@
       <input
         v-model="query"
         type="text"
-        placeholder="Search to filter themes by name, author, or slug..."
+        placeholder="Search to filter BetterSEQTA+ themes by name, author, or slug..."
         class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:ring-2 focus:ring-green-500 focus:border-green-500"
       />
       <div v-if="loadingList" class="text-xs text-zinc-500">Loading themes...</div>
@@ -129,28 +129,6 @@ async function loadAllThemes() {
   }
 }
 
-onMounted(async () => {
-  if (props.modelValue) {
-    await loadSelectedById(props.modelValue);
-  } else if (props.initialTheme) {
-    applyInitialTheme(props.initialTheme);
-  }
-  if (!selected.value) {
-    await loadAllThemes();
-  }
-});
-
-watch(() => props.modelValue, async (newVal) => {
-  if (!newVal) {
-    selected.value = null;
-    invalidLinkedTheme.value = false;
-    if (allThemes.value.length === 0) await loadAllThemes();
-    return;
-  }
-  if (selected.value?.id === newVal) return;
-  await loadSelectedById(newVal);
-});
-
 function applyInitialTheme(theme: NonNullable<typeof props.initialTheme>) {
   if (theme.theme_type && theme.theme_type !== 'betterseqta') {
     invalidLinkedTheme.value = true;
@@ -185,6 +163,28 @@ async function loadSelectedById(id: string) {
     }
   }
 }
+
+onMounted(async () => {
+  if (props.modelValue) {
+    await loadSelectedById(props.modelValue);
+  } else if (props.initialTheme) {
+    applyInitialTheme(props.initialTheme);
+  }
+  if (!selected.value) {
+    await loadAllThemes();
+  }
+});
+
+watch(() => props.modelValue, async (newVal) => {
+  if (!newVal) {
+    selected.value = null;
+    invalidLinkedTheme.value = false;
+    if (allThemes.value.length === 0) await loadAllThemes();
+    return;
+  }
+  if (selected.value?.id === newVal) return;
+  await loadSelectedById(newVal);
+});
 
 function select(theme: ThemeOption) {
   invalidLinkedTheme.value = false;
