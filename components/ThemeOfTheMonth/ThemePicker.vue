@@ -25,15 +25,14 @@
       <input
         v-model="query"
         type="text"
-        placeholder="Search BetterSEQTA+ themes by name, description, or author..."
-        @input="onQueryInput"
+        placeholder="Search or scroll to pick a BetterSEQTA+ theme..."
         class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:ring-2 focus:ring-green-500 focus:border-green-500"
       />
-      <div v-if="searching" class="text-xs text-zinc-500">Searching...</div>
-      <div v-else-if="results.length > 0" class="max-h-64 overflow-y-auto bg-zinc-900/50 border border-zinc-800 rounded-lg divide-y divide-zinc-800">
+      <div v-if="loadingThemes" class="text-xs text-zinc-500">Loading themes...</div>
+      <div v-else-if="filteredResults.length > 0" class="max-h-64 overflow-y-auto bg-zinc-900/50 border border-zinc-800 rounded-lg divide-y divide-zinc-800">
         <button
           type="button"
-          v-for="theme in results"
+          v-for="theme in filteredResults"
           :key="theme.id"
           @click="select(theme)"
           class="w-full text-left px-4 py-2 hover:bg-zinc-800/70 transition-colors"
@@ -42,13 +41,14 @@
           <div class="text-xs text-zinc-500 truncate">by {{ theme.author }} · {{ theme.slug }}</div>
         </button>
       </div>
-      <div v-else-if="query.trim().length >= 2 && !searching" class="text-xs text-zinc-500 italic">No results</div>
+      <div v-else-if="allThemes.length > 0 && query.trim()" class="text-xs text-zinc-500 italic">No themes match your search</div>
+      <div v-else-if="!loadingThemes && allThemes.length === 0" class="text-xs text-zinc-500 italic">No BetterSEQTA+ themes found</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 interface ThemeOption {
   id: string;
@@ -67,17 +67,29 @@ const emit = defineEmits<{
 }>();
 
 const query = ref('');
-const results = ref<ThemeOption[]>([]);
-const searching = ref(false);
+const allThemes = ref<ThemeOption[]>([]);
+const loadingThemes = ref(false);
 const selected = ref<ThemeOption | null>(null);
 const invalidLinkedTheme = ref(false);
-let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+const filteredResults = computed(() => {
+  const q = query.value.trim().toLowerCase();
+  if (!q) return allThemes.value;
+  return allThemes.value.filter((t) =>
+    t.name.toLowerCase().includes(q) ||
+    t.slug.toLowerCase().includes(q) ||
+    (t.author?.toLowerCase().includes(q) ?? false)
+  );
+});
 
 onMounted(async () => {
   if (props.modelValue) {
     await loadSelectedById(props.modelValue);
   } else if (props.initialTheme) {
     applyInitialTheme(props.initialTheme);
+  }
+  if (!selected.value) {
+    await loadAllThemes();
   }
 });
 
@@ -94,6 +106,7 @@ watch(() => props.modelValue, async (newVal) => {
   if (!newVal) {
     selected.value = null;
     invalidLinkedTheme.value = false;
+    await loadAllThemes();
     return;
   }
   if (selected.value?.id === newVal) return;
@@ -126,33 +139,34 @@ async function loadSelectedById(id: string) {
   }
 }
 
-function onQueryInput() {
-  if (searchTimer) clearTimeout(searchTimer);
-  const q = query.value.trim();
-  if (q.length < 2) {
-    results.value = [];
-    searching.value = false;
-    return;
-  }
-  searching.value = true;
-  searchTimer = setTimeout(async () => {
-    try {
-      const res: any = await $fetch('/api/themes/search', {
-        params: { q, limit: 10, type: 'betterseqta' }
+async function loadAllThemes() {
+  if (loadingThemes.value || allThemes.value.length > 0) return;
+  loadingThemes.value = true;
+  const themes: ThemeOption[] = [];
+  let page = 1;
+  try {
+    while (true) {
+      const res: any = await $fetch('/api/themes', {
+        params: { type: 'betterseqta', limit: 100, page, sort: 'name' }
       });
-      const themes = res?.data?.themes ?? [];
-      results.value = themes.map((t: any) => ({
-        id: t.id,
-        name: t.name,
-        slug: t.slug,
-        author: t.author
-      }));
-    } catch {
-      results.value = [];
-    } finally {
-      searching.value = false;
+      const batch = res?.data?.themes ?? [];
+      themes.push(
+        ...batch.map((t: any) => ({
+          id: t.id,
+          name: t.name,
+          slug: t.slug,
+          author: t.author
+        }))
+      );
+      if (!res?.data?.pagination?.has_next) break;
+      page++;
     }
-  }, 300);
+    allThemes.value = themes;
+  } catch {
+    allThemes.value = [];
+  } finally {
+    loadingThemes.value = false;
+  }
 }
 
 function select(theme: ThemeOption) {
@@ -160,12 +174,12 @@ function select(theme: ThemeOption) {
   selected.value = theme;
   emit('update:modelValue', theme.id);
   query.value = '';
-  results.value = [];
 }
 
-function clearSelection() {
+async function clearSelection() {
   selected.value = null;
   invalidLinkedTheme.value = false;
   emit('update:modelValue', '');
+  await loadAllThemes();
 }
 </script>
