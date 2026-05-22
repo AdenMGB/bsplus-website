@@ -9,6 +9,17 @@
           Back to Themes
         </NuxtLink>
         <div class="flex gap-2">
+          <a
+            :href="`/api/admin/themes/${themeId}/download`"
+            class="rounded-md bg-zinc-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-600 transition-all hover:scale-105 inline-flex items-center gap-2"
+            title="Download theme files from storage"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+              <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 3.5a.75.75 0 001.09 0l4.25-3.5a.75.75 0 00-1.09-1.03l-2.955 2.369V2.75z" />
+              <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+            </svg>
+            Download
+          </a>
           <button
             @click="showEditModal = true"
             class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-all hover:scale-105"
@@ -196,6 +207,36 @@
               </span>
             </div>
           </div>
+        </div>
+
+        <!-- Theme files on storage -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
+          <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+            <h2 class="text-xl font-semibold text-white">Theme Files</h2>
+            <a
+              :href="`/api/admin/themes/${themeId}/download`"
+              class="rounded-md bg-zinc-700 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-600 transition-colors inline-flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 3.5a.75.75 0 001.09 0l4.25-3.5a.75.75 0 00-1.09-1.03l-2.955 2.369V2.75z" />
+                <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+              </svg>
+              Download package
+            </a>
+          </div>
+          <p class="text-zinc-400 text-sm mb-0">
+            <template v-if="theme.theme_type === 'betterseqta'">
+              <template v-if="theme.is_pseudo_theme">
+                Downloads a ZIP with the external <code class="text-zinc-500">theme.json</code> plus any banner/marquee images stored on the server.
+              </template>
+              <template v-else>
+                Downloads a ZIP with <code class="text-zinc-500">theme.json</code> and preview images from storage.
+              </template>
+            </template>
+            <template v-else>
+              Downloads the full DesQTA theme package ZIP from storage{{ theme.file_size ? ` (${formatFileSize(theme.file_size)})` : '' }}.
+            </template>
+          </p>
         </div>
 
         <!-- Update Theme Files Section (DesQTA & BetterSEQTA) -->
