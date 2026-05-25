@@ -23,6 +23,8 @@
 
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+      <QuestionnaireAiGenerator mode="fill" @use-question="applyGeneratedQuestion" />
+
       <!-- Question Input -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-zinc-400">Question</label>
@@ -137,6 +139,14 @@ function addOption() {
 function removeOption(index: number) {
   if (form.value.options.length > 2) {
     form.value.options.splice(index, 1);
+  }
+}
+
+function applyGeneratedQuestion(question: { question: string; options: string[] }) {
+  form.value.question = question.question;
+  form.value.options = [...question.options];
+  while (form.value.options.length < 2) {
+    form.value.options.push('');
   }
 }
 

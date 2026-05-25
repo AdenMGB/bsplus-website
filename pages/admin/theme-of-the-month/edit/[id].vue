@@ -35,11 +35,21 @@
       <template v-else-if="form">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-zinc-400">Month</label>
-          <input
-            v-model="form.month"
-            type="month"
-            class="block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
-          />
+          <div class="flex gap-3">
+            <select
+              v-model="selectedMonth"
+              class="flex-1 block w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option v-for="m in monthOptions" :key="m.value" :value="m.value">{{ m.label }}</option>
+            </select>
+            <select
+              v-model="selectedYear"
+              class="w-28 block bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
+            </select>
+          </div>
+          <p class="text-xs text-zinc-500">Only one entry is allowed per calendar month (UTC).</p>
         </div>
 
         <div class="space-y-2">
@@ -88,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({
   middleware: ["admin"],
@@ -98,6 +108,21 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const id = route.params.id as string;
+
+const monthOptions = [
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' }
+];
 
 interface FormState {
   month: string;
@@ -112,6 +137,35 @@ const initialTheme = ref<{ id: string; name: string; slug: string } | null>(null
 const loadingEntry = ref(true);
 const loading = ref(false);
 const deleting = ref(false);
+
+const yearOptions = computed(() => {
+  const current = new Date().getUTCFullYear();
+  const years = new Set<number>();
+  for (let y = current - 2; y <= current + 5; y++) {
+    years.add(y);
+  }
+  if (form.value?.month) {
+    const entryYear = parseInt(form.value.month.slice(0, 4), 10);
+    if (!Number.isNaN(entryYear)) years.add(entryYear);
+  }
+  return [...years].sort((a, b) => a - b);
+});
+
+const selectedMonth = computed({
+  get: () => form.value?.month.slice(5, 7) ?? '01',
+  set: (month: string) => {
+    if (!form.value) return;
+    form.value.month = `${selectedYear.value}-${month}`;
+  }
+});
+
+const selectedYear = computed({
+  get: () => parseInt(form.value?.month.slice(0, 4) ?? '0', 10),
+  set: (year: number) => {
+    if (!form.value) return;
+    form.value.month = `${year}-${selectedMonth.value}`;
+  }
+});
 
 onMounted(async () => {
   try {

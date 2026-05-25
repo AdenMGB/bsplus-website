@@ -25,6 +25,10 @@ database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
 binding = "BUCKET"
 bucket_name = "bsplus-images"
 
+[ai]
+binding = "bs-ai"
+remote = true
+
 # Development Environment (dev.betterseqta.org)
 [env.dev]
 routes = [
@@ -39,6 +43,10 @@ database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
 [[env.dev.r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bsplus-images"
+
+[env.dev.ai]
+binding = "bs-ai"
+remote = true
 
 # Cron Triggers
 [triggers]
