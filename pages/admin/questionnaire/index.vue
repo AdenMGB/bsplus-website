@@ -17,6 +17,10 @@
         </NuxtLink>
       </div>
 
+      <div class="mb-8">
+        <QuestionnaireAiGenerator mode="bulk" @added-to-queue="refresh" />
+      </div>
+
       <!-- Current & Next Question -->
       <div class="mb-8">
         <h3 class="text-lg font-semibold text-white mb-4">Current & Next</h3>
