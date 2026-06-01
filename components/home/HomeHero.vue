@@ -18,7 +18,7 @@
         <p
           class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-300 sm:text-xl"
         >
-          Themes, live wallpapers, and a desktop app that makes the portal
+          Themes, enhancements, and a desktop app that makes the portal
           feel like a real product — pick the browser extension or go all-in
           with DesQTA.
         </p>
