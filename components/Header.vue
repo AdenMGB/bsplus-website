@@ -5,20 +5,16 @@
       aria-label="Global"
     >
       <div class="flex lg:flex-1">
-        <NuxtLink href="/" class="-m-1.5 p-1.5">
+        <NuxtLink href="/" class="-m-1.5 p-1.5 transition-transform duration-200 hover:scale-105 active:scale-95">
           <span class="sr-only">DesQTA</span>
           <img src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png" alt="DesQTA logo" class="h-8 w-8" />
         </NuxtLink>
       </div>
-      <div class="flex lg:hidden">
-        <button
-          type="button"
-          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-zinc-300"
-          @click="mobileMenuOpen = true"
-        >
-          <span class="sr-only">Open main menu</span>
-          <Bars3Icon class="size-6" aria-hidden="true" />
-        </button>
+      <div class="relative z-[60] flex lg:hidden">
+        <HamburgerButton
+          :active="mobileMenuOpen"
+          @click="toggleMobileMenu"
+        />
       </div>
 
       <PopoverGroup class="hidden lg:flex lg:gap-x-12">
@@ -82,7 +78,7 @@
           v-for="(route, i) in routes"
           :key="i"
           :href="route.href"
-          class="text-sm/6 font-semibold text-zinc-100"
+          class="nav-link-polish text-sm/6 font-semibold text-zinc-100"
           >{{ route.name }}</NuxtLink
         >
       </PopoverGroup>
@@ -154,143 +150,36 @@
         <button 
           v-else 
           @click="login" 
-          class="text-sm/6 font-semibold text-zinc-100 hover:text-white transition-colors"
+          class="rounded-lg px-3 py-1.5 text-sm/6 font-semibold text-zinc-100 transition-all duration-200 hover:bg-zinc-800/50 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-95"
         >
           Login
         </button>
       </div>
     </nav>
-    <Dialog
-      class="lg:hidden"
-      @close="mobileMenuOpen = false"
+    <MobileMenu
       :open="mobileMenuOpen"
-    >
-      <div class="fixed inset-0 z-10" />
-      <DialogPanel
-        class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-zinc-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-zinc-900/10"
-      >
-        <div class="flex items-center justify-between">
-          <NuxtLink href="/" class="-m-1.5 p-1.5">
-            <span class="sr-only">Your Company</span>
-            <img src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png" alt="DesQTA logo" class="h-8 w-8" />
-          </NuxtLink>
-          <button
-            type="button"
-            class="-m-2.5 rounded-md p-2.5 text-zinc-400"
-            @click="mobileMenuOpen = false"
-          >
-            <span class="sr-only">Close menu</span>
-            <XMarkIcon class="size-6" aria-hidden="true" />
-          </button>
-        </div>
-        <div class="mt-6 flow-root">
-          <div class="-my-6 divide-y divide-zinc-500/10">
-            <div class="space-y-2 py-6">
-              <!--<Disclosure as="div" class="-mx-3" v-slot="{ open }">
-                <DisclosureButton
-                  class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
-                >
-                  Product
-                  <ChevronDownIcon
-                    :class="[open ? 'rotate-180' : '', 'size-5 flex-none']"
-                    aria-hidden="true"
-                  />
-                </DisclosureButton>
-                <DisclosurePanel class="mt-2 space-y-2">
-                  <DisclosureButton
-                    v-for="item in [...products, ...callsToAction]"
-                    :key="item.name"
-                    as="a"
-                    :href="item.href"
-                    class="block rounded-lg py-2 pl-6 pr-3 text-sm/7 font-semibold text-zinc-300 hover:bg-zinc-800"
-                    >{{ item.name }}</DisclosureButton
-                  >
-                </DisclosurePanel>
-              </Disclosure>-->
-              <NuxtLink
-                v-for="(route, i) in routes"
-                :key="i"
-                :href="route.href"
-                class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
-              >
-                {{ route.name }}
-              </NuxtLink>
-            </div>
-            <div class="py-6 space-y-2">
-              <template v-if="user">
-                <div class="px-3 py-2 flex items-center gap-3 text-base/7 font-semibold text-zinc-100">
-                  <img 
-                    v-if="user.pfpUrl" 
-                    :src="user.pfpUrl" 
-                    :alt="user.username" 
-                    class="h-6 w-6 rounded-full"
-                  />
-                  <span>{{ user.displayName || user.username }}</span>
-                </div>
-                <NuxtLink 
-                  v-if="user.admin_level && user.admin_level >= 1" 
-                  to="/admin" 
-                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-green-400 hover:text-green-300 hover:bg-zinc-800"
-                >
-                  Admin
-                </NuxtLink>
-                <a
-                  href="https://accounts.betterseqta.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-300 hover:text-white hover:bg-zinc-800"
-                >
-                  Account
-                </a>
-                <button
-                  @click="logout"
-                  class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800"
-                >
-                  Logout
-                </button>
-              </template>
-              <button
-                v-else
-                @click="login"
-                class="-mx-3 block w-full text-left rounded-lg px-3 py-2.5 text-base/7 font-semibold text-zinc-100 hover:bg-zinc-800"
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        </div>
-      </DialogPanel>
-    </Dialog>
+      :routes="routes"
+      @close="mobileMenuOpen = false"
+    />
   </header>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  Dialog,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
-  Popover,
-  PopoverButton,
   PopoverGroup,
-  PopoverPanel,
 } from "@headlessui/vue";
 import {
-  Bars3Icon,
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
   ServerStackIcon,
   ShareIcon,
   SquaresPlusIcon,
-  XMarkIcon,
 } from "@heroicons/vue/24/outline";
+import HamburgerButton from "./HamburgerButton.vue";
+import MobileMenu from "./MobileMenu.vue";
 import {
   ChevronDownIcon,
   PhoneIcon,
@@ -368,11 +257,15 @@ const features = [
 ];
 
 const router = useRouter();
+const mobileMenuOpen = ref(false);
+
 router.afterEach(() => {
   mobileMenuOpen.value = false;
 });
 
-const mobileMenuOpen = ref(false);
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+}
 
 const { user, login, logout, loading } = useAuth();
 </script>
@@ -448,5 +341,16 @@ const { user, login, logout, loading } = useAuth();
 .user-menu-leave-active .user-menu-item {
   animation: user-menu-item-out 0.16s ease-out forwards !important;
   animation-delay: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-menu-enter-active,
+  .user-menu-leave-active {
+    transition: none;
+  }
+
+  .user-menu-item {
+    animation: none !important;
+  }
 }
 </style>

@@ -34,7 +34,7 @@
         <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none px-4 sm:px-0">
           <div class="grid grid-cols-1 gap-6 sm:gap-x-8 sm:gap-y-16 lg:grid-cols-2">
             <!-- Features -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 animate-fade-in delay-200">
+            <div class="ui-glass-card ui-glass-card--interactive p-6 sm:p-8 animate-fade-in delay-200">
               <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Server Features</h2>
               <ul class="space-y-3 sm:space-y-4 text-sm sm:text-base text-zinc-300">
                 <li class="flex items-center gap-3">
@@ -71,7 +71,7 @@
             </div>
 
             <!-- Join Now -->
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 animate-fade-in delay-300">
+            <div class="ui-glass-card ui-glass-card--interactive p-6 sm:p-8 animate-fade-in delay-300">
               <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Join Now</h2>
               <p class="text-sm sm:text-base text-zinc-300 mb-4 sm:mb-6">
                 The server is now live! Join our Discord community to stay updated on events, announcements, and connect with other players!
@@ -132,23 +132,3 @@ useSchemaOrg([
   schemaHelpers.webPage('Minecraft Server', 'Join the BetterSEQTA+ Minecraft community server.'),
 ]);
 </script>
-
-<style scoped>
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes slide-down {
-  from { opacity: 0; transform: translateY(-24px); }
-  to { opacity: 1; transform: none; }
-}
-.animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.4,0,0.2,1) both;
-}
-.animate-slide-down {
-  animation: slide-down 0.8s cubic-bezier(0.4,0,0.2,1) both;
-}
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-</style>

@@ -68,6 +68,282 @@ html {
   background-color: oklch(0.21 0.006 285.885);
 }
 
+/* ── Motion tokens (ported from betterseqta-accounts) ── */
+:root {
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 0.2s;
+  --duration-medium: 0.48s;
+}
+
+/* ── Entrance animations ── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s var(--ease-standard) both;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.8s var(--ease-standard) both;
+}
+
+.animate-slide-up {
+  animation: slide-up-in 0.55s var(--ease-out-expo) both;
+}
+
+.delay-75 { animation-delay: 75ms; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-150 { animation-delay: 0.15s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* ── Scroll reveal (RevealOnScroll.vue) ── */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.65s var(--ease-out-expo) var(--reveal-delay, 0s),
+    transform 0.65s var(--ease-out-expo) var(--reveal-delay, 0s);
+}
+
+.reveal-on-scroll--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Glass cards & interactive surfaces ── */
+.ui-glass-card {
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    box-shadow var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+}
+
+.ui-glass-card--interactive:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgb(255 255 255 / 0.16);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
+}
+
+.ui-glass-card--interactive:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+/* ── Buttons ── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+}
+
+.ui-btn:focus {
+  outline: none;
+}
+
+.ui-btn-primary {
+  background: rgb(37 99 235);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.ui-btn-primary:hover {
+  background: rgb(59 130 246);
+  transform: scale(1.05);
+}
+
+.ui-btn-primary:active {
+  transform: scale(0.95);
+}
+
+.ui-btn-primary:focus-visible {
+  box-shadow: 0 0 0 2px rgb(24 24 27), 0 0 0 4px rgb(59 130 246);
+}
+
+.ui-btn-secondary {
+  background: rgb(82 82 91);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.ui-btn-secondary:hover {
+  background: rgb(113 113 122);
+  transform: scale(1.05);
+}
+
+.ui-btn-secondary:active {
+  transform: scale(0.95);
+}
+
+.ui-btn-secondary:focus-visible {
+  box-shadow: 0 0 0 2px rgb(24 24 27), 0 0 0 4px rgb(161 161 170);
+}
+
+.ui-btn-ghost {
+  color: rgb(244 244 245);
+  background: transparent;
+}
+
+.ui-btn-ghost:hover {
+  color: rgb(212 212 216);
+}
+
+/* ── Nav link polish ── */
+.nav-link-polish {
+  position: relative;
+  transition: color var(--duration-fast) ease;
+}
+
+.nav-link-polish::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  border-radius: 9999px;
+  background: rgb(74 222 128);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.nav-link-polish:hover {
+  color: white;
+}
+
+.nav-link-polish:hover::after {
+  transform: scaleX(1);
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.ui-skeleton {
+  border-radius: 1rem;
+  background: linear-gradient(
+    90deg,
+    rgb(39 39 42 / 0.6) 0%,
+    rgb(63 63 70 / 0.5) 50%,
+    rgb(39 39 42 / 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Page transitions (Nuxt) ── */
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 0.28s var(--ease-standard),
+    transform 0.28s var(--ease-standard);
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-down,
+  .animate-slide-up {
+    animation: none;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ui-glass-card--interactive:hover,
+  .ui-glass-card--interactive:active {
+    transform: none;
+  }
+
+  .ui-btn-primary:hover,
+  .ui-btn-primary:active,
+  .ui-btn-secondary:hover,
+  .ui-btn-secondary:active {
+    transform: none;
+  }
+
+  .nav-link-polish::after {
+    display: none;
+  }
+
+  .ui-skeleton {
+    animation: none;
+    background: rgb(39 39 42 / 0.6);
+  }
+
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
+
+  .page-enter-from,
+  .page-leave-to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .prose blockquote {
   font-style: italic;
   quotes: none;

@@ -1,17 +1,19 @@
 <template>
   <div class="relative isolate overflow-hidden">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 pb-12 pt-8 sm:pt-10 lg:px-8 lg:pb-20 lg:pt-16">
-      <div class="mx-auto max-w-3xl text-center">
-        <p class="text-sm font-semibold leading-7 text-violet-400">SEQTA Learn &amp; DesQTA</p>
-        <h1 class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl font-display">
-          Theme store
-        </h1>
-        <p class="mt-4 text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
+      <RevealOnScroll>
+        <div class="mx-auto max-w-3xl text-center animate-fade-in">
+          <p class="text-sm font-semibold leading-7 text-violet-400">SEQTA Learn &amp; DesQTA</p>
+          <h1 class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl font-display animate-slide-down delay-75">
+            Theme store
+          </h1>
+          <p class="mt-4 text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8 animate-fade-in delay-150">
           Browse community themes for <strong class="font-semibold text-white">BetterSEQTA+</strong> (SEQTA Learn in the browser)
           and <strong class="font-semibold text-white">DesQTA</strong> (desktop and mobile). Customise SEQTA with dark mode, colour
           packs, and full UI skins.
         </p>
-      </div>
+        </div>
+      </RevealOnScroll>
 
       <!-- Featured -->
       <section
@@ -113,7 +115,7 @@
 
       <!-- Grid -->
       <div v-if="pending" class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="n in 6" :key="n" class="h-72 animate-pulse rounded-2xl bg-zinc-800/60" />
+        <div v-for="n in 6" :key="n" class="h-72 ui-skeleton" />
       </div>
       <div v-else-if="themes.length === 0" class="mt-16 rounded-2xl border border-zinc-700/80 bg-zinc-900/30 p-12 text-center">
         <p class="text-lg font-medium text-white">No themes match your filters</p>

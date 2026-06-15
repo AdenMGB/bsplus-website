@@ -1,14 +1,18 @@
 <template>
   <div class="relative isolate overflow-hidden py-12 sm:py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl lg:mx-0 px-4 sm:px-0">
-        <h2 class="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white font-display">Privacy Policy</h2>
-        <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300">
-          Last updated: December 1, 2025
-        </p>
-      </div>
+      <RevealOnScroll>
+        <div class="mx-auto max-w-2xl lg:mx-0 px-4 sm:px-0">
+          <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400">Legal</p>
+          <h2 class="mt-2 text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white font-display">Privacy Policy</h2>
+          <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300">
+            Last updated: December 1, 2025
+          </p>
+        </div>
+      </RevealOnScroll>
 
-      <div class="mx-auto mt-12 sm:mt-16 max-w-2xl px-4 sm:px-0 text-sm sm:text-base leading-7 text-zinc-300">
+      <RevealOnScroll :delay="100">
+        <div class="mx-auto mt-12 sm:mt-16 max-w-2xl px-4 sm:px-0 text-sm sm:text-base leading-7 text-zinc-300">
         <h3 class="mt-6 sm:mt-8 text-xl sm:text-2xl font-bold tracking-tight text-white">1. Introduction</h3>
         <p class="mt-4 sm:mt-6">
           BetterSEQTA+ ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we handle your data when you use our browser extension and desktop application (collectively, the "Service").
@@ -104,6 +108,7 @@
           <a href="https://discord.gg/nv6YSjpEM4" class="text-green-400 hover:text-green-300 underline">Discord server</a>.
         </p>
       </div>
+      </RevealOnScroll>
     </div>
   </div>
 </template>
