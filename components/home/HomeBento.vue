@@ -31,7 +31,7 @@
           v-for="(tile, i) in tiles"
           :key="tile.title"
           :ref="(el) => setTileRef(el, i)"
-          class="bento-tile group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg backdrop-blur-md transition-colors duration-200 sm:p-8"
+          class="bento-tile ui-glass-card group relative overflow-hidden p-6 shadow-lg sm:p-8 transition-all duration-200 hover:scale-[1.01]"
           :class="tile.span"
         >
           <div

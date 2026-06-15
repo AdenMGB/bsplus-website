@@ -248,22 +248,3 @@ onMounted(async () => {
   fetchAndUpdateRelease('/api/changelogs/desqta', 'changelog_desqta_latest', desqtaRelease, loadingDesQTA);
 });
 </script>
-
-<style scoped>
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes slide-down {
-  from { opacity: 0; transform: translateY(-24px); }
-  to { opacity: 1; transform: none; }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.4,0,0.2,1) both;
-}
-.animate-slide-down {
-  animation: slide-down 0.8s cubic-bezier(0.4,0,0.2,1) both;
-}
-.delay-100 { animation-delay: 0.1s; }
-</style>

@@ -2,8 +2,8 @@
   <!-- Hide for signed-in users who already voted (server); still show after a fresh vote until refresh -->
   <div v-if="question && !(user && serverHasVoted)">
     <!-- Main poll widget -->
-    <div v-if="!isDismissed" class="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 w-[calc(100%-1rem)] sm:w-auto sm:min-w-[400px] sm:max-w-md">
-    <div class="bg-zinc-900/95 border border-zinc-800 rounded-lg backdrop-blur-sm shadow-xl transition-all duration-200">
+    <div v-if="!isDismissed" class="poll-widget animate-slide-up fixed bottom-2 right-2 z-50 w-[calc(100%-1rem)] sm:bottom-4 sm:right-4 sm:w-auto sm:min-w-[400px] sm:max-w-md">
+    <div class="rounded-lg border border-zinc-800 bg-zinc-900/95 shadow-xl backdrop-blur-sm transition-all duration-200">
       <!-- Minimized State -->
       <div v-if="isMinimized" class="p-3 cursor-pointer" @click="isMinimized = false">
         <div class="flex items-center justify-between gap-2">

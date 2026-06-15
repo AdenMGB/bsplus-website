@@ -24,6 +24,7 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: '/',
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'BetterSEQTA Plus - SEQTA Learn Enhanced',
       meta: [

@@ -239,6 +239,7 @@ function resetTilt(which: "ext" | "desk") {
 onMounted(() => {
   if (!import.meta.client || prefersReducedMotion.value) return;
   const intro = introBlockRef.value;
+  const cards = [cardExtInnerRef.value, cardDeskInnerRef.value].filter(Boolean);
   if (!intro) return;
   const kids = intro.querySelectorAll(":scope > *");
   gsap.from(kids, {
@@ -249,6 +250,16 @@ onMounted(() => {
     ease: "power3.out",
     delay: 0.04,
   });
+  if (cards.length) {
+    gsap.from(cards, {
+      opacity: 0,
+      y: 48,
+      duration: 0.75,
+      stagger: 0.14,
+      ease: "power3.out",
+      delay: 0.35,
+    });
+  }
 });
 </script>
 

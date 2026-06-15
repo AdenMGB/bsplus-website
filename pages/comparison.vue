@@ -12,7 +12,7 @@
       </div>
 
       <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none px-4 sm:px-0 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-fade-in delay-100">
-            <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col items-start">
+            <div class="ui-glass-card ui-glass-card--interactive p-6 sm:p-8 flex flex-col items-start animate-fade-in">
           <dt class="text-base font-semibold leading-7 text-white">Vanilla SEQTA</dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
             <ul class="list-disc pl-6 space-y-3">
@@ -25,7 +25,7 @@
             </ul>
           </dd>
         </div>
-        <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in delay-200">
+        <div class="ui-glass-card ui-glass-card--interactive p-8 flex flex-col items-start animate-fade-in delay-200">
           <dt class="text-base font-semibold leading-7 text-white">BetterSEQTA+</dt>
           <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-zinc-300">
             <ul class="list-disc pl-6 space-y-3">
@@ -49,7 +49,7 @@
           </p>
         </div>
         <div class="mx-auto mt-12 sm:mt-16 lg:mt-24 max-w-2xl lg:max-w-none grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in">
+          <div class="ui-glass-card ui-glass-card--interactive p-8 flex flex-col items-start animate-fade-in">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
               <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
@@ -60,7 +60,7 @@
               <p class="flex-auto">Watch cherry blossoms float by while doing math - way better than staring at that blank white screen!</p>
             </dd>
           </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in delay-100">
+          <div class="ui-glass-card ui-glass-card--interactive p-8 flex flex-col items-start animate-fade-in delay-100">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
               <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
@@ -71,7 +71,7 @@
               <p class="flex-auto">Pick ANY color you want! Purple SEQTA? Sure! Hot pink? Go wild! Make SEQTA your happy place.</p>
             </dd>
           </div>
-          <div class="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 flex flex-col items-start animate-fade-in delay-200">
+          <div class="ui-glass-card ui-glass-card--interactive p-8 flex flex-col items-start animate-fade-in delay-200">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
               <svg class="h-7 w-7 flex-none text-zinc-400 transition-transform duration-300 hover:scale-110" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
@@ -95,9 +95,9 @@
         </div>
         <div class="mt-12 sm:mt-16 overflow-x-auto -mx-4 sm:mx-0">
           <div class="inline-block min-w-full align-middle">
-            <table class="min-w-full text-left rounded-2xl bg-white/5 shadow-xl">
+            <table class="min-w-full text-left rounded-2xl bg-white/5 shadow-xl overflow-hidden">
               <thead>
-                <tr>
+                <tr class="border-b border-white/10">
                   <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-white">Feature</th>
                   <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-blue-400 text-center">BetterSEQTA+</th>
                   <th class="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-lg font-semibold text-blue-400 text-center">DesQTA</th>
@@ -106,133 +106,133 @@
               </thead>
             <tbody class="divide-y divide-white/10 rounded-2xl">
               <!-- Better than default SEQTA -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-4 sm:px-6 py-3 sm:py-5 text-sm sm:text-base text-zinc-300">Better than default SEQTA</td>
                 <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-4 sm:px-6 py-3 sm:py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Grades calculator -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Grades calculator</td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Global search -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Global search</td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Custom home page -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Custom home page</td>
                 <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Modern, responsive interface -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Modern, responsive interface</td>
                 <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Local notifications -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Local notifications</td>
                 <td class="px-6 py-5 text-center align-middle"><Semimark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Local application -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Local application</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Works whilst offline -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Works whilst offline</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Enhanced styling editor -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Enhanced styling editor</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Optimized performance -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Optimized performance</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Full system integration -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Full system integration</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Browser independent -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Browser independent</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- RSS news feeds -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">RSS news feeds</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Cloud-based messaging -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Cloud-based messaging</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Cloud settings sync -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Cloud settings sync</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- AI integration & features -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">AI integration & features</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- To Do list -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">To Do list</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Focus timer -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Focus timer</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
               </tr>
               <!-- Student directory -->
-              <tr>
+              <tr class="transition-colors duration-200 hover:bg-white/[0.03]">
                 <td class="px-6 py-5 text-base text-zinc-300">Student directory</td>
                 <td class="px-6 py-5 text-center align-middle"><Crossmark /></td>
                 <td class="px-6 py-5 text-center align-middle"><Checkmark /></td>

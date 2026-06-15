@@ -1,5 +1,8 @@
 import type { H3Event } from 'h3';
 
+/** OAuth and user-session APIs always use production accounts (not local ACCOUNTS_API_URL). */
+export const ACCOUNTS_OAUTH_BASE_URL = 'https://accounts.betterseqta.org';
+
 export interface AccountsCredentials {
   apiKey: string;
   url: string;
@@ -74,8 +77,7 @@ export function normalizeAccountsUser(user: AccountsUserInfo): AccountsUserInfo 
 }
 
 export async function fetchAccountsUserInfo(event: H3Event, accessToken: string): Promise<AccountsUserInfo> {
-  const { url } = getAccountsApiCredentials(event);
-  const user = await $fetch<AccountsUserInfo>(`${url}/api/oauth/userinfo`, {
+  const user = await $fetch<AccountsUserInfo>(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/userinfo`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -90,9 +92,8 @@ export async function exchangeAccountsAuthorizationCode(
   redirectUri: string
 ): Promise<AccountsTokenResponse> {
   const config = useRuntimeConfig(event);
-  const { url } = getAccountsApiCredentials(event);
 
-  const tokenResponse = await $fetch<AccountsTokenResponse>(`${url}/api/oauth/token`, {
+  const tokenResponse = await $fetch<AccountsTokenResponse>(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/token`, {
     method: 'POST',
     body: {
       client_id: config.oauthClientId,
@@ -127,7 +128,7 @@ export async function fetchAccountsSessionEndpoint<T>(
     includeApiKey?: boolean;
   } = {}
 ): Promise<{ data: T; setCookie: string[] }> {
-  const { url, apiKey } = getAccountsApiCredentials(event);
+  const { apiKey } = getAccountsApiCredentials(event);
   const headers = new Headers();
   const cookieHeader = getIncomingCookieHeader(event);
 
@@ -143,7 +144,7 @@ export async function fetchAccountsSessionEndpoint<T>(
     headers.set('x-api-key', apiKey);
   }
 
-  const response = await fetch(`${url}${path}`, {
+  const response = await fetch(`${ACCOUNTS_OAUTH_BASE_URL}${path}`, {
     method: options.method || 'POST',
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,

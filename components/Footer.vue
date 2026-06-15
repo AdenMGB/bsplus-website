@@ -1,43 +1,51 @@
 <template>
-  <footer>
+  <footer class="border-t border-zinc-800/80 bg-zinc-950/30 backdrop-blur-sm">
     <div class="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
-      <nav
-        class="-mb-6 flex flex-wrap justify-center gap-x-12 gap-y-3 text-sm/6"
-        aria-label="Footer"
-      >
-        <NuxtLink
-          v-for="item in navigation.main"
-          :key="item.name"
-          :href="item.href"
-          class="text-zinc-400 hover:text-white"
-          >{{ item.name }}</NuxtLink
+      <RevealOnScroll>
+        <nav
+          class="-mb-6 flex flex-wrap justify-center gap-x-12 gap-y-3 text-sm/6"
+          aria-label="Footer"
         >
-      </nav>
-      <div class="mt-16 flex justify-center gap-x-10">
-        <NuxtLink
-          v-for="item in navigation.social"
-          :key="item.name"
-          :href="item.href"
-          class="text-zinc-400 hover:text-zinc-300"
-        >
-          <span class="sr-only">{{ item.name }}</span>
-          <component :is="item.icon" class="size-6" aria-hidden="true" />
-        </NuxtLink>
-      </div>
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div class="space-y-8">
-            <img
-              class="h-7"
-              src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
-              alt="BetterSEQTA+"
-            />
-            <p class="text-sm leading-6 text-zinc-400">
-              &copy; {{ new Date().getFullYear() }} BetterSEQTA+. Licensed under MIT License.
-            </p>
+          <NuxtLink
+            v-for="item in navigation.main"
+            :key="item.name"
+            :href="item.href"
+            class="nav-link-polish text-zinc-400 transition-colors duration-200 hover:text-white"
+            >{{ item.name }}</NuxtLink
+          >
+        </nav>
+      </RevealOnScroll>
+
+      <RevealOnScroll :delay="80">
+        <div class="mt-16 flex justify-center gap-x-10">
+          <NuxtLink
+            v-for="item in navigation.social"
+            :key="item.name"
+            :href="item.href"
+            class="text-zinc-400 transition-all duration-200 hover:scale-110 hover:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded-full"
+          >
+            <span class="sr-only">{{ item.name }}</span>
+            <component :is="item.icon" class="size-6" aria-hidden="true" />
+          </NuxtLink>
+        </div>
+      </RevealOnScroll>
+
+      <RevealOnScroll :delay="120">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+            <div class="space-y-8 text-center xl:text-left">
+              <img
+                class="mx-auto h-7 transition-transform duration-200 hover:scale-105 xl:mx-0"
+                src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
+                alt="BetterSEQTA+"
+              />
+              <p class="text-sm leading-6 text-zinc-400">
+                &copy; {{ new Date().getFullYear() }} BetterSEQTA+. Licensed under MIT License.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </RevealOnScroll>
     </div>
   </footer>
 </template>
@@ -78,20 +86,6 @@ const navigation = {
           ]),
       }),
     },
-    // {
-    //   name: "YouTube",
-    //   href: "#",
-    //   icon: defineComponent({
-    //     render: () =>
-    //       h("svg", { fill: "currentColor", viewBox: "0 0 24 24" }, [
-    //         h("path", {
-    //           "fill-rule": "evenodd",
-    //           d: "M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z",
-    //           "clip-rule": "evenodd",
-    //         }),
-    //       ]),
-    //   }),
-    // },
   ],
 };
 </script>
