@@ -1,5 +1,12 @@
-import { appendProxySetCookies, exchangeAccountsAuthorizationCode } from '../../utils/accounts';
-import { getAuthTokenCookieSetOptions } from '~/utils/auth-session';
+import { exchangeAccountsAuthorizationCode } from '../../utils/accounts';
+import {
+  AUTH_REDIRECT_COOKIE_NAME,
+  AUTH_REFRESH_COOKIE_NAME,
+  AUTH_TOKEN_COOKIE_NAME,
+  getAuthRefreshCookieSetOptions,
+  getAuthTokenCookieSetOptions,
+  sanitizeAuthRedirectPath,
+} from '~/utils/auth-session';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -11,16 +18,21 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, '/?error=no_code');
   }
 
+  const savedRedirect = getCookie(event, AUTH_REDIRECT_COOKIE_NAME);
+  deleteCookie(event, AUTH_REDIRECT_COOKIE_NAME, { path: '/' });
+  const destination = sanitizeAuthRedirectPath(savedRedirect);
+
   try {
     const tokenResponse = await exchangeAccountsAuthorizationCode(event, code, redirectUri);
     const accessToken = tokenResponse.access_token;
 
-    setCookie(event, 'auth_token', accessToken, getAuthTokenCookieSetOptions());
+    setCookie(event, AUTH_TOKEN_COOKIE_NAME, accessToken, getAuthTokenCookieSetOptions());
 
-    const forwardedCookies = Array.isArray(tokenResponse.setCookie) ? tokenResponse.setCookie : [];
-    appendProxySetCookies(event, forwardedCookies);
+    if (tokenResponse.refresh_token) {
+      setCookie(event, AUTH_REFRESH_COOKIE_NAME, tokenResponse.refresh_token, getAuthRefreshCookieSetOptions());
+    }
 
-    return sendRedirect(event, '/');
+    return sendRedirect(event, destination);
   } catch (e) {
     console.error('OAuth Callback Error:', e);
     return sendRedirect(event, '/?error=server_error');

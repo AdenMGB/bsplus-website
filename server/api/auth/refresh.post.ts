@@ -1,23 +1,54 @@
-import { appendProxySetCookies, fetchAccountsSessionEndpoint } from '../../utils/accounts';
-import { getAuthTokenCookieSetOptions } from '~/utils/auth-session';
+import { ACCOUNTS_OAUTH_BASE_URL } from '../../utils/accounts';
+import {
+  AUTH_REFRESH_COOKIE_NAME,
+  AUTH_TOKEN_COOKIE_NAME,
+  getAuthRefreshCookieSetOptions,
+  getAuthTokenCookieSetOptions,
+} from '~/utils/auth-session';
 
 interface RefreshResponse {
   access_token: string;
+  refresh_token?: string;
   expires_in?: number;
   token_type?: string;
-  [key: string]: any;
 }
 
-export default defineEventHandler(async (event): Promise<RefreshResponse> => {
-  const { data, setCookie: proxiedCookies } = await fetchAccountsSessionEndpoint<RefreshResponse>(event, '/api/auth/refresh', {
-    method: 'POST',
-  });
+export default defineEventHandler(async (event): Promise<{ access_token: string; expires_in?: number; token_type?: string }> => {
+  const config = useRuntimeConfig(event);
+  const refreshToken = getCookie(event, AUTH_REFRESH_COOKIE_NAME);
 
-  appendProxySetCookies(event, proxiedCookies);
-
-  if (data.access_token) {
-    setCookie(event, 'auth_token', data.access_token, getAuthTokenCookieSetOptions());
+  if (!refreshToken) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Missing refresh token',
+    });
   }
 
-  return data;
+  const data = await $fetch<RefreshResponse>(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/refresh`, {
+    method: 'POST',
+    body: {
+      refresh_token: refreshToken,
+      client_id: config.oauthClientId,
+      client_secret: config.oauthClientSecret,
+    },
+  });
+
+  if (!data.access_token) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Refresh failed',
+    });
+  }
+
+  setCookie(event, AUTH_TOKEN_COOKIE_NAME, data.access_token, getAuthTokenCookieSetOptions());
+
+  if (data.refresh_token) {
+    setCookie(event, AUTH_REFRESH_COOKIE_NAME, data.refresh_token, getAuthRefreshCookieSetOptions());
+  }
+
+  return {
+    access_token: data.access_token,
+    expires_in: data.expires_in,
+    token_type: data.token_type,
+  };
 });
