@@ -1,17 +1,25 @@
-import { appendProxySetCookies, fetchAccountsSessionEndpoint, getBearerOrCookieAccessToken } from '../../utils/accounts';
+import { getBearerOrCookieAccessToken } from '../../utils/accounts';
+import { AUTH_REFRESH_COOKIE_NAME, AUTH_TOKEN_COOKIE_NAME } from '~/utils/auth-session';
 
 export default defineEventHandler(async (event) => {
   const accessToken = getBearerOrCookieAccessToken(event);
 
-  const { data, setCookie: proxiedCookies } = await fetchAccountsSessionEndpoint<{ success?: boolean }>(event, '/api/auth/logout-all', {
-    method: 'POST',
-    accessToken,
-  });
+  if (accessToken) {
+    try {
+      await $fetch('https://accounts.betterseqta.org/api/auth/sessions/revoke-others', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Cookie: getHeader(event, 'cookie') || '',
+        },
+      });
+    } catch {
+      // Best-effort remote revoke
+    }
+  }
 
-  appendProxySetCookies(event, proxiedCookies);
-  deleteCookie(event, 'auth_token', { path: '/' });
+  deleteCookie(event, AUTH_TOKEN_COOKIE_NAME, { path: '/' });
+  deleteCookie(event, AUTH_REFRESH_COOKIE_NAME, { path: '/' });
 
-  return {
-    success: data.success ?? true,
-  };
+  return { success: true };
 });

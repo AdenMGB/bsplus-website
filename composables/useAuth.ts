@@ -6,13 +6,44 @@ interface RefreshResponse {
   token_type?: string;
 }
 
+function readTokenFromForwardHeaders(headers?: Record<string, string>): string | null {
+  if (!headers) return null;
+  const cookieHeader = headers.cookie || headers.Cookie;
+  if (!cookieHeader) return null;
+  for (const part of cookieHeader.split(';')) {
+    const trimmed = part.trim();
+    if (trimmed.startsWith('auth_token=')) {
+      const value = trimmed.slice('auth_token='.length);
+      try {
+        return decodeURIComponent(value) || null;
+      } catch {
+        return value || null;
+      }
+    }
+  }
+  return null;
+}
+
 export const useAuth = () => {
   const user = useState<AuthUser>('auth_user', () => null);
   const loading = useState<boolean>('auth_loading', () => true);
   const accessToken = useState<string | null>('auth_access_token', () => null);
 
+  const bootstrapAccessToken = (headers?: Record<string, string>) => {
+    if (accessToken.value) return accessToken.value;
+    if (import.meta.server) {
+      const fromHeader = readTokenFromForwardHeaders(headers);
+      if (fromHeader) {
+        accessToken.value = fromHeader;
+        return fromHeader;
+      }
+    }
+    return null;
+  };
+
   const getAuthHeaders = (headers?: Record<string, string>) => {
     const nextHeaders: Record<string, string> = { ...(headers || {}) };
+    bootstrapAccessToken(headers);
     if (!nextHeaders.authorization && accessToken.value) {
       nextHeaders.authorization = `Bearer ${accessToken.value}`;
     }
@@ -26,7 +57,7 @@ export const useAuth = () => {
 
   /**
    * On SSR, `credentials: 'include'` does not forward the browser cookie to the internal
-   * `/api/auth/refresh` call — pass `forwardHeaders` from `useRequestHeaders(['cookie'])` (e.g. from admin middleware).
+   * `/api/auth/refresh` call — pass `forwardHeaders` from `useRequestHeaders(['cookie'])`.
    */
   const refreshAccessToken = async (forwardHeaders?: Record<string, string>) => {
     const response = await $fetch<RefreshResponse>('/api/auth/refresh', {
@@ -43,9 +74,6 @@ export const useAuth = () => {
 
   const fetchUser = async (headers?: Record<string, string>) => {
     loading.value = true;
-    const hasProvidedAuthContext = Boolean(
-      headers?.authorization || headers?.Authorization || headers?.cookie || headers?.Cookie
-    );
 
     const fetchMe = async () => {
       const data = await $fetch('/api/auth/me', {
@@ -57,44 +85,40 @@ export const useAuth = () => {
     };
 
     try {
-      if (!accessToken.value && !hasProvidedAuthContext) {
-        try {
-          await refreshAccessToken(headers);
-        } catch (refreshError: any) {
-          const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
-          if (refreshStatus === 401 || refreshStatus === 400) {
-            clearAuthState();
-            return null;
-          }
-          throw refreshError;
-        }
-      }
+      bootstrapAccessToken(headers);
 
-      return await fetchMe();
-    } catch (error: any) {
-      const statusCode = error?.statusCode || error?.response?.status;
-      if (statusCode !== 401) {
-        throw error;
+      if (accessToken.value) {
+        const { isJwtExpired } = await import('~/utils/auth-session');
+        if (isJwtExpired(accessToken.value)) {
+          await refreshAccessToken(headers);
+        }
       }
 
       try {
+        return await fetchMe();
+      } catch (error: any) {
+        const statusCode = error?.statusCode || error?.response?.status;
+        if (statusCode !== 401) {
+          throw error;
+        }
         await refreshAccessToken(headers);
         return await fetchMe();
-      } catch (refreshError: any) {
-        const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
-        if (refreshStatus === 401 || refreshStatus === 400) {
-          clearAuthState();
-          return null;
-        }
-        throw refreshError;
       }
+    } catch (refreshError: any) {
+      const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
+      if (refreshStatus === 401 || refreshStatus === 400) {
+        clearAuthState();
+        return null;
+      }
+      throw refreshError;
     } finally {
       loading.value = false;
     }
   };
 
-  const login = () => {
-    window.location.href = '/api/auth/login';
+  const login = (redirectPath?: string) => {
+    const path = redirectPath ? `?redirect=${encodeURIComponent(redirectPath)}` : '';
+    window.location.href = `/api/auth/login${path}`;
   };
 
   const logout = async () => {

@@ -57,6 +57,7 @@ Your server must exchange this code for an access token by making a POST request
 ```json
 {
   "access_token": "eyJhbGciOiJIUz...",
+  "refresh_token": "session-uuid:base64secret",
   "token_type": "Bearer",
   "expires_in": 3600,
   "user": {
@@ -66,7 +67,45 @@ Your server must exchange this code for an access token by making a POST request
 }
 ```
 
-### Step D: Fetch User Info
+The `refresh_token` is long-lived (180 days, sliding expiry on use). Store it securely server-side (HttpOnly cookie recommended). Use it with `POST /api/oauth/refresh` to obtain new access tokens without re-authorizing the user.
+
+### Step D: Refresh Access Token
+When the access token expires, exchange the refresh token for a new one.
+
+**Endpoint:** `POST https://accounts.betterseqta.org/api/oauth/refresh`
+
+**Body:**
+```json
+{
+  "client_id": "YOUR_CLIENT_ID",
+  "client_secret": "YOUR_CLIENT_SECRET",
+  "refresh_token": "REFRESH_TOKEN_FROM_STEP_C"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUz...",
+  "refresh_token": "session-uuid:base64secret",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+### Step E: Revoke Session (Logout)
+**Endpoint:** `POST https://accounts.betterseqta.org/api/oauth/revoke`
+
+**Body:**
+```json
+{
+  "client_id": "YOUR_CLIENT_ID",
+  "client_secret": "YOUR_CLIENT_SECRET",
+  "refresh_token": "REFRESH_TOKEN"
+}
+```
+
+### Step F: Fetch User Info
 Use the access token to fetch the user's profile.
 
 **Endpoint:** `GET https://accounts.betterseqta.org/api/oauth/userinfo`
