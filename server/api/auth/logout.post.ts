@@ -1,14 +1,32 @@
-import { appendProxySetCookies, fetchAccountsSessionEndpoint } from '../../utils/accounts';
+import { ACCOUNTS_OAUTH_BASE_URL } from '../../utils/accounts';
+import {
+  AUTH_REFRESH_COOKIE_NAME,
+  AUTH_TOKEN_COOKIE_NAME,
+  getAuthRefreshCookieSetOptions,
+  getAuthTokenCookieSetOptions,
+} from '~/utils/auth-session';
 
 export default defineEventHandler(async (event) => {
-  const { data, setCookie: proxiedCookies } = await fetchAccountsSessionEndpoint<{ success?: boolean }>(event, '/api/auth/logout', {
-    method: 'POST',
-  });
+  const config = useRuntimeConfig(event);
+  const refreshToken = getCookie(event, AUTH_REFRESH_COOKIE_NAME);
 
-  appendProxySetCookies(event, proxiedCookies);
-  deleteCookie(event, 'auth_token', { path: '/' });
+  if (refreshToken && config.oauthClientId && config.oauthClientSecret) {
+    try {
+      await $fetch(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/revoke`, {
+        method: 'POST',
+        body: {
+          refresh_token: refreshToken,
+          client_id: config.oauthClientId,
+          client_secret: config.oauthClientSecret,
+        },
+      });
+    } catch {
+      // Best-effort revoke; still clear local cookies
+    }
+  }
 
-  return {
-    success: data.success ?? true,
-  };
+  deleteCookie(event, AUTH_TOKEN_COOKIE_NAME, { path: '/' });
+  deleteCookie(event, AUTH_REFRESH_COOKIE_NAME, { path: '/' });
+
+  return { success: true };
 });

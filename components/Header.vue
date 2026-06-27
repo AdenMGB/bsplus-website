@@ -149,7 +149,7 @@
         </template>
         <button 
           v-else 
-          @click="login" 
+          @click="() => login()" 
           class="rounded-lg px-3 py-1.5 text-sm/6 font-semibold text-zinc-100 transition-all duration-200 hover:bg-zinc-800/50 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-95"
         >
           Login
