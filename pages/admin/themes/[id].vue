@@ -9,6 +9,18 @@
           Back to Themes
         </NuxtLink>
         <div class="flex gap-2">
+          <button
+            v-if="theme?.theme_type === 'desqta' && desqtaInstallUrl"
+            type="button"
+            @click="copyDesqtaInstallLink"
+            class="rounded-md bg-cyan-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 transition-all hover:scale-105 inline-flex items-center gap-2"
+            title="Copy HTTPS install link for DesQTA"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+              <path fill-rule="evenodd" d="M15.666 3.118A4.5 4.5 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" clip-rule="evenodd" />
+            </svg>
+            {{ copiedInstallLink ? 'Copied!' : 'Copy install link' }}
+          </button>
           <a
             :href="`/api/admin/themes/${themeId}/download`"
             class="rounded-md bg-zinc-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-600 transition-all hover:scale-105 inline-flex items-center gap-2"
@@ -661,6 +673,8 @@
 </template>
 
 <script setup lang="ts">
+import { getDesqtaThemeInstallWebUrl } from '~/utils/desqtaThemeLinks';
+
 definePageMeta({
   middleware: ["admin"]
 });
@@ -668,6 +682,8 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const themeId = route.params.id as string;
+const config = useRuntimeConfig();
+const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
 // Fetch theme data by ID
 const { data: themeData, refresh } = await useFetch<any>(`/api/admin/themes/${themeId}`);
@@ -684,6 +700,26 @@ const theme = computed(() => {
     }
   };
 });
+
+const desqtaInstallUrl = computed(() =>
+  theme.value?.theme_type === 'desqta'
+    ? getDesqtaThemeInstallWebUrl(themeId, siteUrl)
+    : ''
+);
+const copiedInstallLink = ref(false);
+
+async function copyDesqtaInstallLink() {
+  if (!desqtaInstallUrl.value) return;
+  try {
+    await navigator.clipboard.writeText(desqtaInstallUrl.value);
+    copiedInstallLink.value = true;
+    setTimeout(() => {
+      copiedInstallLink.value = false;
+    }, 2000);
+  } catch {
+    // ignore
+  }
+}
 
 useHead({
   title: computed(() => {
