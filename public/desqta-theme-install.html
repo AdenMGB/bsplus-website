@@ -24,21 +24,30 @@
         color: #a1a1aa;
         line-height: 1.6;
       }
-      a {
+      a,
+      button {
         color: #38bdf8;
+        background: none;
+        border: none;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 2px;
       }
     </style>
   </head>
   <body>
     <main>
       <h1 id="title">Opening DesQTA…</h1>
-      <p id="message">If DesQTA does not open automatically, <a id="fallback" href="#">click here</a>.</p>
+      <p id="message">If DesQTA is not installed, you will be redirected to the download page shortly.</p>
+      <p><button type="button" id="retry" hidden>Try again</button></p>
     </main>
     <script>
       (function () {
         var params = new URLSearchParams(window.location.search);
         var id = params.get('id') || params.get('theme_id') || params.get('themeId');
         var uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        var fallbackPath = '/download';
 
         if (!id || !uuidRe.test(id)) {
           document.getElementById('title').textContent = 'Invalid theme link';
@@ -47,9 +56,50 @@
           return;
         }
 
-        var schemeUrl = 'desqta://theme/install?id=' + encodeURIComponent(id);
-        document.getElementById('fallback').href = schemeUrl;
-        window.location.href = schemeUrl;
+        function openDesqtaThemeInstall(themeId) {
+          var schemeUrl = 'desqta://theme/install?id=' + encodeURIComponent(themeId);
+          var cancelled = false;
+          var fallbackTimer;
+
+          function cancel() {
+            if (cancelled) return;
+            cancelled = true;
+            window.clearTimeout(fallbackTimer);
+            window.removeEventListener('blur', cancel);
+            document.removeEventListener('visibilitychange', onHide);
+            document.removeEventListener('pagehide', cancel);
+          }
+
+          function onHide() {
+            if (document.hidden) cancel();
+          }
+
+          window.addEventListener('blur', cancel);
+          document.addEventListener('visibilitychange', onHide);
+          document.addEventListener('pagehide', cancel);
+
+          fallbackTimer = window.setTimeout(function () {
+            if (!cancelled) {
+              cancel();
+              window.location.assign(fallbackPath);
+            }
+          }, 2500);
+
+          var link = document.createElement('a');
+          link.href = schemeUrl;
+          link.referrerPolicy = 'no-referrer';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }
+
+        var retry = document.getElementById('retry');
+        retry.hidden = false;
+        retry.addEventListener('click', function () {
+          openDesqtaThemeInstall(id);
+        });
+
+        openDesqtaThemeInstall(id);
       })();
     </script>
   </body>
