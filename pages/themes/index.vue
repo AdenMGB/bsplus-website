@@ -217,7 +217,7 @@
           <li>
             <strong class="text-white">DesQTA</strong> — Download the app from
             <NuxtLink to="/download" class="text-violet-400 underline-offset-2 hover:underline">Download</NuxtLink>,
-            then apply DesQTA theme packages from this store inside the app.
+            then open a theme page and click <strong class="text-white">Install in DesQTA</strong> to preview it in the app.
           </li>
         </ul>
       </section>
