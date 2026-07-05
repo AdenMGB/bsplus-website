@@ -673,7 +673,7 @@
 </template>
 
 <script setup lang="ts">
-import { getDesqtaThemeInstallSchemeUrl } from '~/utils/desqtaThemeLinks';
+import { getDesqtaThemeInstallWebUrl } from '~/utils/desqtaThemeLinks';
 
 definePageMeta({
   middleware: ["admin"]
@@ -682,6 +682,8 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const themeId = route.params.id as string;
+const config = useRuntimeConfig();
+const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
 // Fetch theme data by ID
 const { data: themeData, refresh } = await useFetch<any>(`/api/admin/themes/${themeId}`);
@@ -701,7 +703,7 @@ const theme = computed(() => {
 
 const desqtaInstallUrl = computed(() =>
   theme.value?.theme_type === 'desqta'
-    ? getDesqtaThemeInstallSchemeUrl(themeId)
+    ? getDesqtaThemeInstallWebUrl(themeId, siteUrl)
     : ''
 );
 const copiedInstallLink = ref(false);

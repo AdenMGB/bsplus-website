@@ -4,8 +4,8 @@
       <template v-if="themeId">
         <p class="text-lg font-medium text-white">Opening DesQTA…</p>
         <p class="mt-3 text-sm text-zinc-400">
-          If DesQTA does not open,
-          <NuxtLink to="/download" class="text-sky-400 underline-offset-2 hover:underline">download the app</NuxtLink>.
+          If DesQTA does not open automatically,
+          <a :href="schemeUrl" class="text-sky-400 underline-offset-2 hover:underline">click here</a>.
         </p>
       </template>
       <template v-else>
@@ -21,13 +21,16 @@
 
 <script setup lang="ts">
 import {
+  getDesqtaThemeInstallSchemeUrl,
   isDesqtaThemeUuid,
-  openDesqtaThemeInstall,
 } from '~/utils/desqtaThemeLinks';
 
 const route = useRoute();
 const rawId = route.params.id as string;
 const themeId = computed(() => (isDesqtaThemeUuid(rawId) ? rawId.trim() : null));
+const schemeUrl = computed(() =>
+  themeId.value ? getDesqtaThemeInstallSchemeUrl(themeId.value) : ''
+);
 
 usePageSeo({
   title: 'Install theme in DesQTA',
@@ -37,6 +40,6 @@ usePageSeo({
 
 onMounted(() => {
   if (!themeId.value) return;
-  openDesqtaThemeInstall(themeId.value);
+  window.location.href = schemeUrl.value;
 });
 </script>
