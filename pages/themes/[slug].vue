@@ -134,13 +134,14 @@
               </template>
             </p>
 
-            <a
-              v-if="!isBetterseqtaTheme && desqtaInstallUrl"
-              :href="desqtaInstallUrl"
+            <button
+              v-if="!isBetterseqtaTheme"
+              type="button"
               class="mt-6 block w-full rounded-lg bg-sky-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-zinc-900 hover:scale-[1.02] active:scale-[0.98]"
+              @click="installInDesqta"
             >
               Install in DesQTA
-            </a>
+            </button>
 
             <button
               type="button"
@@ -197,7 +198,7 @@ interface PublicTheme {
   zip_download_url?: string;
 }
 
-import { getDesqtaThemeInstallWebUrl } from '~/utils/desqtaThemeLinks';
+import { openDesqtaThemeInstall } from '~/utils/desqtaThemeLinks';
 
 const route = useRoute();
 const slug = route.params.slug as string;
@@ -328,9 +329,9 @@ const downloadCtaLabel = isBetterseqtaTheme
   ? 'Get theme (SEQTA Learn)'
   : 'Download theme package';
 
-const desqtaInstallUrl = isBetterseqtaTheme
-  ? ''
-  : getDesqtaThemeInstallWebUrl(themeId, baseUrl);
+function installInDesqta() {
+  openDesqtaThemeInstall(themeId);
+}
 
 async function startDownload() {
   downloadError.value = '';

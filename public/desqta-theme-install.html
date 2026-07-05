@@ -32,13 +32,15 @@
   <body>
     <main>
       <h1 id="title">Opening DesQTA…</h1>
-      <p id="message">If DesQTA does not open automatically, <a id="fallback" href="#">click here</a>.</p>
+      <p id="message">If DesQTA does not open, <a id="fallback" href="/download">download the app</a>.</p>
     </main>
     <script>
       (function () {
         var params = new URLSearchParams(window.location.search);
         var id = params.get('id') || params.get('theme_id') || params.get('themeId');
         var uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        var fallbackPath = '/download';
+        var timeoutMs = 2500;
 
         if (!id || !uuidRe.test(id)) {
           document.getElementById('title').textContent = 'Invalid theme link';
@@ -48,8 +50,30 @@
         }
 
         var schemeUrl = 'desqta://theme/install?id=' + encodeURIComponent(id);
-        document.getElementById('fallback').href = schemeUrl;
-        window.location.href = schemeUrl;
+        var appOpened = false;
+
+        function markOpened() {
+          appOpened = true;
+        }
+
+        function onVisibilityChange() {
+          if (document.hidden) markOpened();
+        }
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        window.addEventListener('blur', markOpened);
+        window.addEventListener('pagehide', markOpened);
+
+        window.location.assign(schemeUrl);
+
+        window.setTimeout(function () {
+          document.removeEventListener('visibilitychange', onVisibilityChange);
+          window.removeEventListener('blur', markOpened);
+          window.removeEventListener('pagehide', markOpened);
+          if (!appOpened) {
+            window.location.assign(fallbackPath);
+          }
+        }, timeoutMs);
       })();
     </script>
   </body>
