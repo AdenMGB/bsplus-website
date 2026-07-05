@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Install theme in DesQTA</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: system-ui, sans-serif;
+        background: #09090b;
+        color: #fafafa;
+      }
+      main {
+        max-width: 28rem;
+        padding: 2rem;
+        text-align: center;
+      }
+      p {
+        color: #a1a1aa;
+        line-height: 1.6;
+      }
+      a {
+        color: #38bdf8;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="title">Opening DesQTA…</h1>
+      <p id="message">If DesQTA does not open automatically, <a id="fallback" href="#">click here</a>.</p>
+    </main>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var id = params.get('id') || params.get('theme_id') || params.get('themeId');
+        var uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+        if (!id || !uuidRe.test(id)) {
+          document.getElementById('title').textContent = 'Invalid theme link';
+          document.getElementById('message').innerHTML =
+            'A valid theme UUID is required. <a href="/themes">Browse themes</a>.';
+          return;
+        }
+
+        var schemeUrl = 'desqta://theme/install?id=' + encodeURIComponent(id);
+        document.getElementById('fallback').href = schemeUrl;
+        window.location.href = schemeUrl;
+      })();
+    </script>
+  </body>
+</html>

@@ -129,15 +129,29 @@
                 open SEQTA Learn, then import this theme or subscribe via the extension theme store.
               </template>
               <template v-else>
-                Install <NuxtLink to="/download" class="text-sky-400 underline-offset-2 hover:underline">DesQTA</NuxtLink>
-                and apply this theme package from the app settings.
+                Install <NuxtLink to="/download" class="text-sky-400 underline-offset-2 hover:underline">DesQTA</NuxtLink>,
+                then use Install in DesQTA to preview this theme in the app before installing.
               </template>
             </p>
+
+            <a
+              v-if="!isBetterseqtaTheme && desqtaInstallUrl"
+              :href="desqtaInstallUrl"
+              class="mt-6 block w-full rounded-lg bg-sky-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-zinc-900 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Install in DesQTA
+            </a>
 
             <button
               type="button"
               :disabled="downloading"
-              class="mt-6 w-full rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:cursor-not-allowed disabled:opacity-60 hover:scale-[1.02] active:scale-[0.98]"
+              :class="[
+                isBetterseqtaTheme
+                  ? 'bg-violet-600 hover:bg-violet-500 focus:ring-violet-500'
+                  : 'border border-zinc-600 bg-transparent text-zinc-200 hover:bg-zinc-800 hover:text-white focus:ring-zinc-500',
+                'w-full rounded-lg px-4 py-2.5 text-sm font-semibold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:cursor-not-allowed disabled:opacity-60 hover:scale-[1.02] active:scale-[0.98]',
+                !isBetterseqtaTheme ? 'mt-3' : 'mt-6',
+              ]"
               @click="startDownload"
             >
               {{ downloading ? 'Preparing…' : downloadCtaLabel }}
@@ -182,6 +196,8 @@ interface PublicTheme {
   theme_json_url?: string;
   zip_download_url?: string;
 }
+
+import { getDesqtaThemeInstallWebUrl } from '~/utils/desqtaThemeLinks';
 
 const route = useRoute();
 const slug = route.params.slug as string;
@@ -311,6 +327,10 @@ const downloadError = ref('');
 const downloadCtaLabel = isBetterseqtaTheme
   ? 'Get theme (SEQTA Learn)'
   : 'Download theme package';
+
+const desqtaInstallUrl = isBetterseqtaTheme
+  ? ''
+  : getDesqtaThemeInstallWebUrl(themeId, baseUrl);
 
 async function startDownload() {
   downloadError.value = '';
