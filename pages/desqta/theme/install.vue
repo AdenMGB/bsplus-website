@@ -4,9 +4,15 @@
       <template v-if="themeId">
         <p class="text-lg font-medium text-white">Opening DesQTA…</p>
         <p class="mt-3 text-sm text-zinc-400">
-          If DesQTA does not open automatically,
-          <a :href="schemeUrl" class="text-sky-400 underline-offset-2 hover:underline">click here</a>.
+          If DesQTA is not installed, you will be redirected to the download page shortly.
         </p>
+        <button
+          type="button"
+          class="mt-6 text-sm text-sky-400 underline-offset-2 hover:underline"
+          @click="tryOpen"
+        >
+          Try again
+        </button>
       </template>
       <template v-else>
         <p class="text-lg font-medium text-white">Invalid theme link</p>
@@ -21,16 +27,13 @@
 
 <script setup lang="ts">
 import {
-  getDesqtaThemeInstallSchemeUrl,
+  openDesqtaThemeInstall,
   resolveDesqtaThemeIdFromQuery,
 } from '~/utils/desqtaThemeLinks';
 
 const route = useRoute();
 const themeId = computed(() =>
   resolveDesqtaThemeIdFromQuery(route.query as Record<string, string | string[] | undefined>)
-);
-const schemeUrl = computed(() =>
-  themeId.value ? getDesqtaThemeInstallSchemeUrl(themeId.value) : ''
 );
 
 usePageSeo({
@@ -39,8 +42,12 @@ usePageSeo({
   noIndex: true,
 });
 
-onMounted(() => {
+function tryOpen() {
   if (!themeId.value) return;
-  window.location.href = schemeUrl.value;
+  openDesqtaThemeInstall(themeId.value);
+}
+
+onMounted(() => {
+  tryOpen();
 });
 </script>
