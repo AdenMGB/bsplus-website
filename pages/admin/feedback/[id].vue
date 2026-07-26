@@ -208,6 +208,12 @@
                   <span v-if="item.responded_by"> · {{ item.responded_by }}</span>
                 </span>
               </div>
+              <p
+                v-if="item.response_emailed_at"
+                class="mt-1 text-xs text-sky-400"
+              >
+                Emailed {{ formatDate(item.response_emailed_at) }}
+              </p>
               <p class="mt-2 whitespace-pre-wrap text-sm text-zinc-200">{{ item.admin_response }}</p>
             </div>
 
@@ -223,29 +229,38 @@
 
             <div class="mt-4 flex flex-wrap gap-3">
               <button
+                v-if="canEmail"
                 type="button"
                 class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-105 hover:bg-green-500 active:scale-95 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                 :disabled="savingResponse || !draftResponse.trim()"
-                @click="saveResponse(false)"
+                @click="saveResponse({ email: true, resolve: false })"
               >
-                {{ savingResponse ? 'Saving...' : 'Save response' }}
+                {{ savingResponse ? 'Sending...' : 'Save & email reply' }}
+              </button>
+              <button
+                v-if="canEmail"
+                type="button"
+                class="rounded-lg border border-emerald-500/40 px-4 py-2 text-sm font-medium text-emerald-400 transition-all duration-200 hover:scale-105 hover:bg-emerald-500/10 active:scale-95 disabled:opacity-50"
+                :disabled="savingResponse || !draftResponse.trim()"
+                @click="saveResponse({ email: true, resolve: true })"
+              >
+                Email & resolve
+              </button>
+              <button
+                type="button"
+                class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-all duration-200 hover:scale-105 hover:border-zinc-500 active:scale-95 disabled:opacity-50"
+                :disabled="savingResponse || !draftResponse.trim()"
+                @click="saveResponse({ email: false, resolve: false })"
+              >
+                Save without email
               </button>
               <button
                 type="button"
                 class="rounded-lg border border-emerald-500/40 px-4 py-2 text-sm font-medium text-emerald-400 transition-all duration-200 hover:scale-105 hover:bg-emerald-500/10 active:scale-95 disabled:opacity-50"
                 :disabled="savingResponse || !draftResponse.trim()"
-                @click="saveResponse(true)"
+                @click="saveResponse({ email: false, resolve: true })"
               >
                 Save & mark resolved
-              </button>
-              <button
-                v-if="canEmail"
-                type="button"
-                class="rounded-lg border border-sky-500/40 px-4 py-2 text-sm font-medium text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 active:scale-95 disabled:opacity-50"
-                :disabled="!draftResponse.trim()"
-                @click="openMailto"
-              >
-                Open email client
               </button>
               <button
                 type="button"
@@ -257,8 +272,15 @@
               </button>
             </div>
             <p v-if="responseMessage" class="mt-3 text-sm text-emerald-400">{{ responseMessage }}</p>
+            <p v-if="responseError" class="mt-3 text-sm text-red-400">{{ responseError }}</p>
             <p class="mt-3 text-xs text-zinc-500">
-              Email sending is not wired server-side yet — use “Open email client” to send via your mail app, then save the response here for the triage record.
+              <template v-if="canEmail">
+                Replies are sent via BetterSEQTA Mail from the configured
+                <code class="text-zinc-400">BS_MAIL_FROM</code> address.
+              </template>
+              <template v-else>
+                No contact email on this submission — you can still save a response for the record.
+              </template>
             </p>
           </div>
 
@@ -328,6 +350,7 @@ interface FeedbackDetail {
   admin_response: string | null;
   responded_at: string | null;
   responded_by: string | null;
+  response_emailed_at: string | null;
   created_at: string;
   updated_at: string;
   user_agent?: string | null;
@@ -364,6 +387,7 @@ const savingTriage = ref(false);
 const savingResponse = ref(false);
 const triageMessage = ref('');
 const responseMessage = ref('');
+const responseError = ref('');
 const copied = ref(false);
 
 const canEmail = computed(
@@ -441,41 +465,41 @@ async function markResolved() {
   await saveTriage();
 }
 
-async function saveResponse(alsoResolve: boolean) {
+async function saveResponse(options: { email: boolean; resolve: boolean }) {
   if (!item.value || !draftResponse.value.trim()) return;
   savingResponse.value = true;
   responseMessage.value = '';
+  responseError.value = '';
   try {
-    const body: Record<string, string> = {
+    const body: Record<string, unknown> = {
       admin_response: draftResponse.value.trim(),
+      send_email: options.email,
     };
-    if (alsoResolve) body.status = 'resolved';
+    if (options.resolve) body.status = 'resolved';
     else if (item.value.status === 'received') body.status = 'triaged';
 
-    await $fetch(`/api/bsplus/feedback/${item.value.id}`, {
+    const result = await $fetch<{
+      email_sent?: boolean;
+      email_error?: string | null;
+    }>(`/api/bsplus/feedback/${item.value.id}`, {
       method: 'PATCH',
       body,
     });
     await refresh();
-    responseMessage.value = alsoResolve
-      ? 'Response saved and marked resolved.'
-      : 'Response saved.';
+
+    const parts: string[] = ['Response saved'];
+    if (options.resolve) parts.push('marked resolved');
+    if (options.email && result.email_sent) parts.push('email sent');
+    responseMessage.value = `${parts.join(' · ')}.`;
+
+    if (options.email && !result.email_sent) {
+      responseError.value = result.email_error || 'Email was not sent';
+    }
   } catch (e: any) {
-    alert(e?.data?.message || 'Failed to save response');
+    alert(e?.data?.message || e?.statusMessage || 'Failed to save response');
   } finally {
     savingResponse.value = false;
   }
-}
-
-function openMailto() {
-  if (!item.value?.contact?.email || !draftResponse.value.trim()) return;
-  const subject = encodeURIComponent(
-    `Re: ${item.value.subject || 'BetterSEQTA+ feedback'} [${item.value.id}]`
-  );
-  const body = encodeURIComponent(
-    `Hi${item.value.contact.name ? ` ${item.value.contact.name}` : ''},\n\n${draftResponse.value.trim()}\n\n— BetterSEQTA+ team\nReference: ${item.value.id}`
-  );
-  window.open(`mailto:${item.value.contact.email}?subject=${subject}&body=${body}`, '_blank');
 }
 
 async function copyResponse() {

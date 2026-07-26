@@ -128,11 +128,28 @@ UI: [`/admin/feedback`](https://betterseqta.org/admin/feedback) (requires `admin
 - `GET /api/bsplus/feedback` — query: `status`, `category`, `installId`, `from`, `to`, `q`, `cursor`, `limit`
 - `GET /api/bsplus/feedback/stats` — open/received/awaiting-reply counts
 - `GET /api/bsplus/feedback/:id`
-- `PATCH /api/bsplus/feedback/:id` — body: `{ "status", "internal_notes", "admin_response" }`
+- `POST /api/bsplus/feedback/notify-admins` — send admin digest now (admin or `cf-cron: true`)
+- `PATCH /api/bsplus/feedback/:id` — body: `{ "status", "internal_notes", "admin_response", "send_email" }`
 
 Statuses: `received` → `triaged` → `in_progress` → `resolved` → `wontfix` → `spam`.
 
-Saving `admin_response` records `responded_at` / `responded_by`. Outbound email is not sent by the API yet — the admin UI opens a `mailto:` draft when contact details were opted in.
+### Email (BetterSEQTA Mail API)
+
+Env / Worker secrets:
+
+| Variable | Purpose |
+|----------|---------|
+| `BS_MAIL_API_KEY` | Bearer key (`bsm_…`) for `mail.internal.betterseqta.org` |
+| `BS_MAIL_FROM` | Allowed sender, e.g. `feedback@betterseqta.org` |
+| `BS_MAIL_API_URL` | Optional override (default `https://mail.internal.betterseqta.org`) |
+
+- **User replies:** `PATCH` with `admin_response` + `send_email: true` emails the opted-in contact address and sets `response_emailed_at`.
+- **Admin digests:** Wrangler cron `0 2 * * *` runs Nitro task `daily-maintenance`, which emails all accounts admins (`admin_level >= 1`) about unnotified submissions and sets `admin_notified_at`.
+
+```bash
+# Manually trigger digest (admin session)
+curl -X POST 'https://betterseqta.org/api/bsplus/feedback/notify-admins' -H 'Cookie: …'
+```
 
 ## Database
 
@@ -140,12 +157,21 @@ Migrations:
 
 - `server/database/migrations/012_feedback_submissions.sql`
 - `server/database/migrations/013_feedback_admin_response.sql`
+- `server/database/migrations/014_feedback_mail_tracking.sql`
 
 Apply with Wrangler:
 
 ```bash
 pnpm exec wrangler d1 execute bsplus-db --remote --file=server/database/migrations/012_feedback_submissions.sql
 pnpm exec wrangler d1 execute bsplus-db --remote --file=server/database/migrations/013_feedback_admin_response.sql
+pnpm exec wrangler d1 execute bsplus-db --remote --file=server/database/migrations/014_feedback_mail_tracking.sql
+```
+
+Set Worker secrets (production):
+
+```bash
+pnpm exec wrangler secret put BS_MAIL_API_KEY
+pnpm exec wrangler secret put BS_MAIL_FROM
 ```
 
 For local D1, omit `--remote` (or use your usual local execute flow).

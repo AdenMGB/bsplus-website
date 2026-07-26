@@ -14,29 +14,39 @@
             Triage BetterSEQTA+ bug reports, feature requests, and questions
           </p>
         </div>
-        <button
-          type="button"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-          :disabled="pending"
-          @click="refreshAll"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-5 w-5"
-            :class="pending ? 'animate-spin' : ''"
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-600/10 px-4 py-2 text-sm font-medium text-amber-300 transition-all duration-200 hover:scale-105 hover:bg-amber-600/20 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50"
+            :disabled="notifying"
+            @click="notifyAdminsNow"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-          Refresh
-        </button>
+            {{ notifying ? 'Sending digest...' : 'Send admin digest' }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            :disabled="pending"
+            @click="refreshAll"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-5 w-5"
+              :class="pending ? 'animate-spin' : ''"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+            Refresh
+          </button>
+        </div>
       </div>
 
       <!-- Summary cards -->
@@ -280,6 +290,7 @@ const nextCursor = ref<string | null>(null);
 const pending = ref(true);
 const loadingMore = ref(false);
 const updatingId = ref<string | null>(null);
+const notifying = ref(false);
 
 const { data: stats, refresh: refreshStats } = await useFetch<FeedbackStats>(
   '/api/bsplus/feedback/stats',
@@ -346,6 +357,29 @@ function loadMore() {
 
 async function refreshAll() {
   await Promise.all([fetchPage(false), refreshStats()]);
+}
+
+async function notifyAdminsNow() {
+  notifying.value = true;
+  try {
+    const result = await $fetch<{
+      notified: number;
+      admins: number;
+      skipped: boolean;
+      reason?: string;
+    }>('/api/bsplus/feedback/notify-admins', { method: 'POST' });
+
+    if (result.skipped) {
+      alert(result.reason || 'No digest sent');
+    } else {
+      alert(`Digest sent to ${result.admins} admin(s) covering ${result.notified} item(s).`);
+    }
+    await refreshStats();
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to send digest');
+  } finally {
+    notifying.value = false;
+  }
 }
 
 async function quickStatus(item: FeedbackItem, status: string) {

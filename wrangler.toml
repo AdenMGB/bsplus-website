@@ -48,6 +48,6 @@ bucket_name = "bsplus-images"
 binding = "bs-ai"
 remote = true
 
-# Cron Triggers
+# Cron Triggers — must match nuxt.config nitro.scheduledTasks
 [triggers]
-crons = ["0 2 * * *"]  # Daily at 2 AM UTC (questionnaire cleanup + theme stats recalculation)
+crons = ["0 2 * * *"]  # Daily 02:00 UTC: cleanup + theme stats + admin feedback digest

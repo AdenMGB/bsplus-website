@@ -26,15 +26,16 @@ export interface AccountsUserInfo {
   [key: string]: any;
 }
 
-function getCloudflareEnv(event: H3Event) {
+function getCloudflareEnv(event?: H3Event | null) {
   return (
-    (event as any).context?.cloudflare?.env ??
-    (event as any).req?.runtime?.cloudflare?.env ??
+    (event as any)?.context?.cloudflare?.env ??
+    (event as any)?.req?.runtime?.cloudflare?.env ??
+    (globalThis as any).__env__ ??
     null
   );
 }
 
-export function getAccountsApiCredentials(event: H3Event): AccountsCredentials {
+export function getAccountsApiCredentials(event?: H3Event | null): AccountsCredentials {
   const cfEnv = getCloudflareEnv(event);
 
   const apiKey =
@@ -42,7 +43,13 @@ export function getAccountsApiCredentials(event: H3Event): AccountsCredentials {
     cfEnv?.NUXT_ACCOUNTS_API_KEY ??
     process.env.ACCOUNTS_API_KEY ??
     process.env.NUXT_ACCOUNTS_API_KEY ??
-    (useRuntimeConfig().accountsApiKey as string) ??
+    (() => {
+      try {
+        return useRuntimeConfig(event as H3Event).accountsApiKey as string;
+      } catch {
+        return '';
+      }
+    })() ??
     '';
 
   const url =
@@ -50,7 +57,13 @@ export function getAccountsApiCredentials(event: H3Event): AccountsCredentials {
     cfEnv?.NUXT_ACCOUNTS_API_URL ??
     process.env.ACCOUNTS_API_URL ??
     process.env.NUXT_ACCOUNTS_API_URL ??
-    (useRuntimeConfig().accountsApiUrl as string) ??
+    (() => {
+      try {
+        return useRuntimeConfig(event as H3Event).accountsApiUrl as string;
+      } catch {
+        return 'https://accounts.betterseqta.org';
+      }
+    })() ??
     'https://accounts.betterseqta.org';
 
   return {

@@ -499,6 +499,12 @@ export function mapFeedbackRow(row: Record<string, any>, options: { includeUserA
     admin_response: row.admin_response ?? null,
     responded_at: row.responded_at ? toIsoTimestamp(row.responded_at) : null,
     responded_by: row.responded_by ?? null,
+    response_emailed_at: row.response_emailed_at
+      ? toIsoTimestamp(row.response_emailed_at)
+      : null,
+    admin_notified_at: row.admin_notified_at
+      ? toIsoTimestamp(row.admin_notified_at)
+      : null,
     created_at: toIsoTimestamp(row.created_at),
     updated_at: toIsoTimestamp(row.updated_at),
   };

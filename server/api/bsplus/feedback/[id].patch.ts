@@ -1,6 +1,7 @@
 /**
  * PATCH /api/bsplus/feedback/:id
  * Admin triage update (status / notes / response).
+ * Set `send_email: true` with `admin_response` to email the user via BS Mail API.
  */
 import { getDB } from '../../../utils/db';
 import { requireAdmin } from '../../../utils/auth';
@@ -9,6 +10,7 @@ import {
   mapFeedbackRow,
   type FeedbackStatus,
 } from '../../../utils/feedback';
+import { sendFeedbackReplyEmail } from '../../../utils/feedback-mail';
 
 export default defineEventHandler(async (event) => {
   const admin = await requireAdmin(event);
@@ -25,6 +27,7 @@ export default defineEventHandler(async (event) => {
 
   const updates: string[] = [];
   const params: unknown[] = [];
+  const sendEmail = body.send_email === true;
 
   if (body.status !== undefined) {
     if (
@@ -57,6 +60,7 @@ export default defineEventHandler(async (event) => {
     params.push(body.internal_notes);
   }
 
+  let responseText: string | null = null;
   if (body.admin_response !== undefined) {
     if (body.admin_response !== null && typeof body.admin_response !== 'string') {
       throw createError({
@@ -77,14 +81,16 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    updates.push('admin_response = ?');
-    params.push(
-      typeof body.admin_response === 'string' ? body.admin_response.trim() : null
-    );
+    responseText =
+      typeof body.admin_response === 'string' ? body.admin_response.trim() : null;
 
-    if (body.admin_response === null) {
+    updates.push('admin_response = ?');
+    params.push(responseText);
+
+    if (responseText === null) {
       updates.push('responded_at = NULL');
       updates.push('responded_by = NULL');
+      updates.push('response_emailed_at = NULL');
     } else {
       updates.push('responded_at = unixepoch()');
       updates.push('responded_by = ?');
@@ -92,37 +98,88 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (updates.length === 0) {
+  if (updates.length === 0 && !sendEmail) {
     throw createError({
       statusCode: 400,
-      message: 'No fields to update. Provide status, internal_notes, and/or admin_response.',
+      message:
+        'No fields to update. Provide status, internal_notes, admin_response, and/or send_email.',
     });
   }
 
-  updates.push('updated_at = unixepoch()');
+  if (updates.length > 0) {
+    updates.push('updated_at = unixepoch()');
+  }
+
   const db = getDB(event);
 
   try {
     const existing = await db
-      .prepare('SELECT id FROM feedback_submissions WHERE id = ? LIMIT 1')
+      .prepare('SELECT * FROM feedback_submissions WHERE id = ? LIMIT 1')
       .bind(id)
-      .first();
+      .first<Record<string, any>>();
 
     if (!existing) {
       throw createError({ statusCode: 404, message: 'Feedback not found' });
     }
 
-    await db
-      .prepare(`UPDATE feedback_submissions SET ${updates.join(', ')} WHERE id = ?`)
-      .bind(...params, id)
-      .run();
+    if (updates.length > 0) {
+      await db
+        .prepare(`UPDATE feedback_submissions SET ${updates.join(', ')} WHERE id = ?`)
+        .bind(...params, id)
+        .run();
+    }
+
+    let emailSent = false;
+    let emailError: string | null = null;
+
+    if (sendEmail) {
+      const latest = await db
+        .prepare('SELECT * FROM feedback_submissions WHERE id = ? LIMIT 1')
+        .bind(id)
+        .first<Record<string, any>>();
+
+      const replyText = responseText || latest?.admin_response;
+      if (!replyText) {
+        throw createError({
+          statusCode: 400,
+          message: 'admin_response is required when send_email is true',
+        });
+      }
+
+      try {
+        const result = await sendFeedbackReplyEmail(
+          latest as any,
+          replyText,
+          event
+        );
+        if (result.sent) {
+          emailSent = true;
+          await db
+            .prepare(
+              `UPDATE feedback_submissions
+               SET response_emailed_at = unixepoch(), updated_at = unixepoch()
+               WHERE id = ?`
+            )
+            .bind(id)
+            .run();
+        } else {
+          emailError = result.reason || 'Email was not sent';
+        }
+      } catch (e: any) {
+        emailError = e?.statusMessage || e?.message || 'Failed to send email';
+      }
+    }
 
     const row = await db
       .prepare('SELECT * FROM feedback_submissions WHERE id = ? LIMIT 1')
       .bind(id)
       .first<Record<string, any>>();
 
-    return mapFeedbackRow(row!, { includeUserAgent: true });
+    return {
+      ...mapFeedbackRow(row!, { includeUserAgent: true }),
+      email_sent: emailSent,
+      email_error: emailError,
+    };
   } catch (e: any) {
     if (e.statusCode) throw e;
     throw createError({
