@@ -18,6 +18,12 @@ export default defineNuxtConfig({
     oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
     accountsApiKey: process.env.ACCOUNTS_API_KEY ?? '',
     accountsApiUrl: process.env.ACCOUNTS_API_URL ?? 'https://accounts.betterseqta.org',
+    /** Salt for hashing client IPs on feedback submissions (abuse limits only). */
+    feedbackIpSalt: process.env.FEEDBACK_IP_SALT ?? 'bsplus-feedback-ip-salt-v1',
+    /** BetterSEQTA Mail API (https://mail.internal.betterseqta.org) */
+    bsMailApiKey: process.env.BS_MAIL_API_KEY ?? '',
+    bsMailFrom: process.env.BS_MAIL_FROM ?? '',
+    bsMailApiUrl: process.env.BS_MAIL_API_URL ?? 'https://mail.internal.betterseqta.org',
     public: {
       siteUrl: 'https://betterseqta.org',
     },
@@ -51,6 +57,13 @@ export default defineNuxtConfig({
       preset: "cloudflare-module",
       minify: true,
       compressPublicAssets: true,
+      experimental: {
+        tasks: true,
+      },
+      // Must match wrangler.toml [triggers].crons
+      scheduledTasks: {
+        "0 2 * * *": ["daily-maintenance"],
+      },
       prerender: {
         crawlLinks: false, // DB binding unavailable at build time; render at runtime on CF Workers
       },
