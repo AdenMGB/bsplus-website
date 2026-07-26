@@ -6,7 +6,7 @@
           <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400">Legal</p>
           <h2 class="mt-2 text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white font-display">Privacy Policy</h2>
           <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300">
-            Last updated: December 1, 2025
+            Last updated: July 26, 2026
           </p>
         </div>
       </RevealOnScroll>
@@ -83,26 +83,37 @@
           <strong>DesQTA Anonymous Usage Statistics:</strong> DesQTA collects completely anonymous statistics about how many times the application is used. Each time DesQTA is opened, it sends a single, anonymous session count to our servers. This data is completely anonymous and contains no personal information, user identifiers, or any data that could be used to identify individual users. We use this aggregated data solely to understand overall usage patterns and improve the application.
         </p>
 
-        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">6. Third-Party Services</h3>
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">6. Extension Feedback</h3>
+        <p class="mt-4 sm:mt-6">
+          BetterSEQTA+ may offer an optional in-extension feedback form so you can report bugs, request features, or send comments. Submissions are sent to our servers at betterseqta.org.
+        </p>
+        <ul role="list" class="mt-3 sm:mt-4 space-y-2 list-disc list-inside pl-4">
+          <li><strong>Anonymous by default:</strong> Feedback is correlated only with a random install identifier stored locally in your browser, plus technical metadata such as extension version, browser, and operating system.</li>
+          <li><strong>Optional contact details:</strong> Name and email are stored only if you explicitly choose to include them.</li>
+          <li><strong>Optional school instance details:</strong> Your SEQTA hostname (for example, <code class="text-zinc-200">learn.exampleschool.edu.au</code>) is stored only if you explicitly opt in. We do not collect cookies, session tokens, student IDs, marks, or lesson content through this form.</li>
+          <li>We use this information solely to triage and respond to feedback. Contact details are treated as personal data and are not sold or used for marketing.</li>
+        </ul>
+
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">7. Third-Party Services</h3>
         <p class="mt-4 sm:mt-6">
           Our website and Service may contain links to external sites (such as GitHub or Discord) that are not operated by us. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
         </p>
 
-        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">7. Data Security</h3>
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">8. Data Security</h3>
         <p class="mt-4 sm:mt-6">
-          Since BetterSEQTA+ does not store your personal data on our servers, the security of your data is primarily dependent on:
+          BetterSEQTA+ does not store your school login credentials or academic records on our servers. Aside from optional feedback details you choose to submit (see section 6), the security of your school data is primarily dependent on:
         </p>
         <ul role="list" class="mt-3 sm:mt-4 space-y-2 list-disc list-inside pl-4">
           <li>The security of your own device and browser.</li>
           <li>The security measures implemented by your school's SEQTA installation.</li>
         </ul>
 
-        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">8. Changes to This Policy</h3>
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">9. Changes to This Policy</h3>
         <p class="mt-4 sm:mt-6">
           We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
         </p>
 
-        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">9. Contact Us</h3>
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">10. Contact Us</h3>
         <p class="mt-4 sm:mt-6">
           If you have any questions about this Privacy Policy, please contact us via our
           <a href="https://discord.gg/nv6YSjpEM4" class="text-green-400 hover:text-green-300 underline">Discord server</a>.

@@ -25,6 +25,9 @@
           <NuxtLink to="/admin/theme-of-the-month" class="inline-flex items-center gap-2 rounded-lg bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 px-3 py-2 text-sm font-medium text-pink-400 transition-all duration-200 hover:scale-105">
             Theme of the Month
           </NuxtLink>
+          <NuxtLink to="/admin/feedback" class="inline-flex items-center gap-2 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 px-3 py-2 text-sm font-medium text-amber-400 transition-all duration-200 hover:scale-105">
+            Feedback
+          </NuxtLink>
         </div>
       </div>
 
@@ -38,7 +41,7 @@
           </svg>
           Loading stats...
         </div>
-        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
+        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 mb-8">
         <!-- Stats Cards -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Themes</dt>
@@ -46,6 +49,17 @@
           <dd class="mt-1 text-sm text-zinc-500">{{ stats.themes?.pending || 0 }} pending</dd>
           <NuxtLink to="/admin/themes" class="mt-4 inline-flex items-center gap-2 rounded-md bg-purple-600/10 hover:bg-purple-600/20 border border-purple-600/20 hover:border-purple-600/40 px-3 py-1.5 text-xs font-medium text-purple-400 transition-all hover:scale-105">
             Manage Themes
+          </NuxtLink>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-amber-500/20 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">Extension Feedback</dt>
+          <dd class="mt-2 text-3xl font-bold tracking-tight text-amber-400">{{ feedbackStats?.open ?? 0 }}</dd>
+          <dd class="mt-1 text-sm text-zinc-500">
+            {{ feedbackStats?.received ?? 0 }} new · {{ feedbackStats?.awaiting_reply ?? 0 }} awaiting reply
+          </dd>
+          <NuxtLink to="/admin/feedback" class="mt-4 inline-flex items-center gap-2 rounded-md bg-amber-600/10 hover:bg-amber-600/20 border border-amber-600/20 hover:border-amber-600/40 px-3 py-1.5 text-xs font-medium text-amber-400 transition-all hover:scale-105">
+            Triage Feedback
           </NuxtLink>
         </div>
 
@@ -405,6 +419,7 @@ const { data: usageData, pending: usageLoading } = useLazyFetch<any>('/api/analy
 const { data: questions, refresh: refreshQuestions, pending: questionsLoading } = useLazyFetch<any[]>('/api/questionnaire?admin=true');
 const { data: themesData, pending: themesLoading } = useLazyFetch<any>('/api/admin/themes');
 const { data: collectionsData, pending: collectionsLoading } = useLazyFetch<any>('/api/admin/collections');
+const { data: feedbackStats, pending: feedbackLoading } = useLazyFetch<any>('/api/bsplus/feedback/stats');
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -438,7 +453,11 @@ const recentCollections = computed(() => {
 const usageSummary = computed(() => usageData.value?.summary || {});
 
 const overviewLoading = computed(() =>
-  statsLoading.value || usageLoading.value || themesLoading.value || collectionsLoading.value
+  statsLoading.value ||
+  usageLoading.value ||
+  themesLoading.value ||
+  collectionsLoading.value ||
+  feedbackLoading.value
 );
 
 const stats = computed(() => {
