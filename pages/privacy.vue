@@ -6,7 +6,7 @@
           <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400">Legal</p>
           <h2 class="mt-2 text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white font-display">Privacy Policy</h2>
           <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300">
-            Last updated: July 26, 2026
+            Last updated: July 27, 2026
           </p>
         </div>
       </RevealOnScroll>
