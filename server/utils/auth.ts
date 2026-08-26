@@ -16,6 +16,21 @@ function authHeaders(event: H3Event): Record<string, string> {
   return headers;
 }
 
+export async function requireAuth(event: H3Event): Promise<UserInfo> {
+  const user = await $fetch<UserInfo>('/api/auth/me', {
+    headers: authHeaders(event)
+  }).catch(() => null);
+
+  if (!user?.id) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized - valid authentication required'
+    });
+  }
+
+  return user;
+}
+
 export async function requireAdmin(event: H3Event): Promise<UserInfo> {
   const user = await $fetch<UserInfo>('/api/auth/me', {
     headers: authHeaders(event)
