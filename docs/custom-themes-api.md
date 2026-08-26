@@ -86,7 +86,7 @@ Approved themes cannot be edited in v1 — owners must delete and re-submit.
 | Rule | Limit |
 |------|-------|
 | Concurrent pending submissions per user | **5** |
-| New uploads per 24 hours per user | **10** (tracked in `custom_theme_upload_log`) |
+| New uploads per 24 hours per user | **10** (count of `custom_themes` rows created in the last 24 hours for that user) |
 
 Re-uploading files on an existing theme (`POST …/mine/[id]/files`) does not create a new upload-log row and does not count toward the 24h limit. File replacement still checks the pending cap.
 
@@ -120,7 +120,7 @@ pnpm cf:dev
 ```
 
 Schema file: `server/database/user-themes/schema.sql`  
-Tables: `custom_themes`, `custom_theme_files`, `custom_theme_upload_log`
+Tables: `custom_themes`, `custom_theme_files` (`custom_theme_upload_log` exists for legacy deployments but is no longer written to)
 
 Theme assets are stored in the existing R2 `BUCKET` under keys like `custom-themes/{theme_id}/theme.json`.
 
@@ -155,7 +155,7 @@ Paginated list of approved custom themes.
 | `page` | `1` | 1-based |
 | `limit` | `20` | Max 100 |
 | `type` | — | `betterseqta` or `desqta` |
-| `search` | — | Matches name, description, author |
+| `search` | — | Matches name, description, author (alias: `q`) |
 | `sort` | `popular` | `popular`, `newest`, `name` |
 
 **Response:**
@@ -424,7 +424,9 @@ Delete own theme and all R2 assets. Allowed for any status.
 
 ## Admin moderation (admin required)
 
-No admin UI ships with v1 — use these API routes directly (e.g. curl with admin session cookie).
+**Admin UI:** [`/admin/custom-themes`](https://betterseqta.org/admin/custom-themes) — list pending submissions, review detail, approve/reject (requires `admin_level >= 1`).
+
+API routes (also used by the admin UI):
 
 ### `GET /api/admin/custom-themes`
 
@@ -437,6 +439,7 @@ List submissions for triage.
 | `author_id` | Filter by submitter Accounts user ID |
 | `search` | Name, description, author |
 | `type` | `betterseqta` or `desqta` |
+| `include_counts` | Optional. `1` / `true` adds `counts: { pending, approved, rejected }` |
 
 Returns owner-shaped theme objects (includes status, rejection fields).
 

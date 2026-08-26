@@ -1,9 +1,9 @@
 import { requireAuth } from '../../../utils/auth';
 import { getUserThemesDB } from '../../../utils/userThemesDb';
 import {
-  buildCustomThemeListQuery,
   createApiEnvelope,
   formatCustomThemeOwner,
+  listCustomThemes,
   type CustomThemeStatus
 } from '../../../utils/customThemes';
 
@@ -28,39 +28,18 @@ export default defineEventHandler(async (event) => {
       ? (query.status as CustomThemeStatus)
       : undefined;
 
-  const { whereClause, orderBy, bindings, offset, limit: pageLimit } =
-    buildCustomThemeListQuery({
+  const listed = await listCustomThemes(
+    db,
+    {
       authorId: user.id,
       status: statusFilter,
       themeType: query.type,
       sort: 'newest',
       page,
       limit
-    });
+    },
+    formatCustomThemeOwner
+  );
 
-  const countRow = await db
-    .prepare(`SELECT COUNT(*) as total FROM custom_themes ${whereClause}`)
-    .bind(...bindings)
-    .first<{ total: number }>();
-
-  const total = countRow?.total ?? 0;
-
-  const rows = await db
-    .prepare(
-      `SELECT * FROM custom_themes ${whereClause} ORDER BY ${orderBy} LIMIT ? OFFSET ?`
-    )
-    .bind(...bindings, pageLimit, offset)
-    .all<Record<string, unknown>>();
-
-  const themes = (rows.results ?? []).map(formatCustomThemeOwner);
-
-  return createApiEnvelope({
-    themes,
-    pagination: {
-      page,
-      limit: pageLimit,
-      total,
-      total_pages: Math.ceil(total / pageLimit)
-    }
-  });
+  return createApiEnvelope(listed);
 });

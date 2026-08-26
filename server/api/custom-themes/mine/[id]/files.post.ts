@@ -40,7 +40,9 @@ export default defineEventHandler(async (event) => {
   const { themeFiles, submissionNotes } = await parseMultipartThemeFiles(event);
   const result = await processCustomThemeUpload(event, themeFiles, {
     author: user,
-    submissionNotes: submissionNotes ?? theme.submission_notes ?? undefined,
+    submissionNotes:
+      submissionNotes ??
+      (typeof theme.submission_notes === 'string' ? theme.submission_notes : undefined),
     replaceThemeId: id
   });
 

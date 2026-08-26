@@ -331,3 +331,273 @@ export function mergeThemeFileMaps(
   }
   return merged;
 }
+
+export interface ParsedThemeUpload {
+  themeFiles: Map<string, ArrayBuffer>;
+  submissionNotes?: string;
+  pseudoThemeRequested?: boolean;
+  externalThemeJsonUrl?: string;
+}
+
+/** Parse multipart theme upload (ZIP or loose files). Shared by admin and custom-theme uploads. */
+export async function parseThemeUploadMultipart(
+  event: H3Event,
+  options?: { readAdminFields?: boolean }
+): Promise<ParsedThemeUpload> {
+  const formData = await readMultipartFormData(event);
+  if (!formData || formData.length === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No files uploaded'
+    });
+  }
+
+  const getMultipartText = (name: string): string | undefined => {
+    const part = formData.find((p) => p.name === name && !p.filename);
+    if (!part?.data) return undefined;
+    return new TextDecoder().decode(part.data).trim();
+  };
+
+  const submissionNotes = getMultipartText('submission_notes');
+  let pseudoThemeRequested: boolean | undefined;
+  let externalThemeJsonUrl: string | undefined;
+
+  if (options?.readAdminFields) {
+    pseudoThemeRequested = ['1', 'true', 'on', 'yes'].includes(
+      (getMultipartText('pseudo_theme') ?? '').toLowerCase()
+    );
+    externalThemeJsonUrl = getMultipartText('external_theme_json_url');
+  }
+
+  let zipFile: { filename?: string; data: Uint8Array } | null = null;
+  const themeFiles = new Map<string, ArrayBuffer>();
+
+  for (const part of formData) {
+    if (
+      (part.name === 'theme_zip' || part.name === 'theme_folder') &&
+      part.filename?.endsWith('.zip')
+    ) {
+      zipFile = part;
+    } else if (part.filename) {
+      const path = part.name || part.filename;
+      themeFiles.set(path, new Uint8Array(part.data).buffer);
+    }
+  }
+
+  if (zipFile) {
+    try {
+      const extracted = await extractZipToMap(new Uint8Array(zipFile.data).buffer);
+      for (const [path, data] of extracted) {
+        themeFiles.set(path, data);
+      }
+    } catch (error: unknown) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Failed to extract ZIP: ${error instanceof Error ? error.message : 'Unknown error'}`
+      });
+    }
+  }
+
+  if (themeFiles.size === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No theme files found in upload'
+    });
+  }
+
+  return {
+    themeFiles,
+    submissionNotes,
+    pseudoThemeRequested,
+    externalThemeJsonUrl
+  };
+}
+
+export interface ThemeStorageLayout {
+  /** R2 key prefix without trailing slash, e.g. `themes/abc` or `custom-themes/abc` */
+  r2BaseKey: string;
+  siteUrl: string;
+  /** Full public URL for theme.json, e.g. https://…/api/themes/abc/theme.json */
+  themeJsonUrl: string;
+  /** When true, asset URLs are `/api/images/...` (official store). Default false = absolute URLs. */
+  relativeImageUrls?: boolean;
+}
+
+export function themeStorageLayout(
+  storageRoot: 'themes' | 'custom-themes',
+  themeId: string,
+  siteUrl: string,
+  jsonApiSegment: 'themes' | 'custom-themes',
+  options?: { relativeImageUrls?: boolean }
+): ThemeStorageLayout {
+  const base = `${storageRoot}/${themeId}`;
+  return {
+    r2BaseKey: base,
+    siteUrl,
+    themeJsonUrl: `${siteUrl}/api/${jsonApiSegment}/${themeId}/theme.json`,
+    relativeImageUrls: options?.relativeImageUrls
+  };
+}
+
+function imagePublicUrl(siteUrl: string, r2Key: string, relative = false): string {
+  return relative ? `/api/images/${r2Key}` : `${siteUrl}/api/images/${r2Key}`;
+}
+
+export interface BetterSeqtaAssetUploadResult {
+  themeJsonUrl: string;
+  coverImageUrl: string | null;
+  marqueeImageUrl: string | null;
+  isPseudoTheme: boolean;
+}
+
+/** Upload BetterSEQTA theme.json and optional banner/marquee images to R2. */
+export async function uploadBetterSeqtaThemeAssets(
+  bucket: any,
+  themeId: string,
+  themeFiles: Map<string, ArrayBuffer>,
+  layout: ThemeStorageLayout,
+  options?: {
+    themeJsonContent?: string;
+    pseudoExternalUrl?: string | null;
+  }
+): Promise<BetterSeqtaAssetUploadResult> {
+  const themeJsonPath =
+    Array.from(themeFiles.keys()).find((k) => k.endsWith('/theme.json')) ?? 'theme.json';
+  const themeJsonContent =
+    options?.themeJsonContent ?? new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
+
+  let themeJsonUrl = layout.themeJsonUrl;
+  let isPseudoTheme = false;
+
+  if (options?.pseudoExternalUrl) {
+    themeJsonUrl = options.pseudoExternalUrl;
+    isPseudoTheme = true;
+  } else {
+    const themeJsonKey = `${layout.r2BaseKey}/theme.json`;
+    await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
+      httpMetadata: { contentType: 'application/json' }
+    });
+  }
+
+  let coverImageUrl: string | null = null;
+  let marqueeImageUrl: string | null = null;
+
+  const bannerEntry = Array.from(themeFiles.entries()).find(
+    ([p]) => p.includes('images/banner.webp') || p.includes('banner.webp')
+  );
+  if (bannerEntry) {
+    const bannerKey = `${layout.r2BaseKey}/images/banner.webp`;
+    await bucket.put(bannerKey, bannerEntry[1], {
+      httpMetadata: { contentType: 'image/webp' }
+    });
+    coverImageUrl = imagePublicUrl(layout.siteUrl, bannerKey, layout.relativeImageUrls);
+  }
+
+  const marqueeEntry = Array.from(themeFiles.entries()).find(
+    ([p]) => p.includes('images/marquee.webp') || p.includes('marquee.webp')
+  );
+  if (marqueeEntry) {
+    const marqueeKey = `${layout.r2BaseKey}/images/marquee.webp`;
+    await bucket.put(marqueeKey, marqueeEntry[1], {
+      httpMetadata: { contentType: 'image/webp' }
+    });
+    marqueeImageUrl = imagePublicUrl(layout.siteUrl, marqueeKey, layout.relativeImageUrls);
+  }
+
+  return { themeJsonUrl, coverImageUrl, marqueeImageUrl, isPseudoTheme };
+}
+
+export interface DesqtaAssetUploadResult {
+  previewUrl: string | null;
+  screenshotUrls: string[];
+  zipUrl: string;
+  zipSize: number;
+  zipChecksum: string;
+  /** R2 keys written (for optional file tracking) */
+  r2Keys: Array<{ path: string; key: string; fileType: string; size: number; mimeType?: string; checksum?: string }>;
+}
+
+/** Upload DesQTA preview, screenshots, and rebuilt ZIP to R2. */
+export async function uploadDesqtaThemeAssets(
+  bucket: any,
+  themeId: string,
+  themeSlug: string,
+  themeFiles: Map<string, ArrayBuffer>,
+  layout: ThemeStorageLayout
+): Promise<DesqtaAssetUploadResult> {
+  const r2Keys: DesqtaAssetUploadResult['r2Keys'] = [];
+  let previewUrl: string | null = null;
+
+  const previewPaths = ['preview.png', 'preview.jpg', 'preview.jpeg'];
+  for (const path of previewPaths) {
+    const entry = Array.from(themeFiles.entries()).find(
+      ([p]) =>
+        p.includes(path) && (p.endsWith('.png') || p.endsWith('.jpg') || p.endsWith('.jpeg'))
+    );
+    if (entry) {
+      const previewKey = `${layout.r2BaseKey}/preview.png`;
+      await bucket.put(previewKey, entry[1], {
+        httpMetadata: { contentType: 'image/png' }
+      });
+      previewUrl = imagePublicUrl(layout.siteUrl, previewKey, layout.relativeImageUrls);
+      r2Keys.push({
+        path: entry[0],
+        key: previewKey,
+        fileType: 'preview',
+        size: entry[1].byteLength,
+        mimeType: 'image/png'
+      });
+      break;
+    }
+  }
+
+  const screenshotUrls: string[] = [];
+  let screenshotIndex = 1;
+  while (true) {
+    const screenshotPath = `screenshot${screenshotIndex}.png`;
+    const entry = Array.from(themeFiles.entries()).find(
+      ([p]) => p.includes(screenshotPath) || p.includes(`screenshot${screenshotIndex}.jpg`)
+    );
+    if (!entry) break;
+
+    const screenshotKey = `${layout.r2BaseKey}/screenshot${screenshotIndex}.png`;
+    await bucket.put(screenshotKey, entry[1], {
+      httpMetadata: { contentType: 'image/png' }
+    });
+    screenshotUrls.push(imagePublicUrl(layout.siteUrl, screenshotKey, layout.relativeImageUrls));
+    r2Keys.push({
+      path: entry[0],
+      key: screenshotKey,
+      fileType: 'screenshot',
+      size: entry[1].byteLength,
+      mimeType: 'image/png'
+    });
+    screenshotIndex++;
+  }
+
+  const zipBuffer = await createZipArchive(themeFiles, themeSlug);
+  const zipSize = zipBuffer.byteLength;
+  const zipChecksum = await calculateSHA256(zipBuffer);
+  const zipKey = `${layout.r2BaseKey}/theme.zip`;
+  await bucket.put(zipKey, zipBuffer, {
+    httpMetadata: { contentType: 'application/zip' }
+  });
+  const zipUrl = imagePublicUrl(layout.siteUrl, zipKey, layout.relativeImageUrls);
+  r2Keys.push({
+    path: 'theme.zip',
+    key: zipKey,
+    fileType: 'zip',
+    size: zipSize,
+    mimeType: 'application/zip',
+    checksum: `sha256:${zipChecksum}`
+  });
+
+  return {
+    previewUrl,
+    screenshotUrls,
+    zipUrl,
+    zipSize,
+    zipChecksum,
+    r2Keys
+  };
+}

@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     .bind(id)
     .run();
 
-  const newCount = (theme.download_count ?? 0) + 1;
+  const newCount = Number(theme.download_count ?? 0) + 1;
 
   if (theme.theme_type === 'betterseqta') {
     return createApiEnvelope({

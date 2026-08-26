@@ -1,9 +1,10 @@
 import { requireAdmin } from '../../../utils/auth';
 import { getUserThemesDB } from '../../../utils/userThemesDb';
 import {
-  buildCustomThemeListQuery,
   createApiEnvelope,
   formatCustomThemeOwner,
+  getCustomThemeStatusCounts,
+  listCustomThemes,
   type CustomThemeStatus
 } from '../../../utils/customThemes';
 
@@ -14,6 +15,7 @@ interface AdminQuery {
   author_id?: string;
   search?: string;
   type?: string;
+  include_counts?: string;
 }
 
 export default defineEventHandler(async (event) => {
@@ -30,8 +32,9 @@ export default defineEventHandler(async (event) => {
       ? (query.status as CustomThemeStatus)
       : undefined;
 
-  const { whereClause, orderBy, bindings, offset, limit: pageLimit } =
-    buildCustomThemeListQuery({
+  const listed = await listCustomThemes(
+    db,
+    {
       status: statusFilter,
       authorId: query.author_id,
       themeType: query.type,
@@ -39,31 +42,15 @@ export default defineEventHandler(async (event) => {
       sort: 'newest',
       page,
       limit
-    });
+    },
+    formatCustomThemeOwner
+  );
 
-  const countRow = await db
-    .prepare(`SELECT COUNT(*) as total FROM custom_themes ${whereClause}`)
-    .bind(...bindings)
-    .first<{ total: number }>();
+  const includeCounts = ['1', 'true', 'yes'].includes((query.include_counts ?? '').toLowerCase());
+  const data: Record<string, unknown> = { ...listed };
+  if (includeCounts) {
+    data.counts = await getCustomThemeStatusCounts(db);
+  }
 
-  const total = countRow?.total ?? 0;
-
-  const rows = await db
-    .prepare(
-      `SELECT * FROM custom_themes ${whereClause} ORDER BY ${orderBy} LIMIT ? OFFSET ?`
-    )
-    .bind(...bindings, pageLimit, offset)
-    .all<Record<string, unknown>>();
-
-  const themes = (rows.results ?? []).map(formatCustomThemeOwner);
-
-  return createApiEnvelope({
-    themes,
-    pagination: {
-      page,
-      limit: pageLimit,
-      total,
-      total_pages: Math.ceil(total / pageLimit)
-    }
-  });
+  return createApiEnvelope(data);
 });

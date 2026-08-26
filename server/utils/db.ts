@@ -1,21 +1,24 @@
-export const getDB = (event: any): any => {
-  if (event?.context?.cloudflare?.env?.DB) {
-    return event.context.cloudflare.env.DB;
+export function getCloudflareBinding(event: any, bindingName: string): any {
+  if (event?.context?.cloudflare?.env?.[bindingName]) {
+    return event.context.cloudflare.env[bindingName];
   }
 
-  // Nitro scheduled tasks pass cloudflare env on the task context.
-  if (event?.cloudflare?.env?.DB) {
-    return event.cloudflare.env.DB;
+  if (event?.cloudflare?.env?.[bindingName]) {
+    return event.cloudflare.env[bindingName];
   }
 
-  if (event?.DB) {
-    return event.DB;
+  if (event?.[bindingName]) {
+    return event[bindingName];
   }
 
   const globalEnv = (globalThis as any).__env__;
-  if (globalEnv?.DB) {
-    return globalEnv.DB;
+  if (globalEnv?.[bindingName]) {
+    return globalEnv[bindingName];
   }
 
-  throw new Error('Database binding not found. Ensure you are running with Wrangler or have the binding configured.');
-};
+  throw new Error(
+    `Database binding "${bindingName}" not found. Ensure you are running with Wrangler or have the binding configured.`
+  );
+}
+
+export const getDB = (event: any): any => getCloudflareBinding(event, 'DB');

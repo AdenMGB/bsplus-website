@@ -20,7 +20,7 @@ Users with a BetterSEQTA Accounts login can:
 
 **Out of scope for client v1:**
 
-- Admin moderation UI (use admin API + curl until `/admin/custom-themes` exists)
+- Admin moderation UI (available at `/admin/custom-themes` on betterseqta.org for staff)
 - Editing approved themes (must delete and re-submit)
 - Ratings, favorites, collections on custom themes
 - Mixing custom and official themes in one admin upload flow
