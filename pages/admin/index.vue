@@ -16,6 +16,9 @@
           <NuxtLink to="/admin/themes" class="inline-flex items-center gap-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 px-3 py-2 text-sm font-medium text-purple-400 transition-all duration-200 hover:scale-105">
             Themes
           </NuxtLink>
+          <NuxtLink to="/admin/custom-themes" class="inline-flex items-center gap-2 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 px-3 py-2 text-sm font-medium text-violet-400 transition-all duration-200 hover:scale-105">
+            Custom Themes
+          </NuxtLink>
           <NuxtLink to="/admin/collections" class="inline-flex items-center gap-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 px-3 py-2 text-sm font-medium text-blue-400 transition-all duration-200 hover:scale-105">
             Collections
           </NuxtLink>
@@ -41,7 +44,7 @@
           </svg>
           Loading stats...
         </div>
-        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 mb-8">
+        <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
         <!-- Stats Cards -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
           <dt class="text-sm font-medium leading-6 text-zinc-400">Themes</dt>
@@ -49,6 +52,15 @@
           <dd class="mt-1 text-sm text-zinc-500">{{ stats.themes?.pending || 0 }} pending</dd>
           <NuxtLink to="/admin/themes" class="mt-4 inline-flex items-center gap-2 rounded-md bg-purple-600/10 hover:bg-purple-600/20 border border-purple-600/20 hover:border-purple-600/40 px-3 py-1.5 text-xs font-medium text-purple-400 transition-all hover:scale-105">
             Manage Themes
+          </NuxtLink>
+        </div>
+
+        <div class="bg-zinc-900/50 border border-violet-500/20 rounded-2xl p-6 transition-all duration-200 hover:scale-[1.02]">
+          <dt class="text-sm font-medium leading-6 text-zinc-400">Custom Themes</dt>
+          <dd class="mt-2 text-3xl font-bold tracking-tight text-violet-400">{{ customThemeStats.pending ?? 0 }}</dd>
+          <dd class="mt-1 text-sm text-zinc-500">{{ customThemeStats.approved ?? 0 }} approved · user submissions</dd>
+          <NuxtLink to="/admin/custom-themes" class="mt-4 inline-flex items-center gap-2 rounded-md bg-violet-600/10 hover:bg-violet-600/20 border border-violet-600/20 hover:border-violet-600/40 px-3 py-1.5 text-xs font-medium text-violet-400 transition-all hover:scale-105">
+            Review Submissions
           </NuxtLink>
         </div>
 
@@ -420,6 +432,9 @@ const { data: questions, refresh: refreshQuestions, pending: questionsLoading } 
 const { data: themesData, pending: themesLoading } = useLazyFetch<any>('/api/admin/themes');
 const { data: collectionsData, pending: collectionsLoading } = useLazyFetch<any>('/api/admin/collections');
 const { data: feedbackStats, pending: feedbackLoading } = useLazyFetch<any>('/api/bsplus/feedback/stats');
+const { data: customThemesAdminData } = useLazyFetch<any>('/api/admin/custom-themes', {
+  query: { include_counts: '1', limit: 1, page: 1 },
+});
 
 const recentPosts = computed(() => {
   return posts.value ? posts.value.slice(0, 5) : [];
@@ -451,6 +466,11 @@ const recentCollections = computed(() => {
 });
 
 const usageSummary = computed(() => usageData.value?.summary || {});
+
+const customThemeStats = computed(() => ({
+  pending: customThemesAdminData.value?.data?.counts?.pending ?? 0,
+  approved: customThemesAdminData.value?.data?.counts?.approved ?? 0,
+}));
 
 const overviewLoading = computed(() =>
   statsLoading.value ||

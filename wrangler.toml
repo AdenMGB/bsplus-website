@@ -21,6 +21,14 @@ binding = "DB"
 database_name = "bsplus-db"
 database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
 
+# Custom user-uploaded themes (isolated from main marketplace DB).
+# Run: pnpm exec wrangler d1 create bsplus-user-themes-db
+# Then replace database_id below with the UUID from that command.
+[[d1_databases]]
+binding = "USER_THEMES_DB"
+database_name = "bsplus-user-themes-db"
+database_id = "00000000-0000-0000-0000-user-themes01"
+
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bsplus-images"
@@ -39,6 +47,11 @@ routes = [
 binding = "DB"
 database_name = "bsplus-db"
 database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
+
+[[env.dev.d1_databases]]
+binding = "USER_THEMES_DB"
+database_name = "bsplus-user-themes-db"
+database_id = "00000000-0000-0000-0000-user-themes01"
 
 [[env.dev.r2_buckets]]
 binding = "BUCKET"
