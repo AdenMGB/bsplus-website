@@ -75,3 +75,30 @@ export async function fetchSignupOrderExport(
     }
   );
 }
+
+const FOUNDING_2500_LIMIT = 2500;
+
+export function isFounding2500User(user: Pick<SignupOrderUser, 'signup_number'>): boolean {
+  return user.signup_number != null && user.signup_number > 0 && user.signup_number <= FOUNDING_2500_LIMIT;
+}
+
+/** Load founding members (signup #1–2500) from accounts export. */
+export async function fetchFounding2500Members(
+  event: H3Event,
+): Promise<SignupOrderUser[]> {
+  const exportData = await fetchSignupOrderExport(event, FOUNDING_2500_LIMIT, 0);
+  return (exportData.users || []).filter(isFounding2500User);
+}
+
+export async function findFoundingMemberByEmail(
+  event: H3Event,
+  email: string,
+): Promise<SignupOrderUser | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized || !normalized.includes('@')) return null;
+
+  const members = await fetchFounding2500Members(event);
+  return (
+    members.find((user) => user.email?.trim().toLowerCase() === normalized) ?? null
+  );
+}

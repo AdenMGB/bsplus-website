@@ -96,7 +96,8 @@ function celebrationBodyHtml(displayName: string, signupNumber: number | null | 
 export async function sendSurveyCampaignEmail(
   slug: string,
   recipient: SurveyEmailRecipient,
-  event?: H3Event | null
+  event?: H3Event | null,
+  options?: { test?: boolean },
 ) {
   const displayName = recipient.displayName?.trim() || 'BetterSEQTA member';
   const signupLabel =
@@ -105,17 +106,18 @@ export async function sendSurveyCampaignEmail(
       : 'founding member';
 
   const ctaUrl = buildSurveyInviteUrl(slug, recipient.inviteToken, event);
+  const testPrefix = options?.test ? '[TEST] ' : '';
 
   return sendMail(
     {
       to: recipient.email,
-      subject: `You're user ${signupLabel} — we want to hear from you 🎉`,
+      subject: `${testPrefix}You're user ${signupLabel} — we want to hear from you 🎉`,
       template: 'bsp',
       bodyHtml: celebrationBodyHtml(displayName, recipient.signupNumber),
       templateOptions: {
-        preheaderText: `BetterSEQTA Cloud hit 2,500 users. Share your feedback as user ${signupLabel}.`,
+        preheaderText: `${options?.test ? 'Test send. ' : ''}BetterSEQTA Cloud hit 2,500 users. Share your feedback as user ${signupLabel}.`,
         headline: `You're user ${signupLabel}`,
-        kicker: 'BetterSEQTA Cloud — 2,500 Users',
+        kicker: options?.test ? 'BetterSEQTA Cloud — test email' : 'BetterSEQTA Cloud — 2,500 Users',
         secondaryNote: 'This short survey is only for our first 2,500 Cloud members.',
         ctaUrl,
         ctaLabel: 'Share your feedback',
