@@ -66,15 +66,17 @@ export function isLocalRequest(event?: H3Event | null): boolean {
   }
 }
 
+/**
+ * True only when explicitly running in local dev (never inferred from request host).
+ * Internal Nitro subrequests to /api/* arrive with Host: localhost on Workers and must
+ * not flip outbound service URLs to localhost.
+ */
 export function isLocalDev(event?: H3Event | null): boolean {
   if (process.env.NODE_ENV === 'development' || process.env.CF_DEV === '1') {
     return true;
   }
   const cfEnv = getCloudflareEnv(event);
   if (cfEnv?.CF_DEV === '1' || cfEnv?.NODE_ENV === 'development') {
-    return true;
-  }
-  if (isLocalRequest(event)) {
     return true;
   }
   const devAccounts = readDevServiceUrl('DEV_ACCOUNTS_URL', event);
@@ -95,10 +97,10 @@ function readDevServiceUrl(
 
 export function getAccountsOAuthBaseUrl(event?: H3Event | null): string {
   const devUrl = readDevServiceUrl('DEV_ACCOUNTS_URL', event);
-  if (devUrl && (isLocalDev(event) || isLocalServiceUrl(devUrl))) {
+  if (devUrl && isLocalDev(event)) {
     return devUrl;
   }
-  if (isLocalDev(event) || isLocalRequest(event)) {
+  if (isLocalDev(event)) {
     return 'http://localhost:8788';
   }
   return PRODUCTION_ACCOUNTS_URL;
@@ -152,7 +154,7 @@ export async function getAccountsApiCredentials(event?: H3Event | null): Promise
 
   if (isLocalDev(event) && devAccountsUrl) {
     url = devAccountsUrl;
-  } else if ((isLocalDev(event) || isLocalRequest(event)) && !url.includes('localhost')) {
+  } else if (isLocalDev(event) && !url.includes('localhost')) {
     url = 'http://localhost:8788';
   }
 

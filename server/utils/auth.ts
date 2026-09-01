@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3';
+import { fetchAccountsUserInfo, getBearerOrCookieAccessToken } from './accounts';
 
 export interface UserInfo {
   id: string;
@@ -7,37 +8,26 @@ export interface UserInfo {
   [key: string]: any;
 }
 
-function authHeaders(event: H3Event): Record<string, string> {
-  const headers: Record<string, string> = {
-    cookie: getHeader(event, 'cookie') || ''
-  };
-  const auth = getHeader(event, 'authorization');
-  if (auth) headers.authorization = auth;
-  return headers;
+export async function getOptionalUser(event: H3Event): Promise<UserInfo | null> {
+  const token = getBearerOrCookieAccessToken(event);
+  if (!token) return null;
+
+  try {
+    return await fetchAccountsUserInfo(event, token);
+  } catch {
+    return null;
+  }
 }
 
 export async function requireAdmin(event: H3Event): Promise<UserInfo> {
-  const user = await $fetch<UserInfo>('/api/auth/me', {
-    headers: authHeaders(event)
-  }).catch(() => null);
+  const user = await getOptionalUser(event);
 
   if (!user || !user.admin_level || user.admin_level < 1) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden - Admin access required'
+      statusMessage: 'Forbidden - Admin access required',
     });
   }
 
   return user;
-}
-
-export async function getOptionalUser(event: H3Event): Promise<UserInfo | null> {
-  try {
-    const user = await $fetch<UserInfo>('/api/auth/me', {
-      headers: authHeaders(event)
-    });
-    return user;
-  } catch {
-    return null;
-  }
 }

@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3';
 import { getDB } from './db';
-import { getAccountsOAuthBaseUrl, isLocalDev, isLocalRequest, isLocalServiceUrl } from './accounts';
+import { getAccountsOAuthBaseUrl, isLocalDev } from './accounts';
 
 const SETTINGS_ID = 1;
 const PRODUCTION_MAIL_URL = 'https://mail.internal.betterseqta.org';
@@ -75,9 +75,9 @@ export function getMailApiBaseUrl(event?: H3Event | null): string {
     .replace(/\/$/, '');
 
   const devMailUrl = readDevMailUrl(event);
-  if (devMailUrl && (isLocalDev(event) || isLocalServiceUrl(devMailUrl))) {
+  if (devMailUrl && isLocalDev(event)) {
     apiUrl = devMailUrl;
-  } else if (isLocalDev(event) || isLocalRequest(event)) {
+  } else if (isLocalDev(event)) {
     apiUrl = 'http://localhost:8789';
   }
 
