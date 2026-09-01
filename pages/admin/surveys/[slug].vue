@@ -14,6 +14,61 @@ const seeding = ref(false);
 const updatingStatus = ref(false);
 const seedResult = ref<any>(null);
 
+const testEmail = ref('');
+const testSending = ref(false);
+const testResult = ref<any>(null);
+const memberSearch = ref('');
+const membersLoading = ref(false);
+const members = ref<Array<{
+  id: string;
+  email: string;
+  displayName?: string | null;
+  username?: string | null;
+  signup_number: number | null;
+}>>([]);
+
+async function loadMembers() {
+  membersLoading.value = true;
+  try {
+    const result = await $fetch<{ members: typeof members.value }>(
+      `/api/admin/surveys/${slug.value}/campaign/members`,
+      { query: { q: memberSearch.value || undefined, limit: 200 } },
+    );
+    members.value = result.members || [];
+  } catch (error: any) {
+    alert(error?.data?.statusMessage || 'Failed to load founding members');
+  } finally {
+    membersLoading.value = false;
+  }
+}
+
+async function sendTestEmail() {
+  const email = testEmail.value.trim();
+  if (!email) {
+    alert('Choose or enter an email address');
+    return;
+  }
+  if (!confirm(`Send a test survey email to ${email}?`)) return;
+
+  testSending.value = true;
+  testResult.value = null;
+  try {
+    testResult.value = await $fetch(`/api/admin/surveys/${slug.value}/campaign/test-send`, {
+      method: 'POST',
+      body: { email },
+    });
+    await refresh();
+  } catch (error: any) {
+    alert(error?.data?.statusMessage || 'Failed to send test email');
+  } finally {
+    testSending.value = false;
+  }
+}
+
+function pickMember(email: string) {
+  testEmail.value = email;
+}
+
 const queueTotal = computed(() => {
   const stats = data.value?.stats;
   if (!stats) return 0;
@@ -206,6 +261,81 @@ function formatTs(ts?: number | null) {
           </div>
 
           <pre v-if="seedResult" class="mt-4 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs text-green-400">{{ seedResult }}</pre>
+        </div>
+
+        <div class="mb-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-lg font-semibold text-white">Send test email</h3>
+              <p class="mt-1 text-sm text-zinc-400">
+                Send one survey email to a founding 2,500 member. Subject is prefixed with [TEST]. Uses a fresh invite link.
+              </p>
+
+              <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <label class="block min-w-0 flex-1">
+                  <span class="mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500">Recipient email</span>
+                  <input
+                    v-model="testEmail"
+                    type="email"
+                    list="founding-member-emails"
+                    placeholder="member@example.com"
+                    class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </label>
+                <button
+                  type="button"
+                  class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                  :disabled="testSending || !testEmail.trim()"
+                  @click="sendTestEmail"
+                >
+                  {{ testSending ? 'Sending…' : 'Send test' }}
+                </button>
+              </div>
+
+              <datalist id="founding-member-emails">
+                <option v-for="member in members" :key="member.id" :value="member.email">
+                  #{{ member.signup_number }} — {{ member.displayName || member.username || member.email }}
+                </option>
+              </datalist>
+
+              <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  v-model="memberSearch"
+                  type="search"
+                  placeholder="Search founding members by email, name, or signup #"
+                  class="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  @keydown.enter.prevent="loadMembers"
+                />
+                <button
+                  type="button"
+                  class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                  :disabled="membersLoading"
+                  @click="loadMembers"
+                >
+                  {{ membersLoading ? 'Loading…' : 'Load members' }}
+                </button>
+              </div>
+
+              <div v-if="members.length" class="mt-4 max-h-56 overflow-y-auto rounded-lg border border-zinc-800">
+                <button
+                  v-for="member in members"
+                  :key="member.id"
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 border-b border-zinc-800 px-4 py-2.5 text-left text-sm transition-colors last:border-b-0 hover:bg-zinc-800/60"
+                  :class="testEmail === member.email ? 'bg-zinc-800/40' : ''"
+                  @click="pickMember(member.email)"
+                >
+                  <span class="min-w-0 truncate text-zinc-200">
+                    {{ member.displayName || member.username || member.email }}
+                  </span>
+                  <span class="shrink-0 font-mono text-xs text-zinc-500">#{{ member.signup_number }}</span>
+                  <span class="hidden shrink-0 text-xs text-zinc-500 sm:inline">{{ member.email }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <pre v-if="testResult" class="mt-4 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs text-sky-400">{{ testResult }}</pre>
         </div>
 
         <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
