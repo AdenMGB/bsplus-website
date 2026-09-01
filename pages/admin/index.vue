@@ -28,6 +28,12 @@
           <NuxtLink to="/admin/feedback" class="inline-flex items-center gap-2 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 px-3 py-2 text-sm font-medium text-amber-400 transition-all duration-200 hover:scale-105">
             Feedback
           </NuxtLink>
+          <NuxtLink to="/admin/surveys" class="inline-flex items-center gap-2 rounded-lg bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 px-3 py-2 text-sm font-medium text-green-400 transition-all duration-200 hover:scale-105">
+            Surveys
+          </NuxtLink>
+          <NuxtLink to="/admin/api-keys" class="inline-flex items-center gap-2 rounded-lg bg-zinc-600/20 hover:bg-zinc-600/30 border border-zinc-500/30 px-3 py-2 text-sm font-medium text-zinc-300 transition-all duration-200 hover:scale-105">
+            API Keys
+          </NuxtLink>
         </div>
       </div>
 

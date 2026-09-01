@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
   const days = allTime ? null : Math.min(Math.max(Number(daysParam) || 30, 1), 365);
   const cutoffMs = days != null ? Date.now() - days * 86400 * 1000 : 0;
 
-  const { apiKey, url: baseUrl } = getAccountsApiCredentials(event);
+  const { apiKey, url: baseUrl } = await getAccountsApiCredentials(event);
 
   if (!apiKey) {
     return {

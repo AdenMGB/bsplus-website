@@ -1,6 +1,5 @@
 import type { H3Event } from 'h3';
-
-const DEFAULT_MAIL_API_URL = 'https://mail.internal.betterseqta.org';
+import { getMailApiBaseUrl, getSiteIntegrationSettings } from './site-integrations';
 
 export interface SendMailRequest {
   from: string;
@@ -58,7 +57,7 @@ function getCloudflareEnv(event?: H3Event | null) {
   );
 }
 
-export function getMailCredentials(event?: H3Event | null): MailCredentials {
+export async function getMailCredentials(event?: H3Event | null): Promise<MailCredentials> {
   const cfEnv = getCloudflareEnv(event);
   const config = (() => {
     try {
@@ -68,26 +67,27 @@ export function getMailCredentials(event?: H3Event | null): MailCredentials {
     }
   })();
 
+  let storedApiKey = '';
+  let storedFrom = '';
+  if (event) {
+    try {
+      const stored = await getSiteIntegrationSettings(event);
+      storedApiKey = stored.mailApiKey;
+      storedFrom = stored.mailFromAddress;
+    } catch {
+      // D1 unavailable during build or tests
+    }
+  }
+
   const apiKey =
-    cfEnv?.BS_MAIL_API_KEY ??
-    process.env.BS_MAIL_API_KEY ??
-    (config.bsMailApiKey as string | undefined) ??
-    '';
+    storedApiKey
+    || String(cfEnv?.BS_MAIL_API_KEY ?? process.env.BS_MAIL_API_KEY ?? (config.bsMailApiKey as string | undefined) ?? '');
 
   const from =
-    cfEnv?.BS_MAIL_FROM ??
-    process.env.BS_MAIL_FROM ??
-    (config.bsMailFrom as string | undefined) ??
-    '';
+    storedFrom
+    || String(cfEnv?.BS_MAIL_FROM ?? process.env.BS_MAIL_FROM ?? (config.bsMailFrom as string | undefined) ?? '');
 
-  const apiUrl = (
-    cfEnv?.BS_MAIL_API_URL ??
-    process.env.BS_MAIL_API_URL ??
-    (config.bsMailApiUrl as string | undefined) ??
-    DEFAULT_MAIL_API_URL
-  )
-    .toString()
-    .replace(/\/$/, '');
+  const apiUrl = getMailApiBaseUrl(event);
 
   return {
     apiKey: String(apiKey || '').trim(),
@@ -96,8 +96,8 @@ export function getMailCredentials(event?: H3Event | null): MailCredentials {
   };
 }
 
-export function isMailConfigured(event?: H3Event | null): boolean {
-  const { apiKey, from } = getMailCredentials(event);
+export async function isMailConfigured(event?: H3Event | null): Promise<boolean> {
+  const { apiKey, from } = await getMailCredentials(event);
   return Boolean(apiKey && from);
 }
 
@@ -126,7 +126,7 @@ export async function sendMail(
   payload: Omit<SendMailRequest, 'from'> & { from?: string },
   event?: H3Event | null
 ): Promise<SendMailResult> {
-  const { apiKey, from: defaultFrom, apiUrl } = getMailCredentials(event);
+  const { apiKey, from: defaultFrom, apiUrl } = await getMailCredentials(event);
   if (!apiKey) {
     throw createError({
       statusCode: 503,

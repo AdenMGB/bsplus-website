@@ -20,6 +20,7 @@ not_found_handling = "single-page-application"
 binding = "DB"
 database_name = "bsplus-db"
 database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
+migrations_dir = "server/database/migrations"
 
 [[r2_buckets]]
 binding = "BUCKET"
@@ -27,7 +28,6 @@ bucket_name = "bsplus-images"
 
 [ai]
 binding = "bs-ai"
-remote = true
 
 # Development Environment (dev.betterseqta.org)
 [env.dev]
@@ -39,6 +39,7 @@ routes = [
 binding = "DB"
 database_name = "bsplus-db"
 database_id = "3a1fcbca-3a5c-4407-b61f-68892e8dfed0"
+migrations_dir = "server/database/migrations"
 
 [[env.dev.r2_buckets]]
 binding = "BUCKET"
@@ -46,8 +47,7 @@ bucket_name = "bsplus-images"
 
 [env.dev.ai]
 binding = "bs-ai"
-remote = true
 
 # Cron Triggers — must match nuxt.config nitro.scheduledTasks
 [triggers]
-crons = ["0 2 * * *"]  # Daily 02:00 UTC: cleanup + theme stats + admin feedback digest
+crons = ["0 2 * * *", "*/30 * * * *"]  # Daily 02:00 UTC + every 30 min interop sync

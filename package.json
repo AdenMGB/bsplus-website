@@ -10,7 +10,10 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "cf:deploy": "pnpm build && wrangler deploy",
-    "cf:dev": "pnpm build && wrangler dev",
+    "cf:dev": "CF_DEV=1 node scripts/resolve-dev-services.mjs && CF_DEV=1 node scripts/sync-dev-vars.mjs && CF_DEV=1 pnpm build && wrangler dev --local --persist-to .wrangler/d1-local",
+    "db:migrate:local": "node scripts/d1-migrate-local.mjs",
+    "db:migrate:remote": "node -e \"console.warn('[db:migrate:remote] Applies pending migrations to production D1 (bsplus-db). Ctrl+C to abort.')\" && pnpm exec wrangler d1 migrations apply bsplus-db --remote",
+    "dev:seed": "pnpm --dir ../betterseqta-accounts db:seed:test-user",
     "cf:tail": "wrangler tail",
     "cf:deploy:dev": "pnpm build && wrangler deploy --env dev"
   },

@@ -9,10 +9,11 @@ import {
 } from '~/utils/auth-session';
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
   const query = getQuery(event);
   const rawCode = query.code;
   const code = typeof rawCode === 'string' ? rawCode : null;
-  const redirectUri = process.env.NUXT_OAUTH_REDIRECT_URI || 'http://localhost:8787/api/auth/callback';
+  const redirectUri = config.oauthRedirectUri;
 
   if (!code) {
     return sendRedirect(event, '/?error=no_code');

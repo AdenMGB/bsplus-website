@@ -23,6 +23,8 @@ logs
 .env.*
 !.env.example
 
-.wrangler
+# Wrangler local dev state (D1 SQLite, KV, etc.) — never commit
+.wrangler/
 
+.pnpm-store/
 BetterSEQTA-Themes
