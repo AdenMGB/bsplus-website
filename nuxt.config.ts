@@ -1,4 +1,24 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+const isLocalDev =
+  process.env.NODE_ENV === 'development' ||
+  process.env.CF_DEV === '1' ||
+  Boolean(
+    process.env.DEV_ACCOUNTS_URL ||
+      process.env.DEV_BSPLUS_URL ||
+      process.env.DEV_MAIL_URL,
+  );
+
+const defaultAccountsUrl =
+  isLocalDev && process.env.DEV_ACCOUNTS_URL
+    ? process.env.DEV_ACCOUNTS_URL
+    : (process.env.ACCOUNTS_API_URL ?? 'https://accounts.betterseqta.org');
+
+const defaultMailUrl =
+  isLocalDev && process.env.DEV_MAIL_URL
+    ? process.env.DEV_MAIL_URL
+    : (process.env.BS_MAIL_API_URL ?? 'https://mail.internal.betterseqta.org');
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   site: {
@@ -17,15 +37,18 @@ export default defineNuxtConfig({
     oauthClientSecret: process.env.NUXT_OAUTH_CLIENT_SECRET ?? '',
     oauthRedirectUri: process.env.NUXT_OAUTH_REDIRECT_URI ?? "http://localhost:8787/api/auth/callback",
     accountsApiKey: process.env.ACCOUNTS_API_KEY ?? '',
-    accountsApiUrl: process.env.ACCOUNTS_API_URL ?? 'https://accounts.betterseqta.org',
+    accountsApiUrl: defaultAccountsUrl,
     /** Salt for hashing client IPs on feedback submissions (abuse limits only). */
     feedbackIpSalt: process.env.FEEDBACK_IP_SALT ?? 'bsplus-feedback-ip-salt-v1',
-    /** BetterSEQTA Mail API (https://mail.internal.betterseqta.org) */
+    /** BetterSEQTA Mail API */
     bsMailApiKey: process.env.BS_MAIL_API_KEY ?? '',
     bsMailFrom: process.env.BS_MAIL_FROM ?? '',
-    bsMailApiUrl: process.env.BS_MAIL_API_URL ?? 'https://mail.internal.betterseqta.org',
+    bsMailApiUrl: defaultMailUrl,
     public: {
-      siteUrl: 'https://betterseqta.org',
+      siteUrl:
+        isLocalDev && process.env.DEV_BSPLUS_URL
+          ? process.env.DEV_BSPLUS_URL.replace(/\/$/, '')
+          : (process.env.NUXT_PUBLIC_SITE_URL ?? 'https://betterseqta.org'),
     },
   },
   app: {
@@ -63,6 +86,7 @@ export default defineNuxtConfig({
       // Must match wrangler.toml [triggers].crons
       scheduledTasks: {
         "0 2 * * *": ["daily-maintenance"],
+        "*/30 * * * *": ["interop-sync"],
       },
       prerender: {
         crawlLinks: false, // DB binding unavailable at build time; render at runtime on CF Workers

@@ -46,7 +46,7 @@ function formatLabel(value: string): string {
 }
 
 export async function fetchAdminEmails(event?: H3Event | null): Promise<string[]> {
-  const { apiKey, url: baseUrl } = getAccountsApiCredentials(event as H3Event);
+  const { apiKey, url: baseUrl } = await getAccountsApiCredentials(event as H3Event);
   if (!apiKey) {
     console.warn('[FeedbackMail] ACCOUNTS_API_KEY missing; cannot resolve admin emails');
     return [];
@@ -78,7 +78,7 @@ export async function sendFeedbackReplyEmail(
   responseText: string,
   event?: H3Event | null
 ): Promise<{ sent: boolean; reason?: string }> {
-  if (!isMailConfigured(event)) {
+  if (!(await isMailConfigured(event))) {
     return { sent: false, reason: 'Mail is not configured' };
   }
 
@@ -126,7 +126,7 @@ export async function sendAdminFeedbackDigest(
   skipped: boolean;
   reason?: string;
 }> {
-  if (!isMailConfigured(event)) {
+  if (!(await isMailConfigured(event))) {
     return { notified: 0, admins: 0, skipped: true, reason: 'Mail is not configured' };
   }
 

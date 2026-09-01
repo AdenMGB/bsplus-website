@@ -5,6 +5,7 @@
  * Auth: Option A (anonymous) - no auth, client_id in body for deduplication.
  *       Option B (authenticated) - Authorization: Bearer <token> to associate with user.
  */
+import { getAccountsOAuthBaseUrl } from '../../utils/accounts';
 import { getDB } from '../../utils/db';
 
 const VALID_PLATFORMS = ['windows', 'macos', 'linux', 'android', 'ios'];
@@ -62,7 +63,7 @@ export default defineEventHandler(async (event) => {
 
   if (bearerToken) {
     try {
-      const user = await $fetch<{ id: string }>('https://accounts.betterseqta.org/api/oauth/userinfo', {
+      const user = await $fetch<{ id: string }>(`${getAccountsOAuthBaseUrl(event)}/api/oauth/userinfo`, {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
       userId = user?.id ?? null;
