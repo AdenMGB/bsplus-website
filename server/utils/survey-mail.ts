@@ -61,33 +61,33 @@ export function buildSurveyInviteUrl(
   return `${base}/surveys/${encodeURIComponent(slug)}?invite=${encodeURIComponent(inviteToken)}`;
 }
 
-function celebrationBodyHtml(displayName: string, signupNumber: number | null | undefined): string {
+function surveyBodyHtml(displayName: string, signupNumber: number | null | undefined): string {
   const name = escapeHtml(displayName || 'there');
   const numberText =
     signupNumber && signupNumber > 0
       ? `#${signupNumber.toLocaleString()}`
-      : 'one of our first 2,500';
+      : 'in the first 2,500';
 
   return `
-<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="font-family:Inter,Arial,sans-serif;color:#18181b;">
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#d4d4d8;">
   <tr>
-    <td style="padding:0 0 16px 0;font-size:18px;line-height:1.5;">
+    <td style="padding:0 0 16px 0;font-size:16px;line-height:1.6;">
       Hi ${name},
     </td>
   </tr>
   <tr>
     <td style="padding:0 0 16px 0;font-size:16px;line-height:1.6;">
-      🎉 BetterSEQTA Cloud just crossed <strong>2,500 members</strong> — and you signed up as user <strong>${escapeHtml(numberText)}</strong>.
+      You signed up for BetterSEQTA Cloud as user <strong style="color:#fafafa;">${escapeHtml(numberText)}</strong>. We are planning what to build next for BetterSEQTA+ and DesQTA, and we wanted to ask early members directly.
     </td>
   </tr>
   <tr>
     <td style="padding:0 0 16px 0;font-size:16px;line-height:1.6;">
-      We would love a few minutes of your feedback as a founding Cloud member. Your answers help us decide what to build next for BetterSEQTA+ and DesQTA.
+      The link below opens a short form for founding Cloud members. It should only take a few minutes.
     </td>
   </tr>
   <tr>
-    <td style="padding:0 0 8px 0;font-size:14px;line-height:1.5;color:#52525b;">
-      Thank you for being part of the journey from the very beginning. ✨
+    <td style="padding:0;font-size:16px;line-height:1.6;">
+      Thanks,<br />BetterSEQTA team
     </td>
   </tr>
 </table>`.trim();
@@ -99,7 +99,7 @@ export async function sendSurveyCampaignEmail(
   event?: H3Event | null,
   options?: { test?: boolean },
 ) {
-  const displayName = recipient.displayName?.trim() || 'BetterSEQTA member';
+  const displayName = recipient.displayName?.trim() || 'there';
   const signupLabel =
     recipient.signupNumber && recipient.signupNumber > 0
       ? `#${recipient.signupNumber.toLocaleString()}`
@@ -111,16 +111,15 @@ export async function sendSurveyCampaignEmail(
   return sendMail(
     {
       to: recipient.email,
-      subject: `${testPrefix}You're user ${signupLabel} — we want to hear from you 🎉`,
+      subject: `${testPrefix}Cloud user ${signupLabel}: quick question`,
       template: 'bsp',
-      bodyHtml: celebrationBodyHtml(displayName, recipient.signupNumber),
+      bodyHtml: surveyBodyHtml(displayName, recipient.signupNumber),
       templateOptions: {
-        preheaderText: `${options?.test ? 'Test send. ' : ''}BetterSEQTA Cloud hit 2,500 users. Share your feedback as user ${signupLabel}.`,
-        headline: `You're user ${signupLabel}`,
-        kicker: options?.test ? 'BetterSEQTA Cloud — test email' : 'BetterSEQTA Cloud — 2,500 Users',
-        secondaryNote: 'This short survey is only for our first 2,500 Cloud members.',
+        preheaderText: `${options?.test ? 'Test send. ' : ''}A short form for founding Cloud members (${signupLabel}).`,
+        headline: `Cloud user ${signupLabel}`,
+        secondaryNote: 'Sent to the email on your BetterSEQTA Cloud account.',
         ctaUrl,
-        ctaLabel: 'Share your feedback',
+        ctaLabel: 'Open form',
         year: new Date().getFullYear(),
       },
     },
