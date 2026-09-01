@@ -61,12 +61,33 @@ export function buildSurveyInviteUrl(
   return `${base}/surveys/${encodeURIComponent(slug)}?invite=${encodeURIComponent(inviteToken)}`;
 }
 
-function surveyBodyHtml(displayName: string, signupNumber: number | null | undefined): string {
+const FOUNDER_TIER_LABELS = [
+  { threshold: 10, label: 'Pioneer' },
+  { threshold: 25, label: 'Early Adopter' },
+  { threshold: 50, label: 'Founding Member' },
+  { threshold: 100, label: 'Centurion' },
+  { threshold: 250, label: 'Quarter Thousand' },
+  { threshold: 500, label: 'Half Thousand' },
+  { threshold: 1000, label: 'Thousand Club' },
+  { threshold: 2500, label: 'Founding Cloud' },
+] as const;
+
+function founderBadgeLabel(signupNumber: number | null | undefined): string {
+  if (!signupNumber || signupNumber <= 0) return 'Founding Cloud';
+  return FOUNDER_TIER_LABELS.find((tier) => signupNumber <= tier.threshold)?.label ?? 'Founding Cloud';
+}
+
+function surveyBodyHtml(
+  displayName: string,
+  signupNumber: number | null | undefined,
+  badgeLabel: string,
+): string {
   const name = escapeHtml(displayName || 'there');
+  const tag = escapeHtml(badgeLabel);
   const numberText =
     signupNumber && signupNumber > 0
       ? `#${signupNumber.toLocaleString()}`
-      : 'in the first 2,500';
+      : 'one of the first 2,500';
 
   return `
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#d4d4d8;">
@@ -77,12 +98,12 @@ function surveyBodyHtml(displayName: string, signupNumber: number | null | undef
   </tr>
   <tr>
     <td style="padding:0 0 16px 0;font-size:16px;line-height:1.6;">
-      You signed up for BetterSEQTA Cloud as user <strong style="color:#fafafa;">${escapeHtml(numberText)}</strong>. We are planning what to build next for BetterSEQTA+ and DesQTA, and we wanted to ask early members directly.
+      Congrats on being part of <strong style="color:#fafafa;">${tag}</strong>! You're the <strong style="color:#fafafa;">${escapeHtml(numberText)}</strong> user to ever sign up for BetterSEQTA Cloud. Let's celebrate that for a sec.
     </td>
   </tr>
   <tr>
     <td style="padding:0 0 16px 0;font-size:16px;line-height:1.6;">
-      The link below opens a short form for founding Cloud members. It should only take a few minutes.
+      We're planning what's next for BetterSEQTA+ and DesQTA, and we wanted to ask early members directly. The link below is a short form for founding Cloud members. Should only take a few minutes.
     </td>
   </tr>
   <tr>
@@ -100,23 +121,29 @@ export async function sendSurveyCampaignEmail(
   options?: { test?: boolean },
 ) {
   const displayName = recipient.displayName?.trim() || 'there';
+  const signupNumber = recipient.signupNumber;
+  const badgeLabel = founderBadgeLabel(signupNumber);
   const signupLabel =
-    recipient.signupNumber && recipient.signupNumber > 0
-      ? `#${recipient.signupNumber.toLocaleString()}`
+    signupNumber && signupNumber > 0
+      ? `#${signupNumber.toLocaleString()}`
       : 'founding member';
 
   const ctaUrl = buildSurveyInviteUrl(slug, recipient.inviteToken, event);
   const testPrefix = options?.test ? '[TEST] ' : '';
+  const signupPhrase =
+    signupNumber && signupNumber > 0
+      ? `You're ${signupLabel} (${badgeLabel})!`
+      : `You're part of ${badgeLabel}!`;
 
   return sendMail(
     {
       to: recipient.email,
-      subject: `${testPrefix}Cloud user ${signupLabel}: quick question`,
+      subject: `${testPrefix}${signupPhrase}`,
       template: 'bsp',
-      bodyHtml: surveyBodyHtml(displayName, recipient.signupNumber),
+      bodyHtml: surveyBodyHtml(displayName, signupNumber, badgeLabel),
       templateOptions: {
-        preheaderText: `${options?.test ? 'Test send. ' : ''}A short form for founding Cloud members (${signupLabel}).`,
-        headline: `Cloud user ${signupLabel}`,
+        preheaderText: `${options?.test ? 'Test send. ' : ''}${signupNumber && signupNumber > 0 ? `You're the ${signupLabel} user to ever join Cloud.` : `You're one of the first 2,500 Cloud members.`}`,
+        headline: `Congrats, ${badgeLabel}!`,
         secondaryNote: 'Sent to the email on your BetterSEQTA Cloud account.',
         ctaUrl,
         ctaLabel: 'Open form',
