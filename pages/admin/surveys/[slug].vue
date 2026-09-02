@@ -5,10 +5,6 @@ const route = useRoute();
 const slug = computed(() => String(route.params.slug || ''));
 
 const { data, pending, refresh } = await useFetch(() => `/api/admin/surveys/${slug.value}`);
-const { data: responsesData, refresh: refreshResponses } = await useFetch(
-  () => `/api/admin/surveys/${slug.value}/responses`,
-  { query: { limit: 200 } }
-);
 
 const seeding = ref(false);
 const updatingStatus = ref(false);
@@ -116,59 +112,6 @@ async function setStatus(status: string) {
   } finally {
     updatingStatus.value = false;
   }
-}
-
-function formatAnswer(value: unknown): string {
-  if (Array.isArray(value)) return value.join('|');
-  return String(value ?? '');
-}
-
-function exportCsv() {
-  const rows = responsesData.value?.responses || [];
-  const header = [
-    'user_id',
-    'signup_number',
-    'completed_at',
-    'performance_rating',
-    'nps_rating',
-    'referral_source',
-    'cloud_features',
-    'improvements',
-    'additional_feedback',
-  ];
-  const lines = [header.join(',')];
-
-  for (const row of rows) {
-    const answers = row.answers || {};
-    lines.push(
-      [
-        row.user_id,
-        row.signup_number ?? '',
-        row.completed_at ?? '',
-        answers.performance_rating ?? '',
-        answers.nps_rating ?? '',
-        answers.referral_source ?? '',
-        formatAnswer(answers.cloud_features),
-        formatAnswer(answers.improvements),
-        JSON.stringify(answers.additional_feedback || '').replace(/"/g, '""'),
-      ]
-        .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
-        .join(',')
-    );
-  }
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${slug.value}-responses.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function formatTs(ts?: number | null) {
-  if (!ts) return '—';
-  return new Date(ts * 1000).toLocaleString();
 }
 </script>
 
@@ -338,43 +281,7 @@ function formatTs(ts?: number | null) {
           <pre v-if="testResult" class="mt-4 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs text-sky-400">{{ testResult }}</pre>
         </div>
 
-        <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
-          <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
-            <h3 class="text-base font-semibold text-white">Responses ({{ responsesData?.total ?? 0 }})</h3>
-            <button
-              type="button"
-              class="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 transition-all duration-200 hover:scale-105"
-              @click="exportCsv"
-            >
-              Export CSV
-            </button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-sm">
-              <thead class="bg-zinc-900/50 text-zinc-300">
-                <tr>
-                  <th class="px-6 py-3 font-semibold">User</th>
-                  <th class="px-6 py-3 font-semibold">Signup #</th>
-                  <th class="px-6 py-3 font-semibold">Performance</th>
-                  <th class="px-6 py-3 font-semibold">NPS</th>
-                  <th class="px-6 py-3 font-semibold">Completed</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-zinc-800">
-                <tr v-for="row in responsesData?.responses || []" :key="row.id" class="hover:bg-zinc-800/40">
-                  <td class="px-6 py-4 font-mono text-xs text-zinc-300">{{ row.user_id }}</td>
-                  <td class="px-6 py-4 text-white">{{ row.signup_number ?? '—' }}</td>
-                  <td class="px-6 py-4 text-zinc-300">{{ row.answers?.performance_rating ?? '—' }}</td>
-                  <td class="px-6 py-4 text-zinc-300">{{ row.answers?.nps_rating ?? '—' }}</td>
-                  <td class="px-6 py-4 text-zinc-400">{{ formatTs(row.completed_at) }}</td>
-                </tr>
-                <tr v-if="!(responsesData?.responses || []).length">
-                  <td colspan="5" class="px-6 py-8 text-center text-zinc-500 italic">No responses yet.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <AdminSurveyResponsesPanel :slug="slug" />
       </template>
     </div>
   </div>
