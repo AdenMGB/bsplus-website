@@ -121,7 +121,7 @@ export async function sendSurveyCampaignEmail(
   slug: string,
   recipient: SurveyEmailRecipient,
   event?: H3Event | null,
-  options?: { test?: boolean },
+  options?: { test?: boolean; bypassQuota?: boolean },
 ) {
   const displayName = recipient.displayName?.trim() || 'there';
   const signupNumber = recipient.signupNumber;
@@ -144,6 +144,7 @@ export async function sendSurveyCampaignEmail(
       subject: `${testPrefix}${signupPhrase}`,
       template: 'bsp',
       bodyHtml: surveyBodyHtml(displayName, signupNumber, badgeLabel),
+      bypassQuota: options?.bypassQuota === true,
       templateOptions: {
         preheaderText: `${options?.test ? 'Test send. ' : ''}${signupNumber && signupNumber > 0 ? `You're the ${signupLabel} user to ever join Cloud.` : `You're one of the first 2,500 Cloud members.`}`,
         headline: `Congrats, ${badgeLabel}!`,

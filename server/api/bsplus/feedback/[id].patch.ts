@@ -150,7 +150,8 @@ export default defineEventHandler(async (event) => {
         const result = await sendFeedbackReplyEmail(
           latest as any,
           replyText,
-          event
+          event,
+          { bypassQuota: body.ignore_quota !== false },
         );
         if (result.sent) {
           emailSent = true;
