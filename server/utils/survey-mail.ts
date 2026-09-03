@@ -2,12 +2,15 @@ import type { H3Event } from 'h3';
 import { escapeHtml, getMailCredentials, sendMail } from './mail';
 
 export interface MailQuota {
-  limit: number;
+  enabled?: boolean;
+  unlimited?: boolean;
+  limit: number | null;
   used: number;
-  available: number;
+  available: number | null;
+  windowHours?: number;
   windowSeconds: number;
   quotaResetAt: number;
-  queuePending: number;
+  queuePending?: number;
 }
 
 export interface SurveyEmailRecipient {
