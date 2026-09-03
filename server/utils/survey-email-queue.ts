@@ -135,6 +135,7 @@ export async function drainSurveyEmailQueue(
           inviteToken: row.invite_token,
         },
         event ?? null,
+        { bypassQuota: ignoreQuota },
       );
 
       if (!isMailSendConfirmed(mailResult)) {

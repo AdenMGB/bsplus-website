@@ -11,6 +11,8 @@ export interface SendMailRequest {
   bodyHtml?: string;
   text?: string;
   html?: string;
+  /** When true, BS Mail sends immediately without API send-quota checks (same as web compose). */
+  bypassQuota?: boolean;
   templateOptions?: {
     preheaderText?: string;
     headline?: string;
@@ -136,7 +138,7 @@ export function plainTextToBodyHtml(text: string): string {
 }
 
 export async function sendMail(
-  payload: Omit<SendMailRequest, 'from'> & { from?: string },
+  payload: Omit<SendMailRequest, 'from'> & { from?: string; bypassQuota?: boolean },
   event?: H3Event | null
 ): Promise<SendMailResult> {
   const { apiKey, from: defaultFrom, apiUrl } = await getMailCredentials(event);
@@ -155,10 +157,12 @@ export async function sendMail(
     });
   }
 
+  const { bypassQuota, ...mailPayload } = payload;
   const body: SendMailRequest = {
-    ...payload,
+    ...mailPayload,
     from,
-    template: payload.template || 'bsp',
+    template: mailPayload.template || 'bsp',
+    ...(bypassQuota ? { bypassQuota: true } : {}),
   };
 
   try {
