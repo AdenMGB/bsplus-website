@@ -22,12 +22,14 @@ export default defineEventHandler(async (event) => {
   const emailDrain = await drainSurveyEmailQueue(db, event, {
     surveyId: survey.id,
     useFullQuota,
+    ignoreQuota: useFullQuota,
   });
 
   return {
     ok: true,
     slug,
     use_full_quota: useFullQuota,
+    ignore_quota: useFullQuota,
     email_drain: emailDrain.skipped
       ? {
           skipped: true,

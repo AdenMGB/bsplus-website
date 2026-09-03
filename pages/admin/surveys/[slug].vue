@@ -109,7 +109,7 @@ async function drainCampaignFullQuota() {
   }
   if (
     !confirm(
-      `Send up to the full BS Mail quota now (${pending} pending)? This bypasses the normal 40-email batch cap.`,
+      `Send up to ${Math.min(pending, 500)} pending emails now? Quota checks are skipped — only emails BS Mail confirms will be marked sent.`,
     )
   ) {
     return;
@@ -214,7 +214,7 @@ async function setStatus(status: string) {
                 Seeds queue from accounts signup-order export, then sends the first batch immediately (up to 40 emails when mail quota allows). Cron continues draining every 30 minutes.
               </p>
               <p v-if="data.stats.queue_pending" class="mt-2 text-sm text-amber-400/90">
-                {{ data.stats.queue_pending }} emails pending — use full-quota override to send as many as BS Mail allows right now.
+                {{ data.stats.queue_pending }} emails pending — override sends up to 500 per click and skips quota checks.
               </p>
             </div>
             <div class="flex flex-wrap gap-2">

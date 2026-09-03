@@ -39,6 +39,19 @@ export interface SendMailResult {
   };
 }
 
+/** True when BS Mail accepted the message for delivery (sent immediately or queued). */
+export function isMailSendConfirmed(result: SendMailResult | null | undefined): boolean {
+  if (!result?.ok) return false;
+  const data = result.data;
+  if (!data) return false;
+  return (
+    (data.sent ?? 0) > 0
+    || (data.queued ?? 0) > 0
+    || (data.messageIds?.length ?? 0) > 0
+    || Boolean(data.messageId)
+  );
+}
+
 export interface MailCredentials {
   apiKey: string;
   from: string;
