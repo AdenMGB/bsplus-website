@@ -299,9 +299,9 @@ function exportCsv() {
       </div>
     </div>
 
-    <div v-else class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-      <div class="border-b border-zinc-800 lg:border-b-0 lg:border-r">
-        <div class="border-b border-zinc-800 px-4 py-3">
+    <div v-else class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-stretch">
+      <div class="flex min-h-0 flex-col border-b border-zinc-800 lg:border-b-0 lg:border-r">
+        <div class="shrink-0 border-b border-zinc-800 px-4 py-3">
           <input
             v-model="searchQuery"
             type="search"
@@ -309,7 +309,7 @@ function exportCsv() {
             class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
-        <div class="max-h-[32rem] overflow-y-auto">
+        <div class="overflow-y-auto lg:flex-1 lg:min-h-0">
           <button
             v-for="response in filteredResponses"
             :key="response.id"

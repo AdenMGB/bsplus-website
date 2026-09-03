@@ -7,6 +7,8 @@ const slug = computed(() => String(route.params.slug || ''));
 const { data, pending, refresh } = await useFetch(() => `/api/admin/surveys/${slug.value}`);
 
 const seeding = ref(false);
+const draining = ref(false);
+const drainResult = ref<any>(null);
 const updatingStatus = ref(false);
 const seedResult = ref<any>(null);
 
@@ -99,6 +101,35 @@ async function seedCampaign() {
   }
 }
 
+async function drainCampaignFullQuota() {
+  const pending = data.value?.stats?.queue_pending ?? 0;
+  if (!pending) {
+    alert('No pending emails in the queue.');
+    return;
+  }
+  if (
+    !confirm(
+      `Send up to the full BS Mail quota now (${pending} pending)? This bypasses the normal 40-email batch cap.`,
+    )
+  ) {
+    return;
+  }
+
+  draining.value = true;
+  drainResult.value = null;
+  try {
+    drainResult.value = await $fetch(`/api/admin/surveys/${slug.value}/campaign/drain`, {
+      method: 'POST',
+      body: { useFullQuota: true },
+    });
+    await refresh();
+  } catch (error: any) {
+    alert(error?.data?.statusMessage || 'Failed to drain email queue');
+  } finally {
+    draining.value = false;
+  }
+}
+
 async function setStatus(status: string) {
   updatingStatus.value = true;
   try {
@@ -182,15 +213,28 @@ async function setStatus(status: string) {
               <p class="mt-1 text-sm text-zinc-400">
                 Seeds queue from accounts signup-order export, then sends the first batch immediately (up to 40 emails when mail quota allows). Cron continues draining every 30 minutes.
               </p>
+              <p v-if="data.stats.queue_pending" class="mt-2 text-sm text-amber-400/90">
+                {{ data.stats.queue_pending }} emails pending — use full-quota override to send as many as BS Mail allows right now.
+              </p>
             </div>
-            <button
-              type="button"
-              class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 disabled:opacity-50"
-              :disabled="seeding"
-              @click="seedCampaign"
-            >
-              {{ seeding ? 'Seeding & sending…' : 'Send survey emails (seed queue)' }}
-            </button>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                :disabled="seeding"
+                @click="seedCampaign"
+              >
+                {{ seeding ? 'Seeding & sending…' : 'Send survey emails (seed queue)' }}
+              </button>
+              <button
+                type="button"
+                class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-300 transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                :disabled="draining || !(data.stats.queue_pending > 0)"
+                @click="drainCampaignFullQuota"
+              >
+                {{ draining ? 'Sending…' : 'Send pending (full quota override)' }}
+              </button>
+            </div>
           </div>
 
           <div v-if="queueTotal" class="mt-4">
@@ -204,6 +248,7 @@ async function setStatus(status: string) {
           </div>
 
           <pre v-if="seedResult" class="mt-4 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs text-green-400">{{ seedResult }}</pre>
+          <pre v-if="drainResult" class="mt-4 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs text-amber-300">{{ drainResult }}</pre>
         </div>
 
         <div class="mb-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">

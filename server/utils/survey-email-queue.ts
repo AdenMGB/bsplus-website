@@ -23,7 +23,7 @@ export interface SurveyEmailDrainResult {
 export async function drainSurveyEmailQueue(
   db: any,
   event?: H3Event | null,
-  options?: { surveyId?: string },
+  options?: { surveyId?: string; useFullQuota?: boolean },
 ): Promise<SurveyEmailDrainResult> {
   let quota;
   try {
@@ -58,7 +58,9 @@ export async function drainSurveyEmailQueue(
     return { skipped: true, reason: 'queue_empty', quota };
   }
 
-  const batchSize = Math.min(quota.available, SURVEY_EMAIL_MAX_BATCH_SIZE, pendingCount);
+  const batchSize = options?.useFullQuota
+    ? Math.min(quota.available, pendingCount)
+    : Math.min(quota.available, SURVEY_EMAIL_MAX_BATCH_SIZE, pendingCount);
   const pendingRows = await db
     .prepare(
       `SELECT q.id, q.survey_id, q.user_id, q.email, q.display_name, q.signup_number, q.invite_token, q.attempts,
