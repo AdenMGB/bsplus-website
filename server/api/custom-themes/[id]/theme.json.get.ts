@@ -1,4 +1,4 @@
-import { getUserThemesDB } from '../../../utils/userThemesDb';
+import { getDB } from '../../../utils/db';
 import { getBucket } from '../../../utils/r2';
 import { customThemeR2Key } from '../../../utils/customThemes';
 
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Theme ID required' });
   }
 
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const theme = await db
     .prepare(
       "SELECT theme_type, status FROM custom_themes WHERE id = ? AND status = 'approved'"

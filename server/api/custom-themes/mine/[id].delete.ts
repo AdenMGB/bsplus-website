@@ -1,5 +1,5 @@
 import { requireAuth } from '../../../utils/auth';
-import { getUserThemesDB } from '../../../utils/userThemesDb';
+import { getDB } from '../../../utils/db';
 import {
   assertThemeOwner,
   createApiEnvelope,
@@ -9,7 +9,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const id = getRouterParam(event, 'id');
 
   if (!id) {

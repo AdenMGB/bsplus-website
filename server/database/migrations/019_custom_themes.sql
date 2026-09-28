@@ -1,6 +1,4 @@
--- Custom user-uploaded themes database (isolated from main bsplus-db)
-
-PRAGMA foreign_keys = ON;
+-- User-submitted custom themes (same D1 database as marketplace themes)
 
 CREATE TABLE IF NOT EXISTS custom_themes (
   id TEXT PRIMARY KEY,
@@ -60,8 +58,6 @@ CREATE INDEX IF NOT EXISTS idx_custom_themes_author ON custom_themes(author_id);
 CREATE INDEX IF NOT EXISTS idx_custom_themes_slug ON custom_themes(slug);
 CREATE INDEX IF NOT EXISTS idx_custom_themes_created ON custom_themes(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_custom_themes_type ON custom_themes(theme_type);
-
 CREATE INDEX IF NOT EXISTS idx_custom_theme_files_theme ON custom_theme_files(theme_id);
-
 CREATE INDEX IF NOT EXISTS idx_custom_theme_upload_log_author ON custom_theme_upload_log(author_id);
 CREATE INDEX IF NOT EXISTS idx_custom_theme_upload_log_created ON custom_theme_upload_log(created_at DESC);

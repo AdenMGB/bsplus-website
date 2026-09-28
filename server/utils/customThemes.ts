@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3';
 import type { UserInfo } from './auth';
 import { getBucket } from './r2';
-import { getUserThemesDB } from './userThemesDb';
+import { getDB } from './db';
 import {
   parseManifest,
   validateThemeStructure,
@@ -195,7 +195,7 @@ export function formatCustomThemeOwner(theme: Record<string, unknown>) {
 
 export async function deleteCustomThemeAssets(event: H3Event, themeId: string): Promise<void> {
   const bucket = getBucket(event);
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
 
   const files = await db
     .prepare('SELECT r2_key FROM custom_theme_files WHERE theme_id = ?')
@@ -274,7 +274,7 @@ export async function processCustomThemeUpload(
   themeFiles: Map<string, ArrayBuffer>,
   options: ProcessCustomThemeUploadOptions
 ) {
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const bucket = getBucket(event);
   const siteUrl = getSiteUrl(event);
   const authorName =
@@ -664,7 +664,7 @@ export async function fetchApprovedCustomThemeList(
   event: H3Event,
   options?: { includeSearchQuery?: boolean }
 ) {
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const query = getQuery<{
     page?: string;
     limit?: string;

@@ -1,5 +1,5 @@
 import { requireAdmin } from '../../../utils/auth';
-import { getUserThemesDB } from '../../../utils/userThemesDb';
+import { getDB } from '../../../utils/db';
 import {
   createApiEnvelope,
   formatCustomThemeOwner,
@@ -20,7 +20,7 @@ interface AdminQuery {
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const query = getQuery<AdminQuery>(event);
 
   const page = Math.max(parseInt(query.page || '1', 10), 1);

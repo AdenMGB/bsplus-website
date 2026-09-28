@@ -1,5 +1,5 @@
 import { requireAuth } from '../../../utils/auth';
-import { getUserThemesDB } from '../../../utils/userThemesDb';
+import { getDB } from '../../../utils/db';
 import {
   createApiEnvelope,
   formatCustomThemeOwner,
@@ -16,7 +16,7 @@ interface MineQuery {
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const query = getQuery<MineQuery>(event);
 
   const page = Math.max(parseInt(query.page || '1', 10), 1);

@@ -1,5 +1,5 @@
 import { requireAdmin } from '../../../../utils/auth';
-import { getUserThemesDB } from '../../../../utils/userThemesDb';
+import { getDB } from '../../../../utils/db';
 import { createApiEnvelope, getCustomThemeById, nowUnixSeconds } from '../../../../utils/customThemes';
 
 interface RejectBody {
@@ -8,7 +8,7 @@ interface RejectBody {
 
 export default defineEventHandler(async (event) => {
   const adminUser = await requireAdmin(event);
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const id = getRouterParam(event, 'id');
   const body = await readBody<RejectBody>(event);
 

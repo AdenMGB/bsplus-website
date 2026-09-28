@@ -1,11 +1,11 @@
-import { getUserThemesDB } from '../../../utils/userThemesDb';
+import { getDB } from '../../../utils/db';
 import {
   createApiEnvelope,
   formatCustomThemePublic
 } from '../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
-  const db = getUserThemesDB(event);
+  const db = getDB(event);
   const slug = getRouterParam(event, 'slug');
 
   if (!slug) {
