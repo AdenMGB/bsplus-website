@@ -580,18 +580,21 @@ export async function getCustomThemeById(
   return (await db.prepare(query).bind(...bindings).first()) as Record<string, unknown> | null;
 }
 
-export function buildCustomThemeListQuery(params: {
-  status?: CustomThemeStatus;
-  authorId?: string;
-  themeType?: string;
-  search?: string;
-  sort?: string;
-  page: number;
-  limit: number;
-}) {
+export async function listCustomThemes(
+  db: any,
+  params: {
+    status?: CustomThemeStatus;
+    authorId?: string;
+    themeType?: string;
+    search?: string;
+    sort?: string;
+    page: number;
+    limit: number;
+  },
+  format: (theme: Record<string, unknown>) => unknown
+) {
   const conditions: string[] = [];
   const bindings: unknown[] = [];
-
   if (params.status) {
     conditions.push('status = ?');
     bindings.push(params.status);
@@ -609,36 +612,12 @@ export function buildCustomThemeListQuery(params: {
     const pattern = `%${params.search}%`;
     bindings.push(pattern, pattern, pattern);
   }
-
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
   let orderBy = 'created_at DESC';
   if (params.sort === 'popular') orderBy = 'download_count DESC, created_at DESC';
   else if (params.sort === 'name') orderBy = 'name ASC';
-
-  return {
-    whereClause,
-    orderBy,
-    bindings,
-    offset: (params.page - 1) * params.limit,
-    limit: params.limit
-  };
-}
-
-export async function listCustomThemes(
-  db: any,
-  params: {
-    status?: CustomThemeStatus;
-    authorId?: string;
-    themeType?: string;
-    search?: string;
-    sort?: string;
-    page: number;
-    limit: number;
-  },
-  format: (theme: Record<string, unknown>) => unknown
-) {
-  const { whereClause, orderBy, bindings, offset, limit } = buildCustomThemeListQuery(params);
+  const limit = params.limit;
+  const offset = (params.page - 1) * limit;
 
   const countRow = await db
     .prepare(`SELECT COUNT(*) as total FROM custom_themes ${whereClause}`)
