@@ -1,12 +1,12 @@
 import { requireAuth } from '../../../../utils/auth';
 import { getDB } from '../../../../utils/db';
+import { parseThemeUploadMultipart } from '../../../../utils/themes';
 import {
   assertEditableStatus,
   assertThemeOwner,
   checkUploadRateLimits,
   deleteCustomThemeAssets,
   getCustomThemeById,
-  parseMultipartThemeFiles,
   processCustomThemeUpload
 } from '../../../../utils/customThemes';
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
   await deleteCustomThemeAssets(event, id);
 
-  const { themeFiles, submissionNotes } = await parseMultipartThemeFiles(event);
+  const { themeFiles, submissionNotes } = await parseThemeUploadMultipart(event);
   const result = await processCustomThemeUpload(event, themeFiles, {
     author: user,
     submissionNotes:

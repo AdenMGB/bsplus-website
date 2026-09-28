@@ -443,11 +443,21 @@ function imagePublicUrl(siteUrl: string, r2Key: string, relative = false): strin
   return relative ? `/api/images/${r2Key}` : `${siteUrl}/api/images/${r2Key}`;
 }
 
+export type ThemeFileIndexEntry = {
+  path: string;
+  key: string;
+  fileType: string;
+  size: number;
+  mimeType?: string;
+  checksum?: string;
+};
+
 export interface BetterSeqtaAssetUploadResult {
   themeJsonUrl: string;
   coverImageUrl: string | null;
   marqueeImageUrl: string | null;
   isPseudoTheme: boolean;
+  r2Keys: ThemeFileIndexEntry[];
 }
 
 /** Upload BetterSEQTA theme.json and optional banner/marquee images to R2. */
@@ -466,6 +476,7 @@ export async function uploadBetterSeqtaThemeAssets(
   const themeJsonContent =
     options?.themeJsonContent ?? new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
 
+  const r2Keys: ThemeFileIndexEntry[] = [];
   let themeJsonUrl = layout.themeJsonUrl;
   let isPseudoTheme = false;
 
@@ -476,6 +487,13 @@ export async function uploadBetterSeqtaThemeAssets(
     const themeJsonKey = `${layout.r2BaseKey}/theme.json`;
     await bucket.put(themeJsonKey, new TextEncoder().encode(themeJsonContent), {
       httpMetadata: { contentType: 'application/json' }
+    });
+    r2Keys.push({
+      path: 'theme.json',
+      key: themeJsonKey,
+      fileType: 'theme_json',
+      size: themeJsonContent.length,
+      mimeType: 'application/json'
     });
   }
 
@@ -491,6 +509,13 @@ export async function uploadBetterSeqtaThemeAssets(
       httpMetadata: { contentType: 'image/webp' }
     });
     coverImageUrl = imagePublicUrl(layout.siteUrl, bannerKey, layout.relativeImageUrls);
+    r2Keys.push({
+      path: 'images/banner.webp',
+      key: bannerKey,
+      fileType: 'cover',
+      size: bannerEntry[1].byteLength,
+      mimeType: 'image/webp'
+    });
   }
 
   const marqueeEntry = Array.from(themeFiles.entries()).find(
@@ -502,9 +527,16 @@ export async function uploadBetterSeqtaThemeAssets(
       httpMetadata: { contentType: 'image/webp' }
     });
     marqueeImageUrl = imagePublicUrl(layout.siteUrl, marqueeKey, layout.relativeImageUrls);
+    r2Keys.push({
+      path: 'images/marquee.webp',
+      key: marqueeKey,
+      fileType: 'marquee',
+      size: marqueeEntry[1].byteLength,
+      mimeType: 'image/webp'
+    });
   }
 
-  return { themeJsonUrl, coverImageUrl, marqueeImageUrl, isPseudoTheme };
+  return { themeJsonUrl, coverImageUrl, marqueeImageUrl, isPseudoTheme, r2Keys };
 }
 
 export interface DesqtaAssetUploadResult {
@@ -513,8 +545,7 @@ export interface DesqtaAssetUploadResult {
   zipUrl: string;
   zipSize: number;
   zipChecksum: string;
-  /** R2 keys written (for optional file tracking) */
-  r2Keys: Array<{ path: string; key: string; fileType: string; size: number; mimeType?: string; checksum?: string }>;
+  r2Keys: ThemeFileIndexEntry[];
 }
 
 /** Upload DesQTA preview, screenshots, and rebuilt ZIP to R2. */

@@ -11,16 +11,20 @@ import {
   slugify,
   generateUUID,
   inferCategory,
-  parseThemeUploadMultipart,
   themeStorageLayout,
   uploadBetterSeqtaThemeAssets,
-  uploadDesqtaThemeAssets
+  uploadDesqtaThemeAssets,
+  type ThemeFileIndexEntry,
+  type ThemeValidationResult
 } from './themes';
 
 export const CUSTOM_THEMES_R2_PREFIX = 'custom-themes';
 export const MAX_PENDING_PER_USER = 5;
 export const MAX_UPLOADS_PER_24H = 10;
-export const SECONDS_PER_DAY = 86400;
+const SECONDS_PER_DAY = 86400;
+
+const RESUBMIT_RESET =
+  "status = 'pending', rejection_reason = NULL, reviewed_by = NULL, reviewed_at = NULL";
 
 export type CustomThemeStatus = 'pending' | 'approved' | 'rejected';
 
@@ -48,11 +52,6 @@ export function createApiError(
     error: { code, message, ...(details ? { details } : {}) },
     meta: { timestamp: Date.now(), version: '1.0.0' }
   };
-}
-
-export function getSiteUrl(event: H3Event): string {
-  const config = useRuntimeConfig(event);
-  return (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 }
 
 export function customThemeR2Key(themeId: string, ...parts: string[]): string {
@@ -130,14 +129,24 @@ export async function checkUploadRateLimits(db: any, authorId: string): Promise<
   }
 }
 
-export async function parseMultipartThemeFiles(event: H3Event) {
-  const parsed = await parseThemeUploadMultipart(event);
-  return { themeFiles: parsed.themeFiles, submissionNotes: parsed.submissionNotes };
+function parseJsonArray(value: unknown): unknown[] {
+  if (!value || typeof value !== 'string') return [];
+  try {
+    return JSON.parse(value) as unknown[];
+  } catch {
+    return [];
+  }
+}
+
+function customThemePreview(theme: Record<string, unknown>) {
+  return {
+    thumbnail: (theme.preview_thumbnail_url as string) || (theme.cover_image_url as string),
+    screenshots: parseJsonArray(theme.preview_screenshots)
+  };
 }
 
 export function formatCustomThemePublic(theme: Record<string, unknown>) {
   const themeType = (theme.theme_type as string) || 'desqta';
-
   const base = {
     id: theme.id,
     name: theme.name,
@@ -147,15 +156,10 @@ export function formatCustomThemePublic(theme: Record<string, unknown>) {
     author: theme.author,
     license: theme.license,
     category: theme.category,
-    tags: theme.tags ? JSON.parse(theme.tags as string) : [],
+    tags: parseJsonArray(theme.tags),
     theme_type: themeType,
     download_count: theme.download_count ?? 0,
-    preview: {
-      thumbnail: (theme.preview_thumbnail_url as string) || (theme.cover_image_url as string),
-      screenshots: theme.preview_screenshots
-        ? JSON.parse(theme.preview_screenshots as string)
-        : []
-    },
+    preview: customThemePreview(theme),
     compatibility: {
       min: theme.compatibility_min,
       max: theme.compatibility_max || undefined
@@ -202,9 +206,7 @@ export async function deleteCustomThemeAssets(event: H3Event, themeId: string): 
     .bind(themeId)
     .all<{ r2_key: string }>();
 
-  const keys = (files.results ?? []).map((f: { r2_key: string }) => f.r2_key);
-
-  // Legacy uploads may predate custom_theme_files rows.
+  const keys = (files.results ?? []).map((f) => f.r2_key);
   if (keys.length === 0) {
     keys.push(
       customThemeR2Key(themeId, 'theme.json'),
@@ -216,7 +218,7 @@ export async function deleteCustomThemeAssets(event: H3Event, themeId: string): 
   }
 
   await Promise.all(
-    keys.map(async (key: string) => {
+    keys.map(async (key) => {
       try {
         await bucket.delete(key);
       } catch {
@@ -231,14 +233,7 @@ export async function deleteCustomThemeAssets(event: H3Event, themeId: string): 
 async function replaceCustomThemeFiles(
   db: any,
   themeId: string,
-  entries: Array<{
-    path: string;
-    key: string;
-    fileType: string;
-    size: number;
-    mimeType?: string;
-    checksum?: string;
-  }>
+  entries: ThemeFileIndexEntry[]
 ): Promise<void> {
   await db.prepare('DELETE FROM custom_theme_files WHERE theme_id = ?').bind(themeId).run();
   const now = nowUnixSeconds();
@@ -263,6 +258,205 @@ async function replaceCustomThemeFiles(
   }
 }
 
+async function uploadResult(
+  db: any,
+  themeId: string,
+  validation: ThemeValidationResult
+) {
+  const theme = (await db
+    .prepare('SELECT * FROM custom_themes WHERE id = ?')
+    .bind(themeId)
+    .first()) as Record<string, unknown>;
+
+  return createApiEnvelope({
+    theme: formatCustomThemeOwner(theme),
+    validation: { valid: true, warnings: validation.warnings, errors: [] }
+  });
+}
+
+async function saveBetterSeqtaCustomTheme(
+  db: any,
+  params: {
+    themeId: string;
+    replaceThemeId?: string;
+    authorId: string;
+    authorName: string;
+    submissionNotes?: string;
+    slug: string;
+    bsTheme: Awaited<ReturnType<typeof parseBetterSeqtaTheme>>;
+    assets: Awaited<ReturnType<typeof uploadBetterSeqtaThemeAssets>>;
+  }
+) {
+  const now = nowUnixSeconds();
+  const {
+    themeId,
+    replaceThemeId,
+    authorId,
+    authorName,
+    submissionNotes,
+    slug,
+    bsTheme,
+    assets
+  } = params;
+
+  if (replaceThemeId) {
+    await db
+      .prepare(
+        `UPDATE custom_themes SET
+          name = ?, slug = ?, version = ?, description = ?, author = ?,
+          category = ?, tags = ?, theme_type = 'betterseqta',
+          theme_json_url = ?, cover_image_url = ?, marquee_image_url = ?,
+          zip_download_url = NULL, preview_thumbnail_url = NULL, preview_screenshots = NULL,
+          file_size = NULL, checksum = NULL, compatibility_min = NULL, compatibility_max = NULL,
+          ${RESUBMIT_RESET}, submission_notes = ?, updated_at = ?
+         WHERE id = ? AND author_id = ?`
+      )
+      .bind(
+        bsTheme.name,
+        slug,
+        '1.0.0',
+        bsTheme.description,
+        authorName,
+        'other',
+        '[]',
+        assets.themeJsonUrl,
+        assets.coverImageUrl,
+        assets.marqueeImageUrl,
+        submissionNotes ?? null,
+        now,
+        themeId,
+        authorId
+      )
+      .run();
+    return;
+  }
+
+  await db
+    .prepare(
+      `INSERT INTO custom_themes (
+        id, name, slug, version, description, author, author_id, license,
+        category, tags, status, theme_type, theme_json_url,
+        cover_image_url, marquee_image_url, submission_notes,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      themeId,
+      bsTheme.name,
+      slug,
+      '1.0.0',
+      bsTheme.description,
+      authorName,
+      authorId,
+      'MIT',
+      'other',
+      '[]',
+      'pending',
+      'betterseqta',
+      assets.themeJsonUrl,
+      assets.coverImageUrl,
+      assets.marqueeImageUrl,
+      submissionNotes ?? null,
+      now,
+      now
+    )
+    .run();
+}
+
+async function saveDesqtaCustomTheme(
+  db: any,
+  params: {
+    themeId: string;
+    replaceThemeId?: string;
+    authorId: string;
+    authorName: string;
+    submissionNotes?: string;
+    slug: string;
+    manifest: Awaited<ReturnType<typeof parseManifest>>;
+    assets: Awaited<ReturnType<typeof uploadDesqtaThemeAssets>>;
+  }
+) {
+  const now = nowUnixSeconds();
+  const { themeId, replaceThemeId, authorId, authorName, submissionNotes, slug, manifest, assets } =
+    params;
+  const category = manifest.category || inferCategory(manifest);
+  const tagsJson = JSON.stringify(manifest.tags || []);
+  const screenshotsJson = JSON.stringify(assets.screenshotUrls);
+
+  if (replaceThemeId) {
+    await db
+      .prepare(
+        `UPDATE custom_themes SET
+          name = ?, slug = ?, version = ?, description = ?, author = ?,
+          license = ?, category = ?, tags = ?, theme_type = 'desqta',
+          preview_thumbnail_url = ?, preview_screenshots = ?,
+          zip_download_url = ?, file_size = ?, checksum = ?,
+          compatibility_min = ?, compatibility_max = ?,
+          theme_json_url = NULL, cover_image_url = NULL, marquee_image_url = NULL,
+          ${RESUBMIT_RESET}, submission_notes = ?, updated_at = ?
+         WHERE id = ? AND author_id = ?`
+      )
+      .bind(
+        manifest.name,
+        slug,
+        manifest.version,
+        manifest.description,
+        authorName,
+        manifest.license || 'MIT',
+        category,
+        tagsJson,
+        assets.previewUrl,
+        screenshotsJson,
+        assets.zipUrl,
+        assets.zipSize,
+        `sha256:${assets.zipChecksum}`,
+        manifest.compatibility.minVersion,
+        manifest.compatibility.maxVersion || null,
+        submissionNotes ?? null,
+        now,
+        themeId,
+        authorId
+      )
+      .run();
+    return;
+  }
+
+  await db
+    .prepare(
+      `INSERT INTO custom_themes (
+        id, name, slug, version, description, author, author_id, license,
+        category, tags, status, preview_thumbnail_url, preview_screenshots,
+        zip_download_url, file_size, checksum, compatibility_min, compatibility_max,
+        theme_type, submission_notes, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      themeId,
+      manifest.name,
+      slug,
+      manifest.version,
+      manifest.description,
+      authorName,
+      authorId,
+      manifest.license || 'MIT',
+      category,
+      tagsJson,
+      'pending',
+      assets.previewUrl,
+      screenshotsJson,
+      assets.zipUrl,
+      assets.zipSize,
+      `sha256:${assets.zipChecksum}`,
+      manifest.compatibility.minVersion,
+      manifest.compatibility.maxVersion || null,
+      'desqta',
+      submissionNotes ?? null,
+      now,
+      now
+    )
+    .run();
+}
+
 export interface ProcessCustomThemeUploadOptions {
   author: UserInfo;
   submissionNotes?: string;
@@ -276,7 +470,8 @@ export async function processCustomThemeUpload(
 ) {
   const db = getDB(event);
   const bucket = getBucket(event);
-  const siteUrl = getSiteUrl(event);
+  const config = useRuntimeConfig(event);
+  const siteUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
   const authorName =
     (options.author.displayName as string) ||
     (options.author.username as string) ||
@@ -290,6 +485,9 @@ export async function processCustomThemeUpload(
       { errors: [], warnings: [] }
     );
   }
+
+  const storageLayout = (themeId: string) =>
+    themeStorageLayout('custom-themes', themeId, siteUrl, 'custom-themes');
 
   if (themeType === 'betterseqta') {
     const validation = validateBetterSeqtaStructure(themeFiles);
@@ -306,128 +504,27 @@ export async function processCustomThemeUpload(
     const bsTheme = await parseBetterSeqtaTheme(themeJsonContent);
     const themeId = options.replaceThemeId ?? generateUUID();
     const themeSlug = await ensureUniqueSlug(db, slugify(bsTheme.name), options.replaceThemeId);
-
-    const layout = themeStorageLayout('custom-themes', themeId, siteUrl, 'custom-themes');
-    const assets = await uploadBetterSeqtaThemeAssets(bucket, themeId, themeFiles, layout, {
-      themeJsonContent
-    });
-
-    const bannerEntry = Array.from(themeFiles.entries()).find(
-      ([p]) => p.includes('images/banner.webp') || p.includes('banner.webp')
-    );
-    const marqueeEntry = Array.from(themeFiles.entries()).find(
-      ([p]) => p.includes('images/marquee.webp') || p.includes('marquee.webp')
+    const assets = await uploadBetterSeqtaThemeAssets(
+      bucket,
+      themeId,
+      themeFiles,
+      storageLayout(themeId),
+      { themeJsonContent }
     );
 
-    const fileEntries: Array<{
-      path: string;
-      key: string;
-      fileType: string;
-      size: number;
-      mimeType?: string;
-    }> = [
-      {
-        path: 'theme.json',
-        key: `${layout.r2BaseKey}/theme.json`,
-        fileType: 'theme_json',
-        size: themeJsonContent.length,
-        mimeType: 'application/json'
-      }
-    ];
-    if (bannerEntry) {
-      fileEntries.push({
-        path: 'images/banner.webp',
-        key: `${layout.r2BaseKey}/images/banner.webp`,
-        fileType: 'cover',
-        size: bannerEntry[1].byteLength,
-        mimeType: 'image/webp'
-      });
-    }
-    if (marqueeEntry) {
-      fileEntries.push({
-        path: 'images/marquee.webp',
-        key: `${layout.r2BaseKey}/images/marquee.webp`,
-        fileType: 'marquee',
-        size: marqueeEntry[1].byteLength,
-        mimeType: 'image/webp'
-      });
-    }
-    await replaceCustomThemeFiles(db, themeId, fileEntries);
-
-    const now = nowUnixSeconds();
-
-    if (options.replaceThemeId) {
-      await db
-        .prepare(
-          `UPDATE custom_themes SET
-            name = ?, slug = ?, version = ?, description = ?, author = ?,
-            category = ?, tags = ?, status = 'pending', theme_json_url = ?,
-            cover_image_url = ?, marquee_image_url = ?, zip_download_url = NULL,
-            preview_thumbnail_url = NULL, preview_screenshots = NULL,
-            file_size = NULL, checksum = NULL, compatibility_min = NULL,
-            compatibility_max = NULL, rejection_reason = NULL, reviewed_by = NULL,
-            reviewed_at = NULL, submission_notes = ?, updated_at = ?
-           WHERE id = ? AND author_id = ?`
-        )
-        .bind(
-          bsTheme.name,
-          themeSlug,
-          '1.0.0',
-          bsTheme.description,
-          authorName,
-          'other',
-          '[]',
-          assets.themeJsonUrl,
-          assets.coverImageUrl,
-          assets.marqueeImageUrl,
-          options.submissionNotes ?? null,
-          now,
-          themeId,
-          options.author.id
-        )
-        .run();
-    } else {
-      await db
-        .prepare(
-          `INSERT INTO custom_themes (
-            id, name, slug, version, description, author, author_id, license,
-            category, tags, status, theme_type, theme_json_url,
-            cover_image_url, marquee_image_url, submission_notes,
-            created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        )
-        .bind(
-          themeId,
-          bsTheme.name,
-          themeSlug,
-          '1.0.0',
-          bsTheme.description,
-          authorName,
-          options.author.id,
-          'MIT',
-          'other',
-          '[]',
-          'pending',
-          'betterseqta',
-          assets.themeJsonUrl,
-          assets.coverImageUrl,
-          assets.marqueeImageUrl,
-          options.submissionNotes ?? null,
-          now,
-          now
-        )
-        .run();
-    }
-
-    const theme = (await db
-      .prepare('SELECT * FROM custom_themes WHERE id = ?')
-      .bind(themeId)
-      .first()) as Record<string, unknown>;
-
-    return createApiEnvelope({
-      theme: formatCustomThemeOwner(theme),
-      validation: { valid: true, warnings: validation.warnings, errors: [] }
+    await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
+    await saveBetterSeqtaCustomTheme(db, {
+      themeId,
+      replaceThemeId: options.replaceThemeId,
+      authorId: options.author.id,
+      authorName,
+      submissionNotes: options.submissionNotes,
+      slug: themeSlug,
+      bsTheme,
+      assets
     });
+
+    return uploadResult(db, themeId, validation);
   }
 
   const validation = validateThemeStructure(themeFiles);
@@ -448,95 +545,27 @@ export async function processCustomThemeUpload(
   const manifest = await parseManifest(new TextDecoder().decode(manifestEntry[1]));
   const themeId = options.replaceThemeId ?? generateUUID();
   const themeSlug = await ensureUniqueSlug(db, slugify(manifest.name), options.replaceThemeId);
-  const layout = themeStorageLayout('custom-themes', themeId, siteUrl, 'custom-themes');
-  const assets = await uploadDesqtaThemeAssets(bucket, themeId, themeSlug, themeFiles, layout);
+  const assets = await uploadDesqtaThemeAssets(
+    bucket,
+    themeId,
+    themeSlug,
+    themeFiles,
+    storageLayout(themeId)
+  );
 
   await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
-
-  const now = nowUnixSeconds();
-
-  if (options.replaceThemeId) {
-    await db
-      .prepare(
-        `UPDATE custom_themes SET
-          name = ?, slug = ?, version = ?, description = ?, author = ?,
-          license = ?, category = ?, tags = ?, status = 'pending',
-          preview_thumbnail_url = ?, preview_screenshots = ?,
-          zip_download_url = ?, file_size = ?, checksum = ?,
-          compatibility_min = ?, compatibility_max = ?,
-          theme_json_url = NULL, cover_image_url = NULL, marquee_image_url = NULL,
-          rejection_reason = NULL, reviewed_by = NULL, reviewed_at = NULL,
-          submission_notes = ?, updated_at = ?
-         WHERE id = ? AND author_id = ?`
-      )
-      .bind(
-        manifest.name,
-        themeSlug,
-        manifest.version,
-        manifest.description,
-        authorName,
-        manifest.license || 'MIT',
-        manifest.category || inferCategory(manifest),
-        JSON.stringify(manifest.tags || []),
-        assets.previewUrl,
-        JSON.stringify(assets.screenshotUrls),
-        assets.zipUrl,
-        assets.zipSize,
-        `sha256:${assets.zipChecksum}`,
-        manifest.compatibility.minVersion,
-        manifest.compatibility.maxVersion || null,
-        options.submissionNotes ?? null,
-        now,
-        themeId,
-        options.author.id
-      )
-      .run();
-  } else {
-    await db
-      .prepare(
-        `INSERT INTO custom_themes (
-          id, name, slug, version, description, author, author_id, license,
-          category, tags, status, preview_thumbnail_url, preview_screenshots,
-          zip_download_url, file_size, checksum, compatibility_min, compatibility_max,
-          theme_type, submission_notes, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      )
-      .bind(
-        themeId,
-        manifest.name,
-        themeSlug,
-        manifest.version,
-        manifest.description,
-        authorName,
-        options.author.id,
-        manifest.license || 'MIT',
-        manifest.category || inferCategory(manifest),
-        JSON.stringify(manifest.tags || []),
-        'pending',
-        assets.previewUrl,
-        JSON.stringify(assets.screenshotUrls),
-        assets.zipUrl,
-        assets.zipSize,
-        `sha256:${assets.zipChecksum}`,
-        manifest.compatibility.minVersion,
-        manifest.compatibility.maxVersion || null,
-        'desqta',
-        options.submissionNotes ?? null,
-        now,
-        now
-      )
-      .run();
-  }
-
-  const theme = (await db
-    .prepare('SELECT * FROM custom_themes WHERE id = ?')
-    .bind(themeId)
-    .first()) as Record<string, unknown>;
-
-  return createApiEnvelope({
-    theme: formatCustomThemeOwner(theme),
-    validation: { valid: true, warnings: validation.warnings, errors: [] }
+  await saveDesqtaCustomTheme(db, {
+    themeId,
+    replaceThemeId: options.replaceThemeId,
+    authorId: options.author.id,
+    authorName,
+    submissionNotes: options.submissionNotes,
+    slug: themeSlug,
+    manifest,
+    assets
   });
+
+  return uploadResult(db, themeId, validation);
 }
 
 export async function getCustomThemeById(
@@ -584,14 +613,8 @@ export function buildCustomThemeListQuery(params: {
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   let orderBy = 'created_at DESC';
-  switch (params.sort) {
-    case 'popular':
-      orderBy = 'download_count DESC, created_at DESC';
-      break;
-    case 'name':
-      orderBy = 'name ASC';
-      break;
-  }
+  if (params.sort === 'popular') orderBy = 'download_count DESC, created_at DESC';
+  else if (params.sort === 'name') orderBy = 'name ASC';
 
   return {
     whereClause,
@@ -698,4 +721,3 @@ export async function fetchApprovedCustomThemeList(
 
   return createApiEnvelope(data);
 }
-
