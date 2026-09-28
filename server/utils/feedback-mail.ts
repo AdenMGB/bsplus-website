@@ -3,6 +3,7 @@ import { getAccountsApiCredentials } from './accounts';
 import {
   escapeHtml,
   isMailConfigured,
+  isMailSendConfirmed,
   plainTextToBodyHtml,
   sendMail,
 } from './mail';
@@ -46,7 +47,7 @@ function formatLabel(value: string): string {
 }
 
 export async function fetchAdminEmails(event?: H3Event | null): Promise<string[]> {
-  const { apiKey, url: baseUrl } = getAccountsApiCredentials(event as H3Event);
+  const { apiKey, url: baseUrl } = await getAccountsApiCredentials(event as H3Event);
   if (!apiKey) {
     console.warn('[FeedbackMail] ACCOUNTS_API_KEY missing; cannot resolve admin emails');
     return [];
@@ -76,9 +77,10 @@ export async function fetchAdminEmails(event?: H3Event | null): Promise<string[]
 export async function sendFeedbackReplyEmail(
   row: FeedbackRow,
   responseText: string,
-  event?: H3Event | null
+  event?: H3Event | null,
+  options?: { bypassQuota?: boolean },
 ): Promise<{ sent: boolean; reason?: string }> {
-  if (!isMailConfigured(event)) {
+  if (!(await isMailConfigured(event))) {
     return { sent: false, reason: 'Mail is not configured' };
   }
 
@@ -96,12 +98,13 @@ export async function sendFeedbackReplyEmail(
     <p><strong>Reference:</strong> ${escapeHtml(row.id)}</p>
   `;
 
-  await sendMail(
+  const mailResult = await sendMail(
     {
       to: row.contact_email,
       subject,
       bodyHtml,
       text: `${name ? `Hi ${name}` : 'Hi'},\n\n${responseText.trim()}\n\nThanks,\nThe BetterSEQTA+ team\n\nReference: ${row.id}`,
+      bypassQuota: options?.bypassQuota !== false,
       templateOptions: {
         kicker: 'Feedback reply',
         headline: 'Response to your feedback',
@@ -111,8 +114,12 @@ export async function sendFeedbackReplyEmail(
         ctaLabel: 'Privacy policy',
       },
     },
-    event
+    event,
   );
+
+  if (!isMailSendConfirmed(mailResult)) {
+    return { sent: false, reason: 'BS Mail did not confirm send' };
+  }
 
   return { sent: true };
 }
@@ -126,7 +133,7 @@ export async function sendAdminFeedbackDigest(
   skipped: boolean;
   reason?: string;
 }> {
-  if (!isMailConfigured(event)) {
+  if (!(await isMailConfigured(event))) {
     return { notified: 0, admins: 0, skipped: true, reason: 'Mail is not configured' };
   }
 

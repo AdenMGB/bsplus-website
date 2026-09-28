@@ -1,7 +1,7 @@
+import { getAccountsOAuthBaseUrl } from '../../../utils/accounts';
 /**
  * Extension/DesQTA login: username + password → access token.
- * Proxies to accounts.betterseqta.org using OAuth2 resource owner password credentials grant.
- * No OAuth redirect, no Discord - direct credentials exchange.
+ * Proxies to accounts OAuth using resource owner password credentials grant.
  */
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ username?: string; password?: string }>(event);
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const tokenResponse = await $fetch<{ access_token?: string; expires_in?: number; error?: string }>(
-      'https://accounts.betterseqta.org/api/oauth/token',
+      `${getAccountsOAuthBaseUrl(event)}/api/oauth/token`,
       {
         method: 'POST',
         body: {

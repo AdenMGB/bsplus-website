@@ -1,4 +1,4 @@
-import { ACCOUNTS_OAUTH_BASE_URL } from '../../utils/accounts';
+import { getAccountsOAuthBaseUrl } from '../../utils/accounts';
 import {
   AUTH_REDIRECT_COOKIE_NAME,
   getAuthRedirectCookieSetOptions,
@@ -7,7 +7,15 @@ import {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
-  const redirectUri = process.env.NUXT_OAUTH_REDIRECT_URI || 'http://localhost:8787/api/auth/callback';
+  const redirectUri = config.oauthRedirectUri;
+
+  if (!config.oauthClientId?.trim()) {
+    throw createError({
+      statusCode: 503,
+      statusMessage:
+        'OAuth is not configured for local dev. Set NUXT_OAUTH_CLIENT_ID and NUXT_OAUTH_CLIENT_SECRET in .env (register a dev client at http://localhost:8788).',
+    });
+  }
 
   const query = getQuery(event);
   const redirectPath = sanitizeAuthRedirectPath(
@@ -24,5 +32,6 @@ export default defineEventHandler(async (event) => {
     response_type: 'code',
   });
 
-  return sendRedirect(event, `${ACCOUNTS_OAUTH_BASE_URL}/oauth/authorize?${params.toString()}`);
+  const accountsBase = getAccountsOAuthBaseUrl(event);
+  return sendRedirect(event, `${accountsBase}/oauth/authorize?${params.toString()}`, 302);
 });

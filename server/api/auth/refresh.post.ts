@@ -1,4 +1,4 @@
-import { ACCOUNTS_OAUTH_BASE_URL } from '../../utils/accounts';
+import { getAccountsOAuthBaseUrl } from '../../utils/accounts';
 import {
   AUTH_REFRESH_COOKIE_NAME,
   AUTH_TOKEN_COOKIE_NAME,
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<{ access_token: string;
     });
   }
 
-  const data = await $fetch<RefreshResponse>(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/refresh`, {
+  const data = await $fetch<RefreshResponse>(`${getAccountsOAuthBaseUrl(event)}/api/oauth/refresh`, {
     method: 'POST',
     body: {
       refresh_token: refreshToken,

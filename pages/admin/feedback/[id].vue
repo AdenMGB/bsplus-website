@@ -231,8 +231,17 @@
               <button
                 v-if="canEmail"
                 type="button"
+                class="rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-sm font-semibold text-sky-300 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                :disabled="emailingOnly || savingResponse || !canEmailReplyOnly"
+                @click="emailReplyOnly"
+              >
+                {{ emailingOnly ? 'Sending…' : 'Email reply only' }}
+              </button>
+              <button
+                v-if="canEmail"
+                type="button"
                 class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-105 hover:bg-green-500 active:scale-95 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-                :disabled="savingResponse || !draftResponse.trim()"
+                :disabled="savingResponse || emailingOnly || !draftResponse.trim()"
                 @click="saveResponse({ email: true, resolve: false })"
               >
                 {{ savingResponse ? 'Sending...' : 'Save & email reply' }}
@@ -276,7 +285,7 @@
             <p class="mt-3 text-xs text-zinc-500">
               <template v-if="canEmail">
                 Replies are sent via BetterSEQTA Mail from the configured
-                <code class="text-zinc-400">BS_MAIL_FROM</code> address.
+                <code class="text-zinc-400">BS_MAIL_FROM</code> address. Feedback replies bypass the API send quota.
               </template>
               <template v-else>
                 No contact email on this submission — you can still save a response for the record.
@@ -385,6 +394,7 @@ const draftNotes = ref('');
 const draftResponse = ref('');
 const savingTriage = ref(false);
 const savingResponse = ref(false);
+const emailingOnly = ref(false);
 const triageMessage = ref('');
 const responseMessage = ref('');
 const responseError = ref('');
@@ -393,6 +403,11 @@ const copied = ref(false);
 const canEmail = computed(
   () => !!(item.value?.contact?.include && item.value.contact.email)
 );
+
+const canEmailReplyOnly = computed(() => {
+  if (!canEmail.value) return false;
+  return Boolean(draftResponse.value.trim() || item.value?.admin_response);
+});
 
 const triageDirty = computed(() => {
   if (!item.value) return false;
@@ -463,6 +478,37 @@ async function saveTriage() {
 async function markResolved() {
   draftStatus.value = 'resolved';
   await saveTriage();
+}
+
+async function emailReplyOnly() {
+  if (!item.value || !canEmailReplyOnly.value) return;
+  const replyText = draftResponse.value.trim() || item.value.admin_response || '';
+  if (!replyText) return;
+  if (!confirm(`Send this reply by email to ${item.value.contact?.email}?`)) return;
+
+  emailingOnly.value = true;
+  responseMessage.value = '';
+  responseError.value = '';
+  try {
+    const result = await $fetch<{
+      email_sent?: boolean;
+      email_error?: string | null;
+    }>(`/api/bsplus/feedback/${item.value.id}/send-email`, {
+      method: 'POST',
+      body: draftResponse.value.trim() ? { admin_response: draftResponse.value.trim() } : {},
+    });
+    await refresh();
+
+    if (result.email_sent) {
+      responseMessage.value = 'Reply emailed.';
+    } else {
+      responseError.value = result.email_error || 'Email was not sent';
+    }
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to send email');
+  } finally {
+    emailingOnly.value = false;
+  }
 }
 
 async function saveResponse(options: { email: boolean; resolve: boolean }) {

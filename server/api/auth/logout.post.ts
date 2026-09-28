@@ -1,4 +1,4 @@
-import { ACCOUNTS_OAUTH_BASE_URL } from '../../utils/accounts';
+import { getAccountsOAuthBaseUrl } from '../../utils/accounts';
 import {
   AUTH_REFRESH_COOKIE_NAME,
   AUTH_TOKEN_COOKIE_NAME,
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   if (refreshToken && config.oauthClientId && config.oauthClientSecret) {
     try {
-      await $fetch(`${ACCOUNTS_OAUTH_BASE_URL}/api/oauth/revoke`, {
+      await $fetch(`${getAccountsOAuthBaseUrl(event)}/api/oauth/revoke`, {
         method: 'POST',
         body: {
           refresh_token: refreshToken,

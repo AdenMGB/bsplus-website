@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Forbidden' });
   }
 
-  const credentials = getAccountsApiCredentials(event);
+  const credentials = await getAccountsApiCredentials(event);
 
   const [usersCount, reservedClients]: [AccountsApiResult, AccountsApiResult] = await Promise.all([
     fetchAccountsApi('/users/count', credentials),
