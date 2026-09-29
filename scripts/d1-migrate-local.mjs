@@ -28,7 +28,8 @@ const IGNORE_ERROR = [
 ]
 
 function wrangler(args) {
-  return spawnSync('pnpm', ['exec', 'wrangler', ...args], {
+  const cmd = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
+  return spawnSync(cmd, ['exec', 'wrangler', ...args], {
     cwd: root,
     encoding: 'utf-8',
   })
