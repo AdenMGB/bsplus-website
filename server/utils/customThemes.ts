@@ -512,7 +512,6 @@ export async function processCustomThemeUpload(
       { themeJsonContent }
     );
 
-    await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
     await saveBetterSeqtaCustomTheme(db, {
       themeId,
       replaceThemeId: options.replaceThemeId,
@@ -523,6 +522,7 @@ export async function processCustomThemeUpload(
       bsTheme,
       assets
     });
+    await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
 
     return uploadResult(db, themeId, validation);
   }
@@ -553,7 +553,6 @@ export async function processCustomThemeUpload(
     storageLayout(themeId)
   );
 
-  await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
   await saveDesqtaCustomTheme(db, {
     themeId,
     replaceThemeId: options.replaceThemeId,
@@ -564,6 +563,7 @@ export async function processCustomThemeUpload(
     manifest,
     assets
   });
+  await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
 
   return uploadResult(db, themeId, validation);
 }
