@@ -1,0 +1,20 @@
+-- Mark migrations 001-019 as applied without re-running schema (production was migrated manually).
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('001_migration_add_preview_columns.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('002_migration_add_daily_questions.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('003_migration_add_question_queue.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('004_migration_add_theme_marketplace.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('005_extension_themes_schema.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('006_extension_themes_approval_flow.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('007_analytics_usage.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('008_user_sessions.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('009_pseudo_extension_themes.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('010_bsplus_theme_flavours.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('011_theme_of_the_month.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('012_feedback_submissions.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('013_feedback_admin_response.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('014_feedback_mail_tracking.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('015_service_api_keys.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('016_surveys_milestone.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('017_site_integrations.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('018_survey_invite_clicks.sql');
+INSERT OR IGNORE INTO d1_migrations (name) VALUES ('019_custom_themes.sql');
