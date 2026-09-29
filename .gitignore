@@ -25,6 +25,7 @@ logs
 
 # Wrangler local dev state (D1 SQLite, KV, etc.) — never commit
 .wrangler/
+.dev.vars
 
 .pnpm-store/
 BetterSEQTA-Themes

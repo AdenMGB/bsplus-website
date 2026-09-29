@@ -20,14 +20,12 @@ export async function getOptionalUser(event: H3Event): Promise<UserInfo | null> 
 }
 
 export async function requireAuth(event: H3Event): Promise<UserInfo> {
-  const user = await $fetch<UserInfo>('/api/auth/me', {
-    headers: authHeaders(event)
-  }).catch(() => null);
+  const user = await getOptionalUser(event);
 
   if (!user?.id) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized - valid authentication required'
+      statusMessage: 'Unauthorized - valid authentication required',
     });
   }
 
