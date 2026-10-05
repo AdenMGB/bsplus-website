@@ -92,9 +92,7 @@ export default defineEventHandler(async (event) => {
       pseudoExternalUrl = ext.url;
     }
 
-    const layout = themeStorageLayout('themes', themeId, siteUrl, 'themes', {
-      relativeImageUrls: true
-    });
+    const layout = themeStorageLayout('themes', themeId, siteUrl, 'themes');
     const assets = await uploadBetterSeqtaThemeAssets(bucket, themeId, themeFiles, layout, {
       themeJsonContent,
       pseudoExternalUrl
@@ -213,9 +211,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const layout = themeStorageLayout('themes', themeId, siteUrl, 'themes', {
-    relativeImageUrls: true
-  });
+  const layout = themeStorageLayout('themes', themeId, siteUrl, 'themes');
   const assets = await uploadDesqtaThemeAssets(bucket, themeId, themeSlug, themeFiles, layout);
 
   const now = Date.now();
