@@ -1,3 +1,4 @@
+import { PhotonImage, SamplingFilter, resize } from '@cf-wasm/photon/workerd';
 import { createError, type H3Event } from 'h3';
 import { getDB } from './db';
 import { getBucket } from './r2';
@@ -29,8 +30,44 @@ export function cssBackgroundImageUrl(r2Key: string): string {
   return `/api/images/${r2Key}`;
 }
 
-async function loadPhoton() {
-  return import('@cf-wasm/photon');
+export function isWebpBytes(input: Uint8Array): boolean {
+  return (
+    input.byteLength >= 12 &&
+    input[0] === 0x52 &&
+    input[1] === 0x49 &&
+    input[2] === 0x46 &&
+    input[3] === 0x46 &&
+    input[8] === 0x57 &&
+    input[9] === 0x45 &&
+    input[10] === 0x42 &&
+    input[11] === 0x50
+  );
+}
+
+function assertInputSize(input: Uint8Array): void {
+  if (input.byteLength > MAX_INPUT_BYTES) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Image must be smaller than ${MAX_INPUT_BYTES / (1024 * 1024)}MB`,
+    });
+  }
+}
+
+export async function prepareBackgroundWebpBytes(
+  input: Uint8Array,
+  dimensions?: { width?: number; height?: number }
+): Promise<{ bytes: Uint8Array; width: number; height: number }> {
+  assertInputSize(input);
+
+  if (isWebpBytes(input)) {
+    return {
+      bytes: input,
+      width: dimensions?.width ?? 0,
+      height: dimensions?.height ?? 0,
+    };
+  }
+
+  return encodeImageToWebp(input);
 }
 
 export async function encodeImageToWebp(input: Uint8Array): Promise<{
@@ -38,14 +75,8 @@ export async function encodeImageToWebp(input: Uint8Array): Promise<{
   width: number;
   height: number;
 }> {
-  if (input.byteLength > MAX_INPUT_BYTES) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Image must be smaller than ${MAX_INPUT_BYTES / (1024 * 1024)}MB`,
-    });
-  }
+  assertInputSize(input);
 
-  const { PhotonImage, SamplingFilter, resize } = await loadPhoton();
   const image = PhotonImage.new_from_byteslice(input);
 
   try {
@@ -106,8 +137,8 @@ export async function insertCssBackground(
   options: {
     originalFilename: string | null;
     webpBytes: Uint8Array;
-    width: number;
-    height: number;
+    width: number | null;
+    height: number | null;
     createdBy: string;
   }
 ): Promise<CssBackgroundRow> {

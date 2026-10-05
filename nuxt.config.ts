@@ -80,6 +80,7 @@ export default defineNuxtConfig({
       preset: "cloudflare-module",
       minify: true,
       compressPublicAssets: true,
+      moduleSideEffects: ['@cf-wasm/photon/workerd'],
       experimental: {
         tasks: true,
       },

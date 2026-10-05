@@ -45,7 +45,7 @@
               class="block w-full text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-cyan-500"
               @change="onFileChange"
             />
-            <p class="mt-2 text-xs text-zinc-500">JPEG, PNG, WebP, etc. — converted and compressed to WebP on upload (max 12MB).</p>
+            <p class="mt-2 text-xs text-zinc-500">JPEG, PNG, WebP, etc. — converted to WebP in your browser before upload (max edge 2560px).</p>
           </div>
           <button
             type="submit"
@@ -164,13 +164,58 @@ async function copyPublicUrl() {
   }
 }
 
+const MAX_EDGE_PX = 2560;
+const WEBP_QUALITY = 0.85;
+
+async function fileToWebpFile(
+  file: File
+): Promise<{ file: File; width: number; height: number }> {
+  const bitmap = await createImageBitmap(file);
+  let width = bitmap.width;
+  let height = bitmap.height;
+  const maxEdge = Math.max(width, height);
+
+  if (maxEdge > MAX_EDGE_PX) {
+    const scale = MAX_EDGE_PX / maxEdge;
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    bitmap.close();
+    throw new Error('Could not prepare canvas for WebP conversion');
+  }
+
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (result) => (result ? resolve(result) : reject(new Error('WebP conversion failed'))),
+      'image/webp',
+      WEBP_QUALITY
+    );
+  });
+
+  const baseName = file.name.replace(/\.[^.]+$/, '') || 'background';
+  const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+  return { file: webpFile, width, height };
+}
+
 async function upload() {
   if (!selectedFile.value) return;
   uploading.value = true;
   uploadError.value = '';
   try {
+    const { file, width, height } = await fileToWebpFile(selectedFile.value);
     const body = new FormData();
-    body.append('file', selectedFile.value);
+    body.append('file', file);
+    body.append('width', String(width));
+    body.append('height', String(height));
     await $fetch('/api/admin/backgrounds', { method: 'POST', body });
     selectedFile.value = null;
     if (fileInput.value) fileInput.value.value = '';
