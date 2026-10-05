@@ -37,6 +37,9 @@
           <NuxtLink to="/admin/api-keys" class="inline-flex items-center gap-2 rounded-lg bg-zinc-600/20 hover:bg-zinc-600/30 border border-zinc-500/30 px-3 py-2 text-sm font-medium text-zinc-300 transition-all duration-200 hover:scale-105">
             API Keys
           </NuxtLink>
+          <NuxtLink to="/admin/backgrounds" class="inline-flex items-center gap-2 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-500/30 px-3 py-2 text-sm font-medium text-cyan-400 transition-all duration-200 hover:scale-105">
+            CSS Backgrounds
+          </NuxtLink>
         </div>
       </div>
 
