@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   let outHeight: number;
 
   try {
-    ({ bytes, width: outWidth, height: outHeight } = await prepareBackgroundWebpBytes(input, {
+    ({ bytes, width: outWidth, height: outHeight } = prepareBackgroundWebpBytes(input, {
       width,
       height,
     }));

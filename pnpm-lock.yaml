@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@cf-wasm/photon':
-        specifier: ^0.4.0
-        version: 0.4.0
       '@headlessui/vue':
         specifier: ^1.7.23
         version: 1.7.23(vue@3.5.25(typescript@5.9.3))
@@ -262,12 +259,6 @@ packages:
 
   '@capsizecss/unpack@2.4.0':
     resolution: {integrity: sha512-GrSU71meACqcmIUxPYOJvGKF0yryjN/L1aCuE9DViCTJI7bfkjgYDPD1zbNDcINJwSSP6UaBZY9GAbYDO7re0Q==}
-
-  '@cf-wasm/internals@0.2.0':
-    resolution: {integrity: sha512-QwMNETkTCtrx0uCzjJPRCTyok0OZNvOry9alfG8a8TpHo7oPJ17htPMDG4ptudpwe9F0VtJHy9+nOzJmupteiQ==}
-
-  '@cf-wasm/photon@0.4.0':
-    resolution: {integrity: sha512-PQcN6sThZAR/V6SH2MQmeFndDDhGfOxvra6UStyaBbkDHrgTPKvB+WapAhh0/TA9LsRAUaX/rEEw6hvY9uphbQ==}
 
   '@cloudflare/kv-asset-handler@0.4.1':
     resolution: {integrity: sha512-Nu8ahitGFFJztxUml9oD/DLb7Z28C8cd8F46IVQ7y5Btz575pvMY8AqZsXkX7Gds29eCKdMgIHjIvzskHgPSFg==}
@@ -6005,12 +5996,6 @@ snapshots:
       fontkit: 2.0.4
     transitivePeerDependencies:
       - encoding
-
-  '@cf-wasm/internals@0.2.0': {}
-
-  '@cf-wasm/photon@0.4.0':
-    dependencies:
-      '@cf-wasm/internals': 0.2.0
 
   '@cloudflare/kv-asset-handler@0.4.1':
     dependencies:
