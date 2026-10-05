@@ -1,9 +1,15 @@
 import { requireAdmin } from '../../../utils/auth';
 import {
-  encodeImageToWebp,
   insertCssBackground,
   mapCssBackgroundForAdmin,
+  prepareBackgroundWebpBytes,
 } from '../../../utils/cssBackgrounds';
+
+function parseDimensionPart(part: { data: Buffer | Uint8Array } | undefined): number | undefined {
+  if (!part?.data?.length) return undefined;
+  const value = Number.parseInt(Buffer.from(part.data).toString('utf8'), 10);
+  return Number.isFinite(value) && value > 0 ? value : undefined;
+}
 
 export default defineEventHandler(async (event) => {
   const admin = await requireAdmin(event);
@@ -26,14 +32,32 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const width = parseDimensionPart(formData.find((part) => part.name === 'width'));
+  const height = parseDimensionPart(formData.find((part) => part.name === 'height'));
+
   const input = new Uint8Array(file.data);
-  const { bytes, width, height } = await encodeImageToWebp(input);
+  let bytes: Uint8Array;
+  let outWidth: number;
+  let outHeight: number;
+
+  try {
+    ({ bytes, width: outWidth, height: outHeight } = await prepareBackgroundWebpBytes(input, {
+      width,
+      height,
+    }));
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : 'Image conversion failed';
+    throw createError({ statusCode: 400, statusMessage: message });
+  }
 
   const row = await insertCssBackground(event, {
     originalFilename: file.filename ?? null,
     webpBytes: bytes,
-    width,
-    height,
+    width: outWidth > 0 ? outWidth : (width ?? null),
+    height: outHeight > 0 ? outHeight : (height ?? null),
     createdBy: admin.id,
   });
 
