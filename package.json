@@ -18,7 +18,6 @@
     "cf:deploy:dev": "pnpm build && wrangler deploy --env dev"
   },
   "dependencies": {
-    "@cf-wasm/photon": "^0.4.0",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@nuxt/fonts": "0.11.1",

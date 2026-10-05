@@ -1,4 +1,3 @@
-import { PhotonImage, SamplingFilter, resize } from '@cf-wasm/photon/workerd';
 import { createError, type H3Event } from 'h3';
 import { getDB } from './db';
 import { getBucket } from './r2';
@@ -6,7 +5,6 @@ import { generateUUID } from './themes';
 
 const R2_PREFIX = 'backgrounds';
 const MAX_INPUT_BYTES = 12 * 1024 * 1024;
-const MAX_EDGE_PX = 2560;
 
 export const CSS_BACKGROUND_PUBLIC_PATH = '/api/background.webp';
 
@@ -44,74 +42,30 @@ export function isWebpBytes(input: Uint8Array): boolean {
   );
 }
 
-function assertInputSize(input: Uint8Array): void {
+export function prepareBackgroundWebpBytes(
+  input: Uint8Array,
+  dimensions?: { width?: number; height?: number }
+): { bytes: Uint8Array; width: number; height: number } {
   if (input.byteLength > MAX_INPUT_BYTES) {
     throw createError({
       statusCode: 400,
       statusMessage: `Image must be smaller than ${MAX_INPUT_BYTES / (1024 * 1024)}MB`,
     });
   }
-}
 
-export async function prepareBackgroundWebpBytes(
-  input: Uint8Array,
-  dimensions?: { width?: number; height?: number }
-): Promise<{ bytes: Uint8Array; width: number; height: number }> {
-  assertInputSize(input);
-
-  if (isWebpBytes(input)) {
-    return {
-      bytes: input,
-      width: dimensions?.width ?? 0,
-      height: dimensions?.height ?? 0,
-    };
+  if (!isWebpBytes(input)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        'Only WebP uploads are supported. Use the admin page uploader to convert images.',
+    });
   }
 
-  return encodeImageToWebp(input);
-}
-
-export async function encodeImageToWebp(input: Uint8Array): Promise<{
-  bytes: Uint8Array;
-  width: number;
-  height: number;
-}> {
-  assertInputSize(input);
-
-  const image = PhotonImage.new_from_byteslice(input);
-
-  try {
-    const width = image.get_width();
-    const height = image.get_height();
-    const maxEdge = Math.max(width, height);
-    let working = image;
-
-    if (maxEdge > MAX_EDGE_PX) {
-      const scale = MAX_EDGE_PX / maxEdge;
-      const nextWidth = Math.max(1, Math.round(width * scale));
-      const nextHeight = Math.max(1, Math.round(height * scale));
-      working = resize(
-        image,
-        nextWidth,
-        nextHeight,
-        SamplingFilter.Nearest
-      );
-    }
-
-    try {
-      const bytes = working.get_bytes_webp();
-      return {
-        bytes,
-        width: working.get_width(),
-        height: working.get_height(),
-      };
-    } finally {
-      if (working !== image) {
-        working.free();
-      }
-    }
-  } finally {
-    image.free();
-  }
+  return {
+    bytes: input,
+    width: dimensions?.width ?? 0,
+    height: dimensions?.height ?? 0,
+  };
 }
 
 export async function pickRandomEnabledBackground(
@@ -130,7 +84,6 @@ export async function pickRandomEnabledBackground(
 
   return row ?? null;
 }
-
 
 export async function insertCssBackground(
   event: H3Event,
