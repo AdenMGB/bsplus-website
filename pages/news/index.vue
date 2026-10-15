@@ -79,11 +79,5 @@ function formatDate(timestamp: number) {
 usePageSeo({
   title: "News",
   description: "Latest news and updates from the BetterSEQTA+ team. Stay informed about new features, releases, and SEQTA Learn enhancements.",
-  ogImageComponent: "PageOG",
-  ogImageProps: {
-    title: "News & Updates",
-    description: "Latest from BetterSEQTA+ — features, releases, SEQTA Learn",
-    headline: "BetterSEQTA Plus",
-  },
 });
 </script>

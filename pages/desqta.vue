@@ -335,12 +335,6 @@ import { ref, onMounted, computed } from 'vue';
 usePageSeo({
   title: "DesQTA - The Desktop Experience",
   description: "DesQTA is a powerful desktop application for SEQTA Learn, bringing the full SEQTA experience to your computer with enhanced features, offline support, and optimized performance.",
-  ogImageComponent: "DesQTAOG",
-  ogImageProps: {
-    title: "DesQTA",
-    description: "The full SEQTA Learn experience on your desktop",
-    headline: "Desktop App",
-  },
 });
 
 const schemaHelpers = useSchemaOrgHelpers();

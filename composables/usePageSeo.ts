@@ -1,6 +1,6 @@
 /**
  * Composable for consistent page-level SEO meta tags.
- * Sets description, Open Graph, Twitter Card, canonical URL, and optional dynamic OG image.
+ * Sets description, Open Graph, Twitter Card, canonical URL, and OG image.
  */
 export function usePageSeo(options: {
   title?: string;
@@ -10,27 +10,25 @@ export function usePageSeo(options: {
   canonical?: string;
   noIndex?: boolean;
   ogType?: 'website' | 'article';
-  /** Use dynamic OG image component instead of static image. Pass component name + props. */
-  ogImageComponent?: string;
-  ogImageProps?: Record<string, string>;
 }) {
   const route = useRoute();
   const config = useRuntimeConfig();
   const baseUrl = (config.public?.siteUrl ?? 'https://betterseqta.org').replace(/\/$/, '');
 
   const canonical = options.canonical ?? (options.noIndex ? undefined : `${baseUrl}${route.path}`);
-  const ogImage = options.image?.startsWith('http') ? options.image : options.image ? `${baseUrl}${options.image}` : undefined;
-
-  // Dynamic OG image disabled: Cloudflare Workers return 500 for runtime OG generation.
-  // Use static image instead (pass image or rely on layout default).
-  const effectiveImage = ogImage ?? (options.ogImageComponent ? `${baseUrl}/web-app-manifest-512x512.png` : undefined);
+  const ogImage = options.image?.startsWith('http')
+    ? options.image
+    : options.image
+      ? `${baseUrl}${options.image}`
+      : `${baseUrl}/web-app-manifest-512x512.png`;
   const imageAlt = options.imageAlt ?? options.description?.slice(0, 100);
 
   useSeoMeta({
     description: options.description,
     ogDescription: options.description,
     ogTitle: options.title,
-    ...(effectiveImage && { ogImage: effectiveImage, ogImageAlt: imageAlt }),
+    ogImage,
+    ogImageAlt: imageAlt,
     ogUrl: canonical,
     ogType: options.ogType ?? 'website',
     ogSiteName: 'BetterSEQTA Plus',
@@ -38,7 +36,8 @@ export function usePageSeo(options: {
     twitterCard: 'summary_large_image',
     twitterTitle: options.title,
     twitterDescription: options.description,
-    ...(effectiveImage && { twitterImage: effectiveImage, twitterImageAlt: imageAlt }),
+    twitterImage: ogImage,
+    twitterImageAlt: imageAlt,
     ...(options.noIndex && { robots: 'noindex, nofollow' }),
   });
 
