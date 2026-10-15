@@ -1,4 +1,6 @@
-# Nuxt dev/build outputs
+node_modules
+.pnpm-store/
+
 .output
 .data
 .nuxt
@@ -6,26 +8,19 @@
 .cache
 dist
 
-# Node dependencies
-node_modules
+.wrangler/
+.dev.vars*
 
-# Logs
-logs
-*.log
-
-# Misc
-.DS_Store
-.fleet
-.idea
-
-# Local env files
 .env
 .env.*
 !.env.example
 
-# Wrangler local dev state (D1 SQLite, KV, etc.) — never commit
-.wrangler/
-.dev.vars
+logs
+*.log
 
-.pnpm-store/
+.DS_Store
+Thumbs.db
+.idea
+.fleet
+
 BetterSEQTA-Themes

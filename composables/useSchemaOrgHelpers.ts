@@ -13,7 +13,7 @@ export function useSchemaOrgHelpers() {
       defineOrganization({
         name: 'BetterSEQTA',
         url: siteUrl,
-        logo: `${siteUrl}/favicon-96x96.png`,
+        logo: `${siteUrl}/web-app-manifest-512x512.png`,
       }),
     /** WebSite schema for homepage */
     webSite: (name: string, description?: string) =>

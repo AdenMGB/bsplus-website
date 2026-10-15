@@ -245,7 +245,7 @@ const ogImage =
     ? heroImage
     : heroImage
       ? `${baseUrl}${heroImage.startsWith('/') ? '' : '/'}${heroImage}`
-      : `${baseUrl}/favicon-96x96.png`;
+      : `${baseUrl}/web-app-manifest-512x512.png`;
 
 usePageSeo({
   title: `${theme.name} — SEQTA theme`,

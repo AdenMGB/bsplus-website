@@ -109,9 +109,9 @@ useSeoMeta({
   description: siteDesc,
   ogDescription: siteDesc,
   ogSiteName: 'BetterSEQTA Plus',
-  ogImage: `${siteUrl}/favicon-96x96.png`,
-  ogImageWidth: 1200,
-  ogImageHeight: 630,
+  ogImage: `${siteUrl}/web-app-manifest-512x512.png`,
+  ogImageWidth: 512,
+  ogImageHeight: 512,
   twitterCard: 'summary_large_image',
 });
 useHead({

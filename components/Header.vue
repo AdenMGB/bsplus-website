@@ -7,7 +7,7 @@
       <div class="flex lg:flex-1">
         <NuxtLink href="/" class="-m-1.5 p-1.5 transition-transform duration-200 hover:scale-105 active:scale-95">
           <span class="sr-only">DesQTA</span>
-          <img src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png" alt="DesQTA logo" class="h-8 w-8" />
+          <img src="/favicon.svg" alt="DesQTA logo" class="h-8 w-8" />
         </NuxtLink>
       </div>
       <div class="relative z-[60] flex lg:hidden">

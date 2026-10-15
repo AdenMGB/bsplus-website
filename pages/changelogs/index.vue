@@ -127,12 +127,6 @@ import { useMarkdown } from '~/composables/useMarkdown';
 usePageSeo({
   title: 'Changelogs - BetterSEQTA+ & DesQTA',
   description: 'Release notes and changelogs for BetterSEQTA+ browser extension and DesQTA desktop app. See what\'s new in each version.',
-  ogImageComponent: "PageOG",
-  ogImageProps: {
-    title: "Changelogs",
-    description: "Release notes for BetterSEQTA+ and DesQTA",
-    headline: "What's New",
-  },
 });
 
 const schemaHelpers = useSchemaOrgHelpers();

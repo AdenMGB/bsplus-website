@@ -40,7 +40,7 @@
               <NuxtLink href="/" class="-m-1.5 p-1.5" @click="close">
                 <span class="sr-only">DesQTA</span>
                 <img
-                  src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
+                  src="/favicon.svg"
                   alt="DesQTA logo"
                   class="h-8 w-8"
                 />
@@ -342,11 +342,12 @@ onUnmounted(() => {
   height: 100%;
   padding: 5.5rem 1.5rem 2rem;
   pointer-events: none;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .mobile-menu-shell--open .mobile-menu-content {
   pointer-events: auto;
+  overflow-y: auto;
 }
 
 .mobile-menu-reveal {

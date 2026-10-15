@@ -32,7 +32,7 @@ function parseEnvFile(filePath) {
 function main() {
   // .env / .env.local win over stale .dev.vars (never let old generated file override secrets)
   const merged = {
-    ...parseEnvFile(path.join(root, 'env.example')),
+    ...parseEnvFile(path.join(root, '.env.example')),
     ...parseEnvFile(devVarsPath),
     ...parseEnvFile(path.join(root, '.env')),
     ...parseEnvFile(path.join(root, '.env.local')),
