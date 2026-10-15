@@ -106,7 +106,7 @@ export default defineNuxtConfig({
       type: 'Organization',
       name: 'BetterSEQTA',
       url: 'https://betterseqta.org',
-      logo: 'https://betterseqta.org/favicon-96x96.png',
+      logo: 'https://betterseqta.org/web-app-manifest-512x512.png',
     },
   },
 

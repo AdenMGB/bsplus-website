@@ -40,7 +40,7 @@
               <NuxtLink href="/" class="-m-1.5 p-1.5" @click="close">
                 <span class="sr-only">DesQTA</span>
                 <img
-                  src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
+                  src="/favicon.svg"
                   alt="DesQTA logo"
                   class="h-8 w-8"
                 />

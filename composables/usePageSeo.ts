@@ -23,7 +23,7 @@ export function usePageSeo(options: {
 
   // Dynamic OG image disabled: Cloudflare Workers return 500 for runtime OG generation.
   // Use static image instead (pass image or rely on layout default).
-  const effectiveImage = ogImage ?? (options.ogImageComponent ? `${baseUrl}/favicon-96x96.png` : undefined);
+  const effectiveImage = ogImage ?? (options.ogImageComponent ? `${baseUrl}/web-app-manifest-512x512.png` : undefined);
   const imageAlt = options.imageAlt ?? options.description?.slice(0, 100);
 
   useSeoMeta({
