@@ -342,11 +342,12 @@ onUnmounted(() => {
   height: 100%;
   padding: 5.5rem 1.5rem 2rem;
   pointer-events: none;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .mobile-menu-shell--open .mobile-menu-content {
   pointer-events: auto;
+  overflow-y: auto;
 }
 
 .mobile-menu-reveal {
