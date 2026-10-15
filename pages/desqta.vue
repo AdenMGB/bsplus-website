@@ -21,7 +21,7 @@
           <h1 class="mt-6 sm:mt-8 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-display animate-slide-down delay-100">
             DesQTA
           </h1>
-          <h2 class="mt-2 text-xl sm:text-2xl lg:text-3xl font-medium tracking-tight text-blue-300 font-display animate-slide-down delay-100">
+          <h2 class="mt-2 text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-blue-300 font-display animate-slide-down delay-100">
             The Desktop Experience
           </h2>
           <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-zinc-300 animate-fade-in delay-200">

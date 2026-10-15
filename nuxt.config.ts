@@ -112,75 +112,8 @@ export default defineNuxtConfig({
 
   fonts: {
     families: [
-      /*
-      {
-        name: "Helvetica",
-        src: "/fonts/helvetica/helvetica-300-light.woff2",
-      },
-      {
-        name: "Helvetica",
-        src: "/fonts/helvetica/Helvetica-400-italic.woff",
-      },
-      {
-        name: "Helvetica",
-        src: "/fonts/helvetica/Helvetica-400.woff",
-      },
-      {
-        name: "Helvetica",
-        src: "/fonts/helvetica/Helvetica-600-bold-italic.woff",
-      },
-      {
-        name: "Helvetica",
-        src: "/fonts/helvetica/Helvetica-600-bold.woff",
-      },
-      */
-      {
-        name: "Inter",
-        src: "/fonts/inter/Inter-variable-400.ttf",
-      },
-      {
-        name: "Inter",
-        src: "/fonts/inter/Inter-variable-400-italic.ttf",
-      },
-      /*
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-100-thin.ttf",
-        weight: 100,
-      },
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-300-light.woff.ttf",
-        weight: 300,
-      },
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-400-regular.woff.ttf",
-        weight: 400,
-      },
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-500-medium.woff.ttf",
-        weight: 500
-      },
-      */
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-600-bold.woff.ttf",
-        weight: 600,
-      },
-      /*
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-700-extra-bold.ttf",
-        weight: 700
-      },
-      {
-        name: "Motiva Sans",
-        src: "/fonts/motiva/motiva-sans-900-black.woff.ttf",
-        weight: 900
-      },
-      */
+      { name: "Inter", provider: "none" },
+      { name: "Motiva Sans", provider: "none" },
     ],
   },
 
