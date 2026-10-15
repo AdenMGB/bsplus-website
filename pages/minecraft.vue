@@ -119,12 +119,6 @@
 usePageSeo({
   title: "Minecraft Server",
   description: "Join the BetterSEQTA+ Minecraft server. Community gaming for SEQTA users. Server: mc.betterseqta.org",
-  ogImageComponent: "PageOG",
-  ogImageProps: {
-    title: "BetterSEQTA+ Minecraft",
-    description: "Join our community — mc.betterseqta.org",
-    headline: "Community Server",
-  },
 });
 
 const schemaHelpers = useSchemaOrgHelpers();

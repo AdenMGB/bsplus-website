@@ -36,7 +36,7 @@
             <div class="space-y-8 text-center xl:text-left">
               <img
                 class="mx-auto h-7 transition-transform duration-200 hover:scale-105 xl:mx-0"
-                src="https://raw.githubusercontent.com/BetterSEQTA/DesQTA/refs/heads/develop/static/32x32.png"
+                src="/favicon.svg"
                 alt="BetterSEQTA+"
               />
               <p class="text-sm leading-6 text-zinc-400">

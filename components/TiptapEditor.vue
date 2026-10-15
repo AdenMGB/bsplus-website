@@ -365,7 +365,7 @@ onBeforeUnmount(() => {
 :deep(.ProseMirror pre code) {
   font-size: 0.875rem !important;
   color: rgb(244 244 245) !important; /* text-zinc-100 */
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
   white-space: pre !important;
   line-height: 1.6 !important;
   display: block !important;

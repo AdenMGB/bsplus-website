@@ -204,7 +204,7 @@ usePageSeo({
   title: p.title,
   description,
   ...(coverImage ? { image: coverImage, imageAlt: p.title } : {
-    image: `${baseUrl}/favicon-96x96.png`,
+    image: `${baseUrl}/web-app-manifest-512x512.png`,
     imageAlt: 'BetterSEQTA News',
   }),
   canonical: `${baseUrl}/news/${route.params.slug}`,
