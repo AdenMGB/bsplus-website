@@ -46,24 +46,6 @@
 //   font-style: italic;
 // }
 
-.carousel__icon {
-  color: #f4f4f5;
-}
-.carousel__pagination-button::after {
-  background-color: #3f3f46;
-  border-radius: 999999px;
-}
-.carousel__pagination-button:hover::after {
-  background-color: #27272a;
-  border-radius: 999999px;
-}
-.carousel__pagination-button--active::after {
-  background-color: #a1a1aa;
-}
-.carousel__pagination-button--active:hover::after {
-  background-color: #d4d4d8;
-}
-
 html {
   background-color: oklch(0.21 0.006 285.885);
 }

@@ -66,15 +66,10 @@ export default defineNuxtConfig({
   },
   modules: [
     "@nuxtjs/tailwindcss",
-    "vue3-carousel-nuxt",
-    "@nuxt/image",
     "@nuxt/fonts",
     "@nuxtjs/seo",
   ],
   css: ["~/assets/core.scss"],
-  carousel: {
-    prefix: "Vue",
-  },
 
     nitro: {
       preset: "cloudflare-module",
@@ -197,13 +192,7 @@ export default defineNuxtConfig({
         verbatimModuleSyntax: false,
         strictNullChecks: true,
         skipLibCheck: true,
-        // exactOptionalPropertyTypes disabled - @nuxt/image types are incompatible
       },
     },
   },
-
-  image: {
-    quality: 80,
-    format: ['webp']
-  }
 });

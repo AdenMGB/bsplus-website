@@ -21,7 +21,6 @@
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@nuxt/fonts": "0.11.1",
-    "@nuxt/image": "1.10.0",
     "@nuxtjs/seo": "3.0.3",
     "@nuxtjs/tailwindcss": "6.13.1",
     "@tiptap/extension-code-block": "^3.11.1",
@@ -29,7 +28,6 @@
     "@tiptap/extension-link": "^3.11.1",
     "@tiptap/extension-text-align": "^3.11.1",
     "@tiptap/extension-underline": "^3.11.1",
-    "@tiptap/extension-youtube": "^3.11.1",
     "@tiptap/starter-kit": "^3.11.1",
     "@tiptap/vue-3": "^3.11.1",
     "@zip.js/zip.js": "^2.8.16",
@@ -40,26 +38,16 @@
     "jspdf-autotable": "^5.0.7",
     "markdown-it": "^14.1.0",
     "nuxt": "^3.16.2",
-    "vite": "^8.0.0",
-    "vue": "latest",
+    "vue": "^3.5.25",
     "vue-echarts": "^8.0.1",
-    "vue-router": "latest",
-    "vue3-carousel-nuxt": "^1.1.5"
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251128.0",
-    "@nuxt/icon": "^1.12.0",
     "@types/markdown-it": "^14.1.2",
     "sass-embedded": "^1.83.4",
-    "serve": "^14.2.4",
     "typescript": "^5.8.3",
-    "unstorage": "1.15.0",
     "vue-tsc": "^2.2.8",
     "wrangler": "^4.51.0"
-  },
-  "overrides": {
-    "vue3-carousel-nuxt": {
-      "vue3-carousel": "^0.15.0"
-    }
   }
 }
