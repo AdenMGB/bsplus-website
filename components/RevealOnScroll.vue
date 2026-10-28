@@ -11,6 +11,17 @@
 </template>
 
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue';
+
+function resolveRootElement(
+  target: HTMLElement | ComponentPublicInstance | null,
+): HTMLElement | null {
+  if (!target) return null;
+  if (target instanceof HTMLElement) return target;
+  const el = target.$el;
+  return el instanceof HTMLElement ? el : null;
+}
+
 const props = withDefaults(
   defineProps<{
     tag?: string;
@@ -22,15 +33,15 @@ const props = withDefaults(
   {
     tag: "div",
     delay: 0,
-    threshold: 0.12,
-    rootMargin: "0px 0px -8% 0px",
+    threshold: 0,
+    rootMargin: "0px 0px -4% 0px",
     once: true,
   }
 );
 
 const { prefersReducedMotion } = usePrefersReducedMotion();
 
-const rootRef = ref<HTMLElement | null>(null);
+const rootRef = ref<HTMLElement | ComponentPublicInstance | null>(null);
 const isVisible = ref(false);
 
 const delayStyle = computed(() =>
@@ -47,7 +58,7 @@ onMounted(() => {
     return;
   }
 
-  const el = rootRef.value;
+  const el = resolveRootElement(rootRef.value);
   if (!el) return;
 
   observer = new IntersectionObserver(

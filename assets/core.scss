@@ -103,6 +103,60 @@ html {
   transform: translateY(0);
 }
 
+/* ── Legal pages (markdown → HTML) ── */
+.legal-document-body {
+  :where(h3) {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: rgb(255 255 255);
+  }
+
+  :where(h4) {
+    margin-top: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgb(255 255 255);
+  }
+
+  :where(p) {
+    margin-top: 1rem;
+    color: rgb(212 212 216);
+  }
+
+  :where(ul) {
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    list-style-type: disc;
+    list-style-position: inside;
+  }
+
+  :where(li) {
+    margin-top: 0.5rem;
+    color: rgb(212 212 216);
+  }
+
+  :where(a) {
+    color: rgb(74 222 128);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  :where(a:hover) {
+    color: rgb(134 239 172);
+  }
+
+  :where(code) {
+    color: rgb(228 228 231);
+  }
+
+  :where(strong) {
+    font-weight: 700;
+    color: rgb(255 255 255);
+  }
+}
+
 /* ── Glass cards & interactive surfaces ── */
 .ui-glass-card {
   border-radius: 1rem;
