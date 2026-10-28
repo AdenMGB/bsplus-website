@@ -2,8 +2,11 @@
   <component
     :is="tag"
     ref="rootRef"
-    class="reveal-on-scroll"
-    :class="{ 'reveal-on-scroll--visible': isVisible }"
+    :class="
+      animateOnMount
+        ? 'reveal-on-scroll-animate-on-mount'
+        : ['reveal-on-scroll', { 'reveal-on-scroll--visible': isVisible }]
+    "
     :style="delayStyle"
   >
     <slot />
@@ -29,6 +32,8 @@ const props = withDefaults(
     threshold?: number;
     rootMargin?: string;
     once?: boolean;
+    /** Run the reveal transition on mount (no scroll needed). */
+    animateOnMount?: boolean;
   }>(),
   {
     tag: "div",
@@ -36,6 +41,7 @@ const props = withDefaults(
     threshold: 0,
     rootMargin: "0px 0px -4% 0px",
     once: true,
+    animateOnMount: false,
   }
 );
 
@@ -50,21 +56,33 @@ const delayStyle = computed(() =>
 
 let observer: IntersectionObserver | null = null;
 
+function revealNow() {
+  isVisible.value = true;
+}
+
 onMounted(() => {
-  if (!import.meta.client) return;
+  if (props.animateOnMount) return;
+
+  if (!import.meta.client) {
+    revealNow();
+    return;
+  }
 
   if (prefersReducedMotion.value) {
-    isVisible.value = true;
+    revealNow();
     return;
   }
 
   const el = resolveRootElement(rootRef.value);
-  if (!el) return;
+  if (!el) {
+    revealNow();
+    return;
+  }
 
   observer = new IntersectionObserver(
     ([entry]) => {
       if (!entry?.isIntersecting) return;
-      isVisible.value = true;
+      revealNow();
       if (props.once) observer?.unobserve(el);
     },
     {
@@ -74,6 +92,12 @@ onMounted(() => {
   );
 
   observer.observe(el);
+
+  requestAnimationFrame(() => {
+    const rect = el.getBoundingClientRect();
+    const inView = rect.bottom > 0 && rect.top < window.innerHeight;
+    if (inView) revealNow();
+  });
 });
 
 onUnmounted(() => {
