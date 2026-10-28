@@ -113,7 +113,13 @@
           We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
         </p>
 
-        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">10. Contact Us</h3>
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">10. Terms of Service</h3>
+        <p class="mt-4 sm:mt-6">
+          Use of BetterSEQTA+ and DesQTA is also governed by our
+          <NuxtLink to="/terms" class="text-green-400 hover:text-green-300 underline">Terms of Service</NuxtLink>.
+        </p>
+
+        <h3 class="mt-8 text-2xl font-bold tracking-tight text-white">11. Contact Us</h3>
         <p class="mt-4 sm:mt-6">
           If you have any questions about this Privacy Policy, please contact us via our
           <a href="https://discord.gg/nv6YSjpEM4" class="text-green-400 hover:text-green-300 underline">Discord server</a>.

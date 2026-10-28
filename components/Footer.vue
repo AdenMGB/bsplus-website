@@ -55,6 +55,7 @@ import { defineComponent, h } from "vue";
 
 const navigation = {
   main: [
+    { name: "Terms of Service", href: "/terms" },
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Download", href: "/download" },
     { name: "Themes", href: "/themes" },
