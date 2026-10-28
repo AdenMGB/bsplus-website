@@ -1,10 +1,13 @@
 import type { H3Event } from 'h3';
 import { setHeader } from 'h3';
+import type { LegalApiPayload } from '../../lib/legal/legal-api-payload';
 import { bufferSession, checkAndFlush } from './analytics';
 import { getDB } from './db';
-import { getPrivacyApiPayload } from './privacy-api-payload';
 
-export async function handlePrivacyApiRequest(event: H3Event) {
+export async function handleLegalApiRequest(
+  event: H3Event,
+  payload: LegalApiPayload,
+): Promise<LegalApiPayload> {
   bufferSession();
 
   const db = getDB(event);
@@ -12,5 +15,5 @@ export async function handlePrivacyApiRequest(event: H3Event) {
 
   setHeader(event, 'Cache-Control', 'no-store');
 
-  return getPrivacyApiPayload();
+  return payload;
 }

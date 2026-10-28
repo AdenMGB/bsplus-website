@@ -1,4 +1,7 @@
-import { handlePrivacyApiRequest } from '../../utils/privacy-api-handler';
+import { getPrivacyApiPayload } from '../../../lib/legal/legal-api-payload';
+import { handleLegalApiRequest } from '../../utils/legal-api-handler';
 
-/** @deprecated Prefer GET /api/privacy (extension contract). */
-export default defineEventHandler((event) => handlePrivacyApiRequest(event));
+/** @deprecated Prefer GET /api/privacy. */
+export default defineEventHandler((event) =>
+  handleLegalApiRequest(event, getPrivacyApiPayload()),
+);
