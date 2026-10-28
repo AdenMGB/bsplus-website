@@ -103,6 +103,22 @@ html {
   transform: translateY(0);
 }
 
+.reveal-on-scroll-animate-on-mount {
+  animation: reveal-on-scroll-enter 0.65s var(--ease-out-expo) var(--reveal-delay, 0s) both;
+}
+
+@keyframes reveal-on-scroll-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── Legal pages (markdown → HTML) ── */
 .legal-document-body {
   :where(h3) {
@@ -321,6 +337,12 @@ html {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .reveal-on-scroll-animate-on-mount {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 
   .ui-glass-card--interactive:hover,
