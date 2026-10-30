@@ -9,6 +9,14 @@ import {
 } from './feedback';
 import { getOptionalUser } from './auth';
 import { generateUUID } from './themes';
+import {
+  loadRemoteThemeDirectiveFromRow,
+  parseRemoteThemeDirectiveInput,
+  resolveSnapshotRemoteTheme,
+  type RemoteThemeDirective,
+} from './bsplusRemoteThemePackages';
+
+export type { RemoteThemeDirective };
 
 export const REMOTE_CONFIG_SNAPSHOT_MAX_BYTES = 32 * 1024;
 
@@ -84,6 +92,7 @@ export type RemoteConfigSnapshotData = {
   global: RemoteConfigGlobal;
   features: Record<string, RemoteConfigFeature>;
   campaigns: RemoteConfigCampaign[];
+  remoteTheme: RemoteThemeDirective | null;
 };
 
 const FEATURE_KEY_RE = /^(page|plugin|settings)\.[a-z0-9][a-z0-9._-]{0,126}$/i;
@@ -447,6 +456,40 @@ export async function buildSnapshotCampaigns(
   return campaigns;
 }
 
+export async function loadDraftRemoteThemeDirective(db: any): Promise<RemoteThemeDirective | null> {
+  const row = await db
+    .prepare('SELECT remote_theme_json FROM bsplus_remote_config_global WHERE id = 1')
+    .first<Record<string, unknown>>();
+  if (!row) return null;
+  return loadRemoteThemeDirectiveFromRow(row);
+}
+
+export async function patchRemoteThemeDirective(
+  db: any,
+  body: Record<string, unknown>
+): Promise<RemoteThemeDirective | null> {
+  if (!('remoteTheme' in body)) {
+    return loadDraftRemoteThemeDirective(db);
+  }
+
+  const directive =
+    body.remoteTheme === null
+      ? null
+      : parseRemoteThemeDirectiveInput(body.remoteTheme);
+
+  if (body.remoteTheme !== null && !directive) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid remoteTheme directive' });
+  }
+
+  const updatedAt = nowUnix();
+  await db
+    .prepare('UPDATE bsplus_remote_config_global SET remote_theme_json = ?, updated_at = ? WHERE id = 1')
+    .bind(directive ? JSON.stringify(directive) : null, updatedAt)
+    .run();
+
+  return directive;
+}
+
 export async function buildSnapshotPayload(
   db: any,
   configVersion: string,
@@ -455,6 +498,7 @@ export async function buildSnapshotPayload(
   const global = await loadDraftGlobal(db);
   const features = filterActiveFeatureGates(await loadDraftFeatures(db));
   let campaigns = await buildSnapshotCampaigns(db, { activeOnly: true });
+  const remoteTheme = await resolveSnapshotRemoteTheme(db, await loadDraftRemoteThemeDirective(db));
 
   let payload: RemoteConfigSnapshotData = {
     configVersion,
@@ -463,6 +507,7 @@ export async function buildSnapshotPayload(
     global,
     features,
     campaigns,
+    remoteTheme,
   };
 
   let json = JSON.stringify(payload);
@@ -491,6 +536,7 @@ export async function publishRemoteConfig(db: any): Promise<RemoteConfigSnapshot
     global: payload.global,
     features: payload.features,
     campaigns: payload.campaigns,
+    remoteTheme: payload.remoteTheme,
   });
   const etag = await computeConfigEtag(canonical);
   payload.etag = etag;
@@ -522,6 +568,9 @@ export async function getPublishedSnapshot(db: any): Promise<RemoteConfigSnapsho
     parsed.etag = row.etag || parsed.etag;
     parsed.configVersion = row.config_version || parsed.configVersion;
     parsed.source = 'api';
+    if (parsed.remoteTheme === undefined) {
+      parsed.remoteTheme = null;
+    }
     return parsed;
   } catch {
     return null;

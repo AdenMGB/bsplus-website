@@ -51,6 +51,10 @@ export default defineNuxtConfig({
         isLocalDev && process.env.DEV_BSPLUS_URL
           ? process.env.DEV_BSPLUS_URL.replace(/\/$/, '')
           : (process.env.NUXT_PUBLIC_SITE_URL ?? 'https://betterseqta.org'),
+      apiUrl:
+        isLocalDev && process.env.DEV_API_URL
+          ? process.env.DEV_API_URL.replace(/\/$/, '')
+          : (process.env.NUXT_PUBLIC_API_URL ?? 'https://api.betterseqta.org'),
     },
   },
   app: {

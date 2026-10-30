@@ -9,7 +9,8 @@ globs = ["**/*.wasm"]
 fallthrough = true
 
 routes = [
-  { pattern = "betterseqta.org", custom_domain = true }
+  { pattern = "betterseqta.org", custom_domain = true },
+  { pattern = "api.betterseqta.org", custom_domain = true }
 ]
 
 [dev]
@@ -37,7 +38,8 @@ binding = "bs-ai"
 # Development Environment (dev.betterseqta.org)
 [env.dev]
 routes = [
-  { pattern = "dev.betterseqta.org", custom_domain = true }
+  { pattern = "dev.betterseqta.org", custom_domain = true },
+  { pattern = "api.dev.betterseqta.org", custom_domain = true }
 ]
 
 [[env.dev.rules]]

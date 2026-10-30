@@ -7,8 +7,10 @@ import {
   getPublishedSnapshot,
   loadDraftFeatures,
   loadDraftGlobal,
+  loadDraftRemoteThemeDirective,
   type RemoteConfigCampaign,
 } from './bsplusRemoteConfig';
+import { resolveSnapshotRemoteTheme } from './bsplusRemoteThemePackages';
 
 export type GithubBsStatusConfig = {
   token: string;
@@ -158,6 +160,7 @@ export async function buildGithubMirrorPayload(
   global: Record<string, unknown>;
   features: Record<string, unknown>;
   campaigns: RemoteConfigCampaign[];
+  remoteTheme: RemoteConfigSnapshotData['remoteTheme'];
 }> {
   if (source === 'published-snapshot') {
     return {
@@ -165,18 +168,21 @@ export async function buildGithubMirrorPayload(
       global: compactGlobalForExport(snapshot.global),
       features: filterActiveFeatureGates(snapshot.features),
       campaigns: snapshot.campaigns,
+      remoteTheme: snapshot.remoteTheme ?? null,
     };
   }
 
   const global = compactGlobalForExport(await loadDraftGlobal(db));
   const features = filterActiveFeatureGates(await loadDraftFeatures(db));
   const campaigns = await buildSnapshotCampaigns(db, { activeOnly: true });
+  const remoteTheme = await resolveSnapshotRemoteTheme(db, await loadDraftRemoteThemeDirective(db));
 
   return {
     configVersion: snapshot.configVersion,
     global,
     features,
     campaigns,
+    remoteTheme,
   };
 }
 
@@ -194,6 +200,7 @@ export async function buildGithubMirrorPayloadFromDraft(
     global: await loadDraftGlobal(db),
     features: {},
     campaigns: [],
+    remoteTheme: null,
   };
 
   const payload = await buildGithubMirrorPayload(db, snapshot);
@@ -218,10 +225,12 @@ export async function syncRemoteConfigToGithub(
     const prefix = cfg.pathPrefix;
     const manifest = {
       configVersion: mirror.configVersion,
+      updatedAt: new Date().toISOString(),
       files: {
         global: 'global.json',
         features: 'features.json',
         campaigns: 'campaigns.json',
+        remoteTheme: 'remoteTheme.json',
       },
     };
 
@@ -230,6 +239,7 @@ export async function syncRemoteConfigToGithub(
       { path: `${prefix}/global.json`, json: mirror.global },
       { path: `${prefix}/features.json`, json: mirror.features },
       { path: `${prefix}/campaigns.json`, json: mirror.campaigns },
+      { path: `${prefix}/remoteTheme.json`, json: mirror.remoteTheme },
     ];
 
     let lastSha: string | undefined;
@@ -274,6 +284,7 @@ export async function forceSyncRemoteConfigToGithub(
     global: await loadDraftGlobal(db),
     features: {},
     campaigns: [],
+    remoteTheme: null,
   };
 
   return syncRemoteConfigToGithub(event, db, snapshot, 'force-sync');
