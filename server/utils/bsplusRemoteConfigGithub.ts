@@ -1,9 +1,10 @@
 import type { H3Event } from 'h3';
 import type { RemoteConfigSnapshotData } from './bsplusRemoteConfig';
 import {
-  campaignRowToPublic,
+  buildSnapshotCampaigns,
+  compactGlobalForExport,
+  filterActiveFeatureGates,
   getPublishedSnapshot,
-  loadCampaignRows,
   loadDraftFeatures,
   loadDraftGlobal,
   type RemoteConfigCampaign,
@@ -145,48 +146,58 @@ async function upsertRepoFile(
   return data.commit?.sha;
 }
 
-/** Payload split for BS-Status repo (extension GitHub fallback). */
+export type GithubMirrorSource = 'published-snapshot' | 'draft-tables';
+
+/** BS-Status repo files. On publish, mirrors the D1 snapshot clients receive from the API. */
 export async function buildGithubMirrorPayload(
   db: any,
-  snapshot: RemoteConfigSnapshotData
+  snapshot: RemoteConfigSnapshotData,
+  source: GithubMirrorSource = 'published-snapshot'
 ): Promise<{
   configVersion: string;
-  global: RemoteConfigSnapshotData['global'];
-  features: RemoteConfigSnapshotData['features'];
+  global: Record<string, unknown>;
+  features: Record<string, unknown>;
   campaigns: RemoteConfigCampaign[];
 }> {
-  const campaigns: RemoteConfigCampaign[] = [];
-  for (const row of await loadCampaignRows(db)) {
-    const campaign = campaignRowToPublic(row, { includeBody: true });
-    if (campaign) campaigns.push(campaign);
+  if (source === 'published-snapshot') {
+    return {
+      configVersion: snapshot.configVersion,
+      global: compactGlobalForExport(snapshot.global),
+      features: filterActiveFeatureGates(snapshot.features),
+      campaigns: snapshot.campaigns,
+    };
   }
+
+  const global = compactGlobalForExport(await loadDraftGlobal(db));
+  const features = filterActiveFeatureGates(await loadDraftFeatures(db));
+  const campaigns = await buildSnapshotCampaigns(db, { activeOnly: true });
 
   return {
     configVersion: snapshot.configVersion,
-    global: snapshot.global,
-    features: snapshot.features,
+    global,
+    features,
     campaigns,
   };
 }
 
-/** Force sync: published meta version + draft table content (fixes GH without new publish). */
+/** Force sync: published configVersion + current draft tables. */
 export async function buildGithubMirrorPayloadFromDraft(
   db: any
 ): Promise<{ payload: Awaited<ReturnType<typeof buildGithubMirrorPayload>>; configVersion: string } | null> {
   const published = await getPublishedSnapshot(db);
   const configVersion = published?.configVersion ?? new Date().toISOString();
-  const global = await loadDraftGlobal(db);
-  const features = await loadDraftFeatures(db);
-  const campaigns: RemoteConfigCampaign[] = [];
-  for (const row of await loadCampaignRows(db)) {
-    const campaign = campaignRowToPublic(row, { includeBody: true });
-    if (campaign) campaigns.push(campaign);
-  }
 
-  return {
+  const snapshot: RemoteConfigSnapshotData = {
     configVersion,
-    payload: { configVersion, global, features, campaigns },
+    etag: published?.etag ?? '',
+    source: 'api',
+    global: await loadDraftGlobal(db),
+    features: {},
+    campaigns: [],
   };
+
+  const payload = await buildGithubMirrorPayload(db, snapshot);
+  return { configVersion, payload };
 }
 
 export async function syncRemoteConfigToGithub(
@@ -201,7 +212,9 @@ export async function syncRemoteConfigToGithub(
   }
 
   try {
-    const mirror = await buildGithubMirrorPayload(db, snapshot);
+    const mirrorSource: GithubMirrorSource =
+      commitLabel === 'force-sync' ? 'draft-tables' : 'published-snapshot';
+    const mirror = await buildGithubMirrorPayload(db, snapshot, mirrorSource);
     const prefix = cfg.pathPrefix;
     const manifest = {
       configVersion: mirror.configVersion,
@@ -258,9 +271,9 @@ export async function forceSyncRemoteConfigToGithub(
     configVersion: built.configVersion,
     etag: '',
     source: 'api',
-    global: built.payload.global,
-    features: built.payload.features,
-    campaigns: built.payload.campaigns,
+    global: await loadDraftGlobal(db),
+    features: {},
+    campaigns: [],
   };
 
   return syncRemoteConfigToGithub(event, db, snapshot, 'force-sync');

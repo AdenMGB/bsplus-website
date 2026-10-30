@@ -665,7 +665,7 @@ async function publish() {
     };
     const gh = res.data?.github;
     if (gh?.synced) {
-      successMessage.value = `Published and GitHub mirror updated (${gh.files?.length ?? 4} files).`;
+      successMessage.value = `Published to API/D1 and GitHub mirror (${gh.files?.length ?? 4} files). etag ${res.data?.etag ?? ''}`;
     } else if (gh?.skipped_reason === 'missing_token') {
       successMessage.value = 'Published to API. GitHub sync skipped (token not configured).';
     } else if (gh?.error) {
