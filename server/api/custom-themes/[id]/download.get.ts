@@ -1,5 +1,9 @@
 import { getDB } from '../../../utils/db';
-import { createApiEnvelope, getCustomThemeById } from '../../../utils/customThemes';
+import {
+  buildCustomThemeDownloadData,
+  createApiEnvelope,
+  recordCustomThemeDownload
+} from '../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
@@ -12,32 +16,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const theme = await getCustomThemeById(db, id, 'approved');
-  if (!theme) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Theme not found'
-    });
-  }
+  const { theme, download_count } = await recordCustomThemeDownload(db, id);
 
-  await db
-    .prepare('UPDATE custom_themes SET download_count = download_count + 1 WHERE id = ?')
-    .bind(id)
-    .run();
-
-  const newCount = Number(theme.download_count ?? 0) + 1;
-
-  if (theme.theme_type === 'betterseqta') {
-    return createApiEnvelope({
-      theme_json_url: theme.theme_json_url,
-      download_count: newCount
-    });
-  }
-
-  return createApiEnvelope({
-    zip_download_url: theme.zip_download_url,
-    checksum: theme.checksum,
-    file_size: theme.file_size,
-    download_count: newCount
-  });
+  return createApiEnvelope(buildCustomThemeDownloadData(theme, download_count));
 });

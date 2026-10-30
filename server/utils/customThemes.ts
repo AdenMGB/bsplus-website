@@ -568,6 +568,48 @@ export async function processCustomThemeUpload(
   return uploadResult(db, themeId, validation);
 }
 
+export async function recordCustomThemeDownload(
+  db: any,
+  id: string
+): Promise<{ theme: Record<string, unknown>; download_count: number }> {
+  const theme = await getCustomThemeById(db, id, 'approved');
+  if (!theme) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Theme not found'
+    });
+  }
+
+  await db
+    .prepare(
+      'UPDATE custom_themes SET download_count = COALESCE(download_count, 0) + 1, updated_at = ? WHERE id = ?'
+    )
+    .bind(nowUnixSeconds(), id)
+    .run();
+
+  const download_count = Number(theme.download_count ?? 0) + 1;
+  return { theme, download_count };
+}
+
+export function buildCustomThemeDownloadData(
+  theme: Record<string, unknown>,
+  download_count: number
+) {
+  if (theme.theme_type === 'betterseqta') {
+    return {
+      theme_json_url: theme.theme_json_url,
+      download_count
+    };
+  }
+
+  return {
+    zip_download_url: theme.zip_download_url,
+    checksum: theme.checksum,
+    file_size: theme.file_size,
+    download_count
+  };
+}
+
 export async function getCustomThemeById(
   db: any,
   id: string,
