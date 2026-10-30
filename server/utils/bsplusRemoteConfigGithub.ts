@@ -26,6 +26,7 @@ export type GithubMirrorSyncResult = {
 };
 
 const GITHUB_API = 'https://api.github.com';
+const GITHUB_USER_AGENT = 'BetterSEQTA-Website/1.0 (bsplus-remote-config; +https://betterseqta.org)';
 
 function getCloudflareEnv(event?: H3Event | null) {
   return (
@@ -92,6 +93,7 @@ async function githubRequest(
   headers.set('Authorization', `Bearer ${cfg.token}`);
   headers.set('Accept', 'application/vnd.github+json');
   headers.set('X-GitHub-Api-Version', '2022-11-28');
+  headers.set('User-Agent', GITHUB_USER_AGENT);
   if (init.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
