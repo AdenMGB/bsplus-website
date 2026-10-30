@@ -2,7 +2,7 @@ import { getDB } from '../../../utils/db';
 import {
   buildCustomThemeDownloadData,
   createApiEnvelope,
-  recordCustomThemeDownload
+  resolveCustomThemeDownload
 } from '../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { theme, download_count } = await recordCustomThemeDownload(db, id);
+  const { theme, download_count } = await resolveCustomThemeDownload(db, id);
 
   return createApiEnvelope(buildCustomThemeDownloadData(theme, download_count));
 });

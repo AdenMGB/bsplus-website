@@ -568,10 +568,7 @@ export async function processCustomThemeUpload(
   return uploadResult(db, themeId, validation);
 }
 
-export async function recordCustomThemeDownload(
-  db: any,
-  id: string
-): Promise<{ theme: Record<string, unknown>; download_count: number }> {
+export async function incrementCustomThemeDownloadCount(db: any, id: string): Promise<number> {
   const theme = await getCustomThemeById(db, id, 'approved');
   if (!theme) {
     throw createError({
@@ -587,8 +584,72 @@ export async function recordCustomThemeDownload(
     .bind(nowUnixSeconds(), id)
     .run();
 
-  const download_count = Number(theme.download_count ?? 0) + 1;
+  return Number(theme.download_count ?? 0) + 1;
+}
+
+/**
+ * BetterSEQTA+ often installs community themes by fetching theme.json directly (theme_json_url
+ * from the catalog) and skips GET /custom-themes/:id/download — count on theme.json serve instead.
+ * DesQTA community themes count on the download endpoint (zip URL).
+ */
+export async function resolveCustomThemeDownload(
+  db: any,
+  id: string
+): Promise<{ theme: Record<string, unknown>; download_count: number }> {
+  const theme = await getCustomThemeById(db, id, 'approved');
+  if (!theme) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Theme not found'
+    });
+  }
+
+  let download_count = Number(theme.download_count ?? 0);
+  if (theme.theme_type === 'desqta') {
+    download_count = await incrementCustomThemeDownloadCount(db, id);
+  }
+
   return { theme, download_count };
+}
+
+/** @deprecated Use resolveCustomThemeDownload or incrementCustomThemeDownloadCount */
+export async function recordCustomThemeDownload(
+  db: any,
+  id: string
+): Promise<{ theme: Record<string, unknown>; download_count: number }> {
+  return resolveCustomThemeDownload(db, id);
+}
+
+export async function serveApprovedCustomBetterseqtaThemeJson(
+  event: H3Event,
+  id: string,
+  options?: { incrementDownload?: boolean }
+) {
+  const db = getDB(event);
+  const bucket = getBucket(event);
+
+  const theme = await getCustomThemeById(db, id, 'approved');
+  if (!theme || theme.theme_type !== 'betterseqta') {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Theme not found or not a BetterSEQTA theme'
+    });
+  }
+
+  if (options?.incrementDownload !== false) {
+    await incrementCustomThemeDownloadCount(db, id);
+  }
+
+  const key = customThemeR2Key(id, 'theme.json');
+  const object = await bucket.get(key);
+
+  if (!object) {
+    throw createError({ statusCode: 404, statusMessage: 'Theme file not found' });
+  }
+
+  const json = new TextDecoder().decode(await object.arrayBuffer());
+  setHeader(event, 'Cache-Control', 'public, max-age=3600');
+  return send(event, json, 'application/json');
 }
 
 export function buildCustomThemeDownloadData(
