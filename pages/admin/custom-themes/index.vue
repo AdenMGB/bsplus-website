@@ -169,6 +169,13 @@
                   {{ formatDate(theme.created_at) }}
                 </td>
                 <td class="px-6 py-4 text-right whitespace-nowrap">
+                  <a
+                    :href="`/api/admin/custom-themes/${theme.id}/download`"
+                    class="mr-3 font-medium text-zinc-400 transition-colors duration-200 hover:text-white"
+                    title="Download theme files for review"
+                  >
+                    Download
+                  </a>
                   <NuxtLink
                     :to="`/admin/custom-themes/${theme.id}`"
                     class="mr-3 font-medium text-indigo-400 transition-colors duration-200 hover:text-indigo-300"
