@@ -110,6 +110,7 @@
                 <th scope="col" class="px-6 py-3 font-semibold">Submitter</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Type</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Status</th>
+                <th scope="col" class="px-6 py-3 font-semibold">Downloads</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Submitted</th>
                 <th scope="col" class="px-6 py-3 text-right font-semibold">Actions</th>
               </tr>
@@ -164,6 +165,9 @@
                   <span :class="statusBadgeClass(theme.status)">
                     {{ theme.status }}
                   </span>
+                </td>
+                <td class="px-6 py-4 text-zinc-400">
+                  {{ theme.download_count ?? 0 }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-zinc-400">
                   {{ formatDate(theme.created_at) }}
