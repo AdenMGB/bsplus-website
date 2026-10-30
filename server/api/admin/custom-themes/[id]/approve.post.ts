@@ -1,5 +1,6 @@
 import { requireAdmin } from '../../../../utils/auth';
 import { getDB } from '../../../../utils/db';
+import { ensureThemeSubmitterBadge } from '../../../../utils/accounts-badges';
 import { createApiEnvelope, getCustomThemeById, nowUnixSeconds } from '../../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const now = nowUnixSeconds();
+  const authorId = typeof theme.author_id === 'string' ? theme.author_id : '';
 
   await db
     .prepare(
@@ -31,9 +33,12 @@ export default defineEventHandler(async (event) => {
     .bind(now, now, adminUser.id, now, id)
     .run();
 
+  const badge = await ensureThemeSubmitterBadge(event, authorId);
+
   return createApiEnvelope({
     message: 'Custom theme approved successfully',
     id,
-    status: 'approved'
+    status: 'approved',
+    theme_submitter_badge: badge
   });
 });
