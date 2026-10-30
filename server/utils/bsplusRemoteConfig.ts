@@ -369,6 +369,51 @@ export async function loadDraftFeatures(db: any): Promise<Record<string, RemoteC
   return features;
 }
 
+/** Gates that actually restrict the extension (allow = omit from remote JSON). */
+export function filterActiveFeatureGates(
+  features: Record<string, RemoteConfigFeature>
+): Record<string, RemoteConfigFeature> {
+  const out: Record<string, RemoteConfigFeature> = {};
+  for (const [key, gate] of Object.entries(features)) {
+    if (!gate.mode || gate.mode === 'allow') continue;
+    const entry: RemoteConfigFeature = { mode: gate.mode };
+    if (gate.message?.body) {
+      entry.message = gate.message;
+    }
+    out[key] = entry;
+  }
+  return out;
+}
+
+/** GitHub / fallback JSON: drop cleared optional global fields. */
+export function compactGlobalForExport(global: RemoteConfigGlobal): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    mode: global.mode === 'off' ? 'off' : 'on',
+  };
+  if (global.allowLocalOverride === false) {
+    out.allowLocalOverride = false;
+  }
+  if (global.statusMessage) {
+    out.statusMessage = global.statusMessage;
+  }
+  if (global.maintenance?.title || global.maintenance?.body) {
+    out.maintenance = global.maintenance;
+  }
+  if (global.minExtensionVersion) {
+    out.minExtensionVersion = global.minExtensionVersion;
+  }
+  if (global.forceUpdateUrl) {
+    out.forceUpdateUrl = global.forceUpdateUrl;
+  }
+  if (global.hostnamePolicy?.suffixes?.length) {
+    out.hostnamePolicy = global.hostnamePolicy;
+  }
+  if (global.disableCloudSync) out.disableCloudSync = true;
+  if (global.disableThemeStore) out.disableThemeStore = true;
+  if (global.disableFeedbackSubmit) out.disableFeedbackSubmit = true;
+  return out;
+}
+
 export async function loadCampaignRows(db: any): Promise<Record<string, unknown>[]> {
   const result = await db
     .prepare(
@@ -380,26 +425,36 @@ export async function loadCampaignRows(db: any): Promise<Record<string, unknown>
   return (result.results || []) as Record<string, unknown>[];
 }
 
+/** Campaign list for published API snapshot (active window, optional body trim). */
+export async function buildSnapshotCampaigns(
+  db: any,
+  options: { activeOnly?: boolean } = {}
+): Promise<RemoteConfigCampaign[]> {
+  const activeOnly = options.activeOnly !== false;
+  const campaigns: RemoteConfigCampaign[] = [];
+
+  for (const row of await loadCampaignRows(db)) {
+    const includeBodyInRow = !boolFromDb(row.omit_body_from_snapshot);
+    const campaign = campaignRowToPublic(row, { includeBody: true });
+    if (!campaign) continue;
+    if (activeOnly && !isCampaignActiveNow(campaign)) continue;
+    if (!includeBodyInRow) {
+      campaign.bodyHtml = '';
+    }
+    campaigns.push(campaign);
+  }
+
+  return campaigns;
+}
+
 export async function buildSnapshotPayload(
   db: any,
   configVersion: string,
   etag: string
 ): Promise<RemoteConfigSnapshotData> {
   const global = await loadDraftGlobal(db);
-  const features = await loadDraftFeatures(db);
-  const rows = await loadCampaignRows(db);
-
-  let campaigns: RemoteConfigCampaign[] = [];
-  for (const row of rows) {
-    const includeBody = !boolFromDb(row.omit_body_from_snapshot);
-    const campaign = campaignRowToPublic(row, { includeBody: true });
-    if (!campaign || !isCampaignActiveNow(campaign)) continue;
-
-    if (!includeBody) {
-      campaign.bodyHtml = '';
-    }
-    campaigns.push(campaign);
-  }
+  const features = filterActiveFeatureGates(await loadDraftFeatures(db));
+  let campaigns = await buildSnapshotCampaigns(db, { activeOnly: true });
 
   let payload: RemoteConfigSnapshotData = {
     configVersion,
@@ -912,6 +967,11 @@ export async function upsertFeatureGate(
   mode: FeatureMode,
   message: RemoteConfigFeatureMessage | null
 ) {
+  if (mode === 'allow') {
+    await deleteFeatureGate(db, featureKey);
+    return;
+  }
+
   const updatedAt = nowUnix();
   await db
     .prepare(

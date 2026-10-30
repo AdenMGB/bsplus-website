@@ -110,6 +110,10 @@ On every **Publish**, the worker updates [BetterSEQTA/BS-Status](https://github.
 
 - `manifest.json`, `global.json`, `features.json`, `campaigns.json`
 
+**Order of operations:** Publish always writes **`bsplus_remote_config_meta.snapshot_json` in D1 first** (what `GET /api/bsplus/remote-config` serves). GitHub is updated **after**, using that **same published snapshot** for `global.json`, `features.json`, and `campaigns.json` so fallback clients stay aligned with the API.
+
+**Force GitHub mirror sync** rebuilds from **draft tables** (same rules as the next publish) but does **not** change D1 — use **Publish** to update live API clients.
+
 **Worker secret** (required for GitHub push):
 
 ```bash
