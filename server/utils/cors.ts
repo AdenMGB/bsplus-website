@@ -11,7 +11,7 @@ export const API_ACCESS_CONTROL_ALLOW_HEADERS =
 const API_ACCESS_CONTROL_MAX_AGE = '86400';
 
 const ORIGIN_ECHO_PATTERN =
-  /^https:\/\/(dev\.)?betterseqta\.org$|^moz-extension:\/\/.+|^chrome-extension:\/\/.+/;
+  /^https:\/\/(api(\.dev)?\.)?(dev\.)?betterseqta\.org$|^moz-extension:\/\/.+|^chrome-extension:\/\/.+/;
 
 /**
  * Resolves Access-Control-Allow-Origin. Uses `*` for Bearer-only clients.

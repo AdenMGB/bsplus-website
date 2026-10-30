@@ -310,6 +310,64 @@
             </div>
           </form>
         </div>
+
+        <!-- Remote theme -->
+        <div v-show="activeTab === 'remoteTheme'" class="grid gap-6 lg:grid-cols-2">
+          <form class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="saveRemoteThemeDirective">
+            <h2 class="text-lg font-semibold text-white">Remote theme directive</h2>
+            <p class="text-sm text-zinc-500">
+              Published in the config snapshot as <code class="text-zinc-400">remoteTheme</code>. Theme binaries are served from
+              <code class="text-zinc-400">api.betterseqta.org</code>, not the theme store.
+            </p>
+            <label class="flex flex-col gap-2 text-sm text-zinc-200">
+              Mode
+              <select v-model="remoteThemeForm.mode" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white">
+                <option value="">Inactive (omit from snapshot)</option>
+                <option value="off">off — end remote theme</option>
+                <option value="optional">optional — user may turn off</option>
+                <option value="forced">forced — lock theme picker</option>
+              </select>
+            </label>
+            <input v-model="remoteThemeForm.packageId" placeholder="packageId (e.g. school-brand-2026)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <input v-model="remoteThemeForm.packageVersion" placeholder="packageVersion (optional, defaults to package row)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <input v-model="remoteThemeForm.activeFrom" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <input v-model="remoteThemeForm.activeTo" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <input v-model="remoteThemeForm.messageTitle" placeholder="Message title" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <textarea v-model="remoteThemeForm.messageBody" rows="2" placeholder="Message body" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <label v-if="remoteThemeForm.mode === 'optional'" class="flex items-center gap-2 text-sm text-zinc-200">
+              <input v-model="remoteThemeForm.allowUserOptOut" type="checkbox" class="rounded border-zinc-600" />
+              Allow user opt-out
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" :disabled="remoteThemeSaving">
+                {{ remoteThemeSaving ? 'Saving…' : 'Save directive draft' }}
+              </button>
+              <button type="button" class="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-300" @click="clearRemoteThemeDirective">
+                Clear directive
+              </button>
+            </div>
+          </form>
+
+          <form class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="saveRemoteThemePackage">
+            <h2 class="text-lg font-semibold text-white">Theme packages</h2>
+            <ul v-if="remoteThemePackages.length" class="mb-4 max-h-40 space-y-1 overflow-y-auto text-sm text-zinc-400">
+              <li v-for="p in remoteThemePackages" :key="p.packageId">
+                <button type="button" class="text-left hover:text-orange-300" @click="loadRemoteThemePackage(p.packageId)">
+                  {{ p.packageId }} · v{{ p.version }} · {{ p.enabled ? 'enabled' : 'disabled' }}
+                </button>
+              </li>
+            </ul>
+            <input v-model="packageForm.packageId" placeholder="packageId" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <input v-model="packageForm.version" placeholder="version" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <label class="flex items-center gap-2 text-sm text-zinc-200">
+              <input v-model="packageForm.enabled" type="checkbox" class="rounded border-zinc-600" /> Enabled
+            </label>
+            <textarea v-model="packageForm.themeJson" rows="8" placeholder='ThemeContent JSON (id, name, CustomCSS, …)' class="w-full font-mono text-xs rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white" />
+            <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" :disabled="packageSaving">
+              {{ packageSaving ? 'Saving…' : 'Save package' }}
+            </button>
+          </form>
+        </div>
       </template>
     </div>
   </div>
@@ -329,6 +387,7 @@ const tabs = [
   { id: 'global', label: 'Global' },
   { id: 'features', label: 'Feature gates' },
   { id: 'campaigns', label: 'Campaigns' },
+  { id: 'remoteTheme', label: 'Remote theme' },
 ] as const;
 
 type TabId = (typeof tabs)[number]['id'];
@@ -340,6 +399,8 @@ const publishing = ref(false);
 const githubSyncing = ref(false);
 const featureSaving = ref('');
 const campaignSaving = ref(false);
+const remoteThemeSaving = ref(false);
+const packageSaving = ref(false);
 const errorMessage = ref('');
 const successMessage = ref('');
 
@@ -387,6 +448,25 @@ const campaignForm = reactive({
   omitBodyFromSnapshot: false,
 });
 
+const remoteThemePackages = ref<any[]>([]);
+const remoteThemeForm = reactive({
+  mode: '' as '' | 'off' | 'optional' | 'forced',
+  packageId: '',
+  packageVersion: '',
+  activeFrom: '',
+  activeTo: '',
+  messageTitle: '',
+  messageBody: '',
+  allowUserOptOut: true,
+});
+
+const packageForm = reactive({
+  packageId: '',
+  version: '1',
+  enabled: true,
+  themeJson: '',
+});
+
 function needsMessage(mode: string) {
   return mode === 'banner' || mode === 'block' || mode === 'greyout';
 }
@@ -427,10 +507,11 @@ async function loadAll() {
   loading.value = true;
   errorMessage.value = '';
   try {
-    const [globalRes, statsRes, campaignsRes] = await Promise.all([
+    const [globalRes, statsRes, campaignsRes, packagesRes] = await Promise.all([
       $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-config/global'),
       $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/installs/stats'),
       $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-config/campaigns'),
+      $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-theme-packages'),
     ]);
 
     catalog.value = globalRes.data?.catalog ?? null;
@@ -456,6 +537,19 @@ async function loadAll() {
     publishedMeta.value = globalRes.data?.published ?? null;
     installStats.value = statsRes.data ?? null;
     campaigns.value = campaignsRes.data?.campaigns ?? [];
+    remoteThemePackages.value = packagesRes.data?.packages ?? [];
+
+    const rt = globalRes.data?.remoteTheme;
+    if (rt?.mode) {
+      remoteThemeForm.mode = rt.mode;
+      remoteThemeForm.packageId = rt.packageId ?? '';
+      remoteThemeForm.packageVersion = rt.packageVersion ?? '';
+      remoteThemeForm.activeFrom = rt.activeFrom ? fromIsoToDatetimeLocal(rt.activeFrom) : '';
+      remoteThemeForm.activeTo = rt.activeTo ? fromIsoToDatetimeLocal(rt.activeTo) : '';
+      remoteThemeForm.messageTitle = rt.message?.title ?? '';
+      remoteThemeForm.messageBody = rt.message?.body ?? '';
+      remoteThemeForm.allowUserOptOut = rt.allowUserOptOut !== false;
+    }
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || 'Failed to load';
   } finally {
@@ -650,6 +744,101 @@ async function deleteCampaign() {
   const list = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-config/campaigns');
   campaigns.value = list.data?.campaigns ?? [];
   successMessage.value = 'Campaign deleted.';
+}
+
+async function saveRemoteThemeDirective() {
+  remoteThemeSaving.value = true;
+  errorMessage.value = '';
+  try {
+    let remoteTheme: Record<string, unknown> | null = null;
+    if (remoteThemeForm.mode) {
+      remoteTheme = { mode: remoteThemeForm.mode };
+      if (remoteThemeForm.mode !== 'off') {
+        remoteTheme.packageId = remoteThemeForm.packageId.trim();
+        if (remoteThemeForm.packageVersion.trim()) {
+          remoteTheme.packageVersion = remoteThemeForm.packageVersion.trim();
+        }
+        if (remoteThemeForm.activeFrom) {
+          remoteTheme.activeFrom = toIsoFromDatetimeLocal(remoteThemeForm.activeFrom);
+        }
+        if (remoteThemeForm.activeTo) {
+          remoteTheme.activeTo = toIsoFromDatetimeLocal(remoteThemeForm.activeTo);
+        }
+        if (remoteThemeForm.messageBody.trim()) {
+          remoteTheme.message = {
+            title: remoteThemeForm.messageTitle.trim() || undefined,
+            body: remoteThemeForm.messageBody.trim(),
+          };
+        }
+        if (remoteThemeForm.mode === 'optional' && remoteThemeForm.allowUserOptOut) {
+          remoteTheme.allowUserOptOut = true;
+        }
+      }
+    }
+    await $fetch('/api/bsplus/admin/remote-config/global', {
+      method: 'PATCH',
+      body: { remoteTheme },
+    });
+    successMessage.value = 'Remote theme directive saved.';
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'Save failed';
+  } finally {
+    remoteThemeSaving.value = false;
+  }
+}
+
+async function clearRemoteThemeDirective() {
+  remoteThemeForm.mode = '';
+  remoteThemeForm.packageId = '';
+  remoteThemeForm.packageVersion = '';
+  remoteThemeForm.activeFrom = '';
+  remoteThemeForm.activeTo = '';
+  remoteThemeForm.messageTitle = '';
+  remoteThemeForm.messageBody = '';
+  await saveRemoteThemeDirective();
+}
+
+async function loadRemoteThemePackage(packageId: string) {
+  try {
+    const res = await $fetch<{ success: boolean; data: any }>(
+      `/api/bsplus/admin/remote-theme-packages/${encodeURIComponent(packageId)}`
+    );
+    const p = res.data?.package;
+    if (!p) return;
+    packageForm.packageId = p.packageId;
+    packageForm.version = p.version;
+    packageForm.enabled = p.enabled !== false;
+    packageForm.themeJson = p.themeJson || '';
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'Failed to load package';
+  }
+}
+
+async function saveRemoteThemePackage() {
+  packageSaving.value = true;
+  errorMessage.value = '';
+  try {
+    let theme: unknown;
+    if (packageForm.themeJson.trim()) {
+      theme = JSON.parse(packageForm.themeJson);
+    }
+    await $fetch('/api/bsplus/admin/remote-theme-packages', {
+      method: 'POST',
+      body: {
+        packageId: packageForm.packageId.trim(),
+        version: packageForm.version.trim(),
+        enabled: packageForm.enabled,
+        ...(theme ? { theme } : {}),
+      },
+    });
+    const list = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-theme-packages');
+    remoteThemePackages.value = list.data?.packages ?? [];
+    successMessage.value = 'Remote theme package saved.';
+  } catch (e: any) {
+    errorMessage.value = e?.message || e?.data?.message || 'Package save failed';
+  } finally {
+    packageSaving.value = false;
+  }
 }
 
 async function publish() {

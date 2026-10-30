@@ -14,10 +14,12 @@ export default defineEventHandler(async (event) => {
   const global = await loadDraftGlobal(db);
   const features = await loadDraftFeatures(db);
   const published = await getPublishedMeta(db);
+  const remoteTheme = await loadDraftRemoteThemeDirective(db);
 
   return createApiEnvelope({
     global,
     features,
+    remoteTheme,
     feature_count: Object.keys(features).length,
     catalog: getBsplusRemoteConfigCatalog(),
     published: published
