@@ -58,6 +58,14 @@
           <div class="ml-auto flex flex-wrap gap-2">
             <button
               type="button"
+              class="rounded-lg border border-zinc-600 bg-zinc-900/80 px-4 py-2 text-sm font-semibold text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-500 disabled:opacity-50"
+              :disabled="githubSyncing"
+              @click="forceGithubSync"
+            >
+              {{ githubSyncing ? 'Syncing GitHub…' : 'Force GitHub mirror sync' }}
+            </button>
+            <button
+              type="button"
               class="rounded-lg border border-orange-500/40 bg-orange-600/10 px-4 py-2 text-sm font-semibold text-orange-300 transition-all duration-200 hover:scale-105 disabled:opacity-50"
               :disabled="publishing"
               @click="publish"
@@ -329,6 +337,7 @@ const activeTab = ref<TabId>('global');
 const loading = ref(true);
 const saving = ref(false);
 const publishing = ref(false);
+const githubSyncing = ref(false);
 const featureSaving = ref('');
 const campaignSaving = ref(false);
 const errorMessage = ref('');
@@ -654,11 +663,43 @@ async function publish() {
       configVersion: res.data?.configVersion,
       etag: res.data?.etag,
     };
-    successMessage.value = 'Published — extensions pick up on next poll (~20 min).';
+    const gh = res.data?.github;
+    if (gh?.synced) {
+      successMessage.value = `Published and GitHub mirror updated (${gh.files?.length ?? 4} files).`;
+    } else if (gh?.skipped_reason === 'missing_token') {
+      successMessage.value = 'Published to API. GitHub sync skipped (token not configured).';
+    } else if (gh?.error) {
+      successMessage.value = 'Published to API.';
+      errorMessage.value = `GitHub mirror failed: ${gh.error}`;
+    } else {
+      successMessage.value = 'Published — extensions pick up on next poll (~20 min).';
+    }
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || 'Publish failed';
   } finally {
     publishing.value = false;
+  }
+}
+
+async function forceGithubSync() {
+  githubSyncing.value = true;
+  errorMessage.value = '';
+  successMessage.value = '';
+  try {
+    const res = await $fetch<{ success: boolean; data: any }>(
+      '/api/bsplus/admin/remote-config/sync-github',
+      { method: 'POST' }
+    );
+    const gh = res.data?.github;
+    if (gh?.synced) {
+      successMessage.value = `GitHub mirror synced (${gh.commit?.slice(0, 7) ?? 'ok'}). Uses draft config with current published configVersion.`;
+    } else {
+      errorMessage.value = gh?.error || res.data?.message || 'GitHub sync failed';
+    }
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'GitHub sync failed';
+  } finally {
+    githubSyncing.value = false;
   }
 }
 

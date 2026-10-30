@@ -40,6 +40,8 @@ export default defineNuxtConfig({
     accountsApiUrl: defaultAccountsUrl,
     /** Salt for hashing client IPs on feedback submissions (abuse limits only). */
     feedbackIpSalt: process.env.FEEDBACK_IP_SALT ?? 'bsplus-feedback-ip-salt-v1',
+    /** PAT for BetterSEQTA/BS-Status mirror (Contents write). Prefer wrangler secret in production. */
+    githubBsStatusToken: process.env.GITHUB_BS_STATUS_TOKEN ?? '',
     /** BetterSEQTA Mail API */
     bsMailApiKey: process.env.BS_MAIL_API_KEY ?? '',
     bsMailFrom: process.env.BS_MAIL_FROM ?? '',

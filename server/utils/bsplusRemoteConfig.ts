@@ -294,7 +294,7 @@ function rowToFeature(row: Record<string, unknown>): RemoteConfigFeature {
   return feature;
 }
 
-function campaignRowToPublic(
+export function campaignRowToPublic(
   row: Record<string, unknown>,
   options: { includeBody: boolean }
 ): RemoteConfigCampaign | null {

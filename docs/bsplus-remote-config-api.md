@@ -51,7 +51,8 @@ Draft edits do **not** affect extensions until **publish**.
 | `POST` | `/api/bsplus/admin/remote-config/campaigns` | Create campaign |
 | `PATCH` | `/api/bsplus/admin/remote-config/campaigns/{id}` | Update campaign |
 | `DELETE` | `/api/bsplus/admin/remote-config/campaigns/{id}` | Delete campaign |
-| `POST` | `/api/bsplus/admin/remote-config/publish` | Rebuild snapshot, bump `configVersion` + `etag` |
+| `POST` | `/api/bsplus/admin/remote-config/publish` | Rebuild snapshot, bump `configVersion` + `etag`, push BS-Status GitHub mirror |
+| `POST` | `/api/bsplus/admin/remote-config/sync-github` | Force push draft config to GitHub (backfill; keeps published `configVersion`) |
 | `GET` | `/api/bsplus/admin/installs/stats` | Install registry counts |
 
 ### Global `PATCH` body (partial)
@@ -102,6 +103,32 @@ pnpm db:migrate:remote
 ```
 
 After deploy, use **Publish** once so `configVersion` / `etag` reflect live data (bootstrap row is replaced on first publish or first successful public fetch).
+
+### GitHub mirror (BS-Status)
+
+On every **Publish**, the worker updates [BetterSEQTA/BS-Status](https://github.com/BetterSEQTA/BS-Status) under `config/`:
+
+- `manifest.json`, `global.json`, `features.json`, `campaigns.json`
+
+**Worker secret** (required for GitHub push):
+
+```bash
+wrangler secret put GITHUB_BS_STATUS_TOKEN
+# Fine-grained or classic PAT: Contents read/write on BetterSEQTA/BS-Status only
+```
+
+Optional vars (defaults shown):
+
+| Var | Default |
+|-----|---------|
+| `GITHUB_BS_STATUS_OWNER` | `BetterSEQTA` |
+| `GITHUB_BS_STATUS_REPO` | `BS-Status` |
+| `GITHUB_BS_STATUS_BRANCH` | `main` |
+| `GITHUB_BS_STATUS_PATH` | `config` |
+
+**Force GitHub mirror sync** (`POST .../sync-github`): pushes **current admin draft** (global, features, full campaign bodies) using the **existing published `configVersion`** — use after backfilling publishes that ran before GitHub sync existed. Does not bump API `configVersion`.
+
+Publish still succeeds if GitHub fails; check `github` in the publish response or server logs.
 
 ---
 
