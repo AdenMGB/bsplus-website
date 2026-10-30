@@ -537,6 +537,10 @@ curl "https://betterseqta.org/api/themes?type=betterseqta" \
   -H "Authorization: Bearer <access_token>"
 ```
 
+### Admin theme preview (BetterSEQTA+ client)
+
+Site admins can preview and apply **pending** themes without incrementing download counts. See **[BetterSEQTA+ Admin Theme Preview API](./bsplus-admin-themes-api.md)** (`/api/bsplus/admin/...`).
+
 ### Admin metadata update (example)
 ```bash
 curl -X PUT "https://betterseqta.org/api/admin/themes/<theme-id>" \
