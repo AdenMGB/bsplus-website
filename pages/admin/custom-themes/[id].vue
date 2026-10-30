@@ -45,6 +45,13 @@
                 View theme.json
               </a>
               <button
+                type="button"
+                class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-blue-500"
+                @click="showEditModal = true"
+              >
+                Edit
+              </button>
+              <button
                 v-if="theme.status === 'pending'"
                 type="button"
                 class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-green-500 disabled:opacity-50"
@@ -200,9 +207,228 @@
               </li>
             </ul>
           </div>
+
+          <div class="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <div class="mb-4 flex flex-wrap items-start justify-between gap-4">
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+                Update theme files
+              </h3>
+              <a
+                :href="`/api/admin/custom-themes/${themeId}/download`"
+                class="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+              >
+                Download package
+              </a>
+            </div>
+            <p class="mb-6 text-sm text-zinc-400">
+              <template v-if="theme.theme_type === 'betterseqta'">
+                Upload a full ZIP or individual files — for example only
+                <code class="text-zinc-500">theme.json</code>, or only banner/marquee images.
+              </template>
+              <template v-else>
+                Upload a full DesQTA ZIP or individual files; partial uploads merge with the stored
+                package.
+              </template>
+            </p>
+            <div
+              :class="[
+                'rounded-lg border-2 border-dashed p-8 text-center transition-colors',
+                isDragging ? 'border-green-500 bg-green-500/10' : 'border-zinc-700 bg-zinc-900/30',
+              ]"
+              @drop.prevent="handleDrop"
+              @dragover.prevent="isDragging = true"
+              @dragleave.prevent="isDragging = false"
+            >
+              <input
+                ref="fileInput"
+                type="file"
+                accept=".zip,.json,.webp,.css,.png,.jpg,.jpeg"
+                class="hidden"
+                @change="handleFileSelect"
+              />
+              <p class="mb-2 text-white">Drag and drop a theme ZIP or a single file</p>
+              <button
+                type="button"
+                class="mt-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-green-500"
+                @click="fileInput?.click()"
+              >
+                Browse files
+              </button>
+            </div>
+            <div v-if="selectedUpdateFile" class="mt-4 rounded-lg bg-zinc-800 p-4">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="font-medium text-white">{{ selectedUpdateFile.name }}</p>
+                  <p class="text-sm text-zinc-400">{{ formatFileSize(selectedUpdateFile.size) }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="text-red-400 hover:text-red-300"
+                  @click="
+                    selectedUpdateFile = null;
+                    updateManifestPreview = null;
+                  "
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div
+              v-if="
+                theme.theme_type === 'betterseqta' &&
+                updateManifestPreview?.manifest?.id &&
+                updateManifestPreview.manifest.id !== themeId
+              "
+              class="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4"
+            >
+              <p class="text-sm text-amber-400">
+                Theme ID in upload ({{ updateManifestPreview.manifest.id }}) does not match this
+                theme ({{ themeId }}).
+              </p>
+            </div>
+            <div v-if="selectedUpdateFile && canSubmitThemeUpdate" class="mt-6 flex justify-end">
+              <button
+                type="button"
+                class="rounded-md bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500 disabled:opacity-50"
+                :disabled="updatingFiles"
+                @click="updateThemeFiles"
+              >
+                {{ updatingFiles ? 'Updating…' : 'Update theme files' }}
+              </button>
+            </div>
+          </div>
         </template>
 
         <div v-else class="py-16 text-center text-zinc-500">Submission not found.</div>
+      </div>
+
+      <!-- Edit modal -->
+      <div
+        v-if="showEditModal && theme"
+        class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+      >
+        <div class="my-8 w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+          <h3 class="mb-6 text-lg font-semibold text-white">Edit community theme</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-400">Name *</label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-400">Description *</label>
+              <textarea
+                v-model="editForm.description"
+                rows="3"
+                class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-400">Slug</label>
+              <input
+                v-model="editForm.slug"
+                type="text"
+                class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">Author</label>
+                <input
+                  v-model="editForm.author"
+                  type="text"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">Version</label>
+                <input
+                  v-model="editForm.version"
+                  type="text"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">License</label>
+                <input
+                  v-model="editForm.license"
+                  type="text"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">Category</label>
+                <select
+                  v-model="editForm.category"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">Uncategorized</option>
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                  <option value="colorful">Colorful</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">Compatibility (min)</label>
+                <input
+                  v-model="editForm.compatibilityMin"
+                  type="text"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-400">Compatibility (max)</label>
+                <input
+                  v-model="editForm.compatibilityMax"
+                  type="text"
+                  class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-400">Tags (comma-separated)</label>
+              <input
+                v-model="editForm.tagsInput"
+                type="text"
+                class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-400">Submitter notes (admin)</label>
+              <textarea
+                v-model="editForm.submissionNotes"
+                rows="2"
+                class="block w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div class="flex justify-end gap-2 border-t border-zinc-800 pt-4">
+              <button
+                type="button"
+                class="rounded-md bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
+                @click="showEditModal = false"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-50"
+                :disabled="saving || !editForm.name || !editForm.description"
+                @click="saveTheme"
+              >
+                {{ saving ? 'Saving…' : 'Save changes' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Reject modal -->
@@ -251,7 +477,7 @@ definePageMeta({
 });
 
 const route = useRoute();
-const themeId = computed(() => route.params.id as string);
+const themeId = route.params.id as string;
 
 useHead({
   title: 'Review Custom Theme — Admin',
@@ -265,12 +491,68 @@ interface ThemeFile {
 }
 
 const showRejectModal = ref(false);
+const showEditModal = ref(false);
 const rejectReason = ref('');
 const acting = ref(false);
+const saving = ref(false);
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const isDragging = ref(false);
+const selectedUpdateFile = ref<File | null>(null);
+const updateManifestPreview = ref<any>(null);
+const updatingFiles = ref(false);
+
+const editForm = ref({
+  name: '',
+  slug: '',
+  description: '',
+  author: '',
+  version: '',
+  license: '',
+  category: '',
+  compatibilityMin: '',
+  compatibilityMax: '',
+  tagsInput: '',
+  submissionNotes: '',
+});
+
+const canSubmitThemeUpdate = computed(() => {
+  const prev = updateManifestPreview.value as {
+    validation?: { valid?: boolean };
+    manifest?: { id?: string };
+    imageOnly?: boolean;
+  } | null;
+  if (!selectedUpdateFile.value || !prev?.validation?.valid) return false;
+  if (theme.value?.theme_type === 'betterseqta') {
+    if (prev.manifest?.id && prev.manifest.id !== themeId) return false;
+    if (prev.imageOnly) return true;
+    if (prev.manifest?.id === themeId) return true;
+    return false;
+  }
+  return true;
+});
+
+watch(showEditModal, (isOpen) => {
+  if (!isOpen || !theme.value) return;
+  const t = theme.value as Record<string, unknown>;
+  editForm.value = {
+    name: String(t.name || ''),
+    slug: String(t.slug || ''),
+    description: String(t.description || ''),
+    author: String(t.author || ''),
+    version: String(t.version || ''),
+    license: String(t.license || 'MIT'),
+    category: String(t.category || ''),
+    compatibilityMin: String((t.compatibility as { min?: string })?.min ?? ''),
+    compatibilityMax: String((t.compatibility as { max?: string })?.max ?? ''),
+    tagsInput: Array.isArray(t.tags) ? (t.tags as string[]).join(', ') : '',
+    submissionNotes: String(t.submission_notes || ''),
+  };
+});
 
 const { data, pending, refresh } = await useFetch<any>(
-  () => `/api/admin/custom-themes/${themeId.value}`,
-  { watch: [themeId] }
+  () => `/api/admin/custom-themes/${themeId}`,
+  { watch: [() => themeId] }
 );
 
 const theme = computed(() => data.value?.data?.theme ?? null);
@@ -287,7 +569,7 @@ async function approve() {
   if (!confirm('Approve this theme for public distribution?')) return;
   acting.value = true;
   try {
-    await $fetch(`/api/admin/custom-themes/${themeId.value}/approve`, {
+    await $fetch(`/api/admin/custom-themes/${themeId}/approve`, {
       method: 'POST',
       body: {},
     });
@@ -303,7 +585,7 @@ async function reject() {
   if (!rejectReason.value.trim()) return;
   acting.value = true;
   try {
-    await $fetch(`/api/admin/custom-themes/${themeId.value}/reject`, {
+    await $fetch(`/api/admin/custom-themes/${themeId}/reject`, {
       method: 'POST',
       body: { reason: rejectReason.value.trim() },
     });
@@ -352,5 +634,129 @@ function typeBadgeClass(type: string) {
   return type === 'betterseqta'
     ? 'inline-flex items-center rounded-md bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-400 ring-1 ring-inset ring-purple-500/20'
     : 'inline-flex items-center rounded-md bg-cyan-500/10 px-2 py-1 text-xs font-medium text-cyan-400 ring-1 ring-inset ring-cyan-500/20';
+}
+
+async function saveTheme() {
+  if (!editForm.value.name || !editForm.value.description) return;
+  saving.value = true;
+  try {
+    const tags = editForm.value.tagsInput
+      ? editForm.value.tagsInput.split(',').map((t) => t.trim()).filter(Boolean)
+      : [];
+    await $fetch(`/api/admin/custom-themes/${themeId}`, {
+      method: 'PUT',
+      body: {
+        name: editForm.value.name,
+        slug: editForm.value.slug.trim(),
+        description: editForm.value.description,
+        author: editForm.value.author,
+        version: editForm.value.version,
+        license: editForm.value.license,
+        category: editForm.value.category || null,
+        tags,
+        compatibility_min: editForm.value.compatibilityMin.trim() || null,
+        compatibility_max: editForm.value.compatibilityMax.trim() || null,
+        submission_notes: editForm.value.submissionNotes.trim() || null,
+      },
+    });
+    showEditModal.value = false;
+    await refresh();
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to update theme');
+  } finally {
+    saving.value = false;
+  }
+}
+
+function handleDrop(event: DragEvent) {
+  isDragging.value = false;
+  const files = event.dataTransfer?.files;
+  if (files?.length) handleUpdateFile(files[0]!);
+}
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (target.files?.length) handleUpdateFile(target.files[0]!);
+}
+
+async function handleUpdateFile(file: File) {
+  if (!/\.(zip|json|webp|css|png|jpg|jpeg)$/i.test(file.name)) {
+    alert('Please upload a .zip, .json, .webp, .css, or image file');
+    return;
+  }
+  selectedUpdateFile.value = file;
+  updateManifestPreview.value = null;
+  try {
+    const formData = new FormData();
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      formData.append('theme_zip', file);
+    } else {
+      formData.append(file.name, file);
+    }
+    const response = await $fetch<any>('/api/admin/themes/manifest-preview', {
+      method: 'POST',
+      body: formData,
+    });
+    if (response.success) {
+      updateManifestPreview.value = response.data;
+      return;
+    }
+    if (theme.value?.theme_type === 'betterseqta' && /\.webp$/i.test(file.name)) {
+      updateManifestPreview.value = {
+        theme_type: 'betterseqta',
+        validation: { valid: true, warnings: [], errors: [] },
+        manifest: null,
+        imageOnly: true,
+      };
+      return;
+    }
+    if (theme.value?.theme_type !== 'betterseqta') {
+      updateManifestPreview.value = {
+        theme_type: 'desqta',
+        validation: {
+          valid: true,
+          warnings: ['Partial upload — merged with the existing package on save.'],
+          errors: [],
+        },
+        manifest: null,
+        partialUpload: true,
+      };
+      return;
+    }
+    alert('Failed to preview: ' + (response.error?.message || 'Unknown error'));
+    selectedUpdateFile.value = null;
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to preview upload');
+    selectedUpdateFile.value = null;
+  }
+}
+
+async function updateThemeFiles() {
+  if (!selectedUpdateFile.value) return;
+  updatingFiles.value = true;
+  try {
+    const formData = new FormData();
+    const file = selectedUpdateFile.value;
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      formData.append('theme_zip', file);
+    } else {
+      formData.append(file.name, file);
+    }
+    const response = await $fetch<any>(`/api/admin/custom-themes/${themeId}/update-files`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (response.success) {
+      selectedUpdateFile.value = null;
+      updateManifestPreview.value = null;
+      await refresh();
+    } else {
+      alert(response.error?.message || 'Failed to update theme files');
+    }
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to update theme files');
+  } finally {
+    updatingFiles.value = false;
+  }
 }
 </script>
