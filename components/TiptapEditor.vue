@@ -1,5 +1,8 @@
 <template>
-  <div class="tiptap-editor border border-zinc-700 rounded-lg overflow-hidden bg-zinc-900 h-full flex flex-col">
+  <div
+    class="tiptap-editor border border-zinc-700 rounded-lg overflow-hidden bg-zinc-900 flex flex-col"
+    :class="compact ? 'h-auto' : 'h-full'"
+  >
     <div v-if="editor" class="menu-bar flex flex-wrap gap-1 p-2 border-b border-zinc-700 bg-zinc-800 sticky top-0 z-10">
       <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }" class="editor-btn" title="Bold">
         <span class="font-bold">B</span>
@@ -79,9 +82,17 @@
       <button @click="editor.chain().focus().setHorizontalRule().run()" class="editor-btn" title="Horizontal Rule">
         ---
       </button>
-      
+      <button
+        type="button"
+        class="editor-btn"
+        title="Insert blank line for spacing"
+        @click="insertParagraphSpacing"
+      >
+        Spacing
+      </button>
+
       <div class="w-px h-6 bg-zinc-600 mx-1 self-center"></div>
-      
+
       <button @click="toggleCodeBlock" :class="{ 'is-active': editor.isActive('codeBlock') }" class="editor-btn flex items-center gap-1" title="Code Block">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
@@ -94,20 +105,28 @@
         </svg>
         <span>Lang</span>
       </button>
-      
       <div class="flex-grow"></div>
-      
-      <button @click="addImage" class="editor-btn flex items-center gap-1">
+
+      <button v-if="enableImages" @click="addImage" class="editor-btn flex items-center gap-1">
         <span>Link Img</span>
       </button>
-      <label class="editor-btn cursor-pointer flex items-center gap-1">
+      <label v-if="enableImages" class="editor-btn cursor-pointer flex items-center gap-1">
         <input type="file" class="hidden" accept="image/*" @change="handleImageUpload" />
         <span>Upload Img</span>
       </label>
     </div>
-    
-    <div class="flex-1 overflow-y-auto bg-zinc-900/50 cursor-text" @click="focusEditor">
-      <editor-content v-if="editor" :editor="editor" class="p-8 prose prose-invert prose-lg max-w-none focus:outline-none min-h-full" />
+
+    <div
+      class="flex-1 overflow-y-auto bg-zinc-900/50 cursor-text"
+      :class="compact ? 'min-h-[220px]' : ''"
+      @click="focusEditor"
+    >
+      <editor-content
+        v-if="editor"
+        :editor="editor"
+        class="focus:outline-none min-h-full"
+        :class="compact ? 'p-4 prose prose-invert prose-base max-w-none' : 'p-8 prose prose-invert prose-lg max-w-none'"
+      />
     </div>
   </div>
 </template>
@@ -150,6 +169,14 @@ const props = defineProps({
   modelValue: {
     type: String,
     default: '',
+  },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
+  enableImages: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -199,6 +226,10 @@ watch(() => props.modelValue, (value) => {
 
 const focusEditor = () => {
   editor.value?.chain().focus().run()
+}
+
+const insertParagraphSpacing = () => {
+  editor.value?.chain().focus().insertContent('<p></p>').run()
 }
 
 const addImage = () => {
