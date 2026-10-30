@@ -1,8 +1,8 @@
-import { requireAdmin } from '../../../../utils/auth';
+import { requireAdmin } from '../../../utils/auth';
 import {
   adminUpdateCustomThemeMetadata,
   type AdminUpdateCustomThemeBody
-} from '../../../../utils/adminCustomThemeUpdates';
+} from '../../../utils/adminCustomThemeUpdates';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
