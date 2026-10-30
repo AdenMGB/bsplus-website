@@ -230,7 +230,7 @@ export async function deleteCustomThemeAssets(event: H3Event, themeId: string): 
   await db.prepare('DELETE FROM custom_theme_files WHERE theme_id = ?').bind(themeId).run();
 }
 
-async function replaceCustomThemeFiles(
+export async function replaceCustomThemeFileIndex(
   db: any,
   themeId: string,
   entries: ThemeFileIndexEntry[]
@@ -522,7 +522,7 @@ export async function processCustomThemeUpload(
       bsTheme,
       assets
     });
-    await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
+    await replaceCustomThemeFileIndex(db, themeId, assets.r2Keys);
 
     return uploadResult(db, themeId, validation);
   }
@@ -563,7 +563,7 @@ export async function processCustomThemeUpload(
     manifest,
     assets
   });
-  await replaceCustomThemeFiles(db, themeId, assets.r2Keys);
+  await replaceCustomThemeFileIndex(db, themeId, assets.r2Keys);
 
   return uploadResult(db, themeId, validation);
 }
