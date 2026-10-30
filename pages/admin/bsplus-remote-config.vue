@@ -241,7 +241,7 @@
         </div>
 
         <!-- Campaigns -->
-        <div v-show="activeTab === 'campaigns'" class="grid gap-6 lg:grid-cols-2">
+        <div v-show="activeTab === 'campaigns'" class="grid gap-6 xl:grid-cols-[minmax(240px,320px)_1fr]">
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h2 class="mb-4 text-lg font-semibold text-white">Campaigns</h2>
             <ul class="space-y-2">
@@ -260,33 +260,40 @@
             <button type="button" class="mt-4 text-sm text-orange-400 hover:text-orange-300" @click="resetCampaignForm">+ New campaign</button>
           </div>
 
-          <form class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="saveCampaign">
+          <form class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 xl:max-w-none" @submit.prevent="saveCampaign">
             <h2 class="text-lg font-semibold text-white">{{ campaignEditId ? 'Edit campaign' : 'New campaign' }}</h2>
-            <input v-model="campaignForm.id" :readonly="!!campaignEditId" placeholder="id (auto if empty)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid gap-4 lg:grid-cols-2">
+              <input v-model="campaignForm.id" :readonly="!!campaignEditId" placeholder="id (auto if empty)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white lg:col-span-2" />
               <input v-model.number="campaignForm.priority" type="number" placeholder="Priority" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
               <label class="flex items-center gap-2 text-sm text-zinc-200">
                 <input v-model="campaignForm.enabled" type="checkbox" /> Enabled
               </label>
-            </div>
-            <input v-model="campaignForm.activeFrom" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <input v-model="campaignForm.activeTo" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <input v-model="campaignForm.headerTitle" placeholder="Header title" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <input v-model="campaignForm.headerSubtitle" placeholder="Header subtitle" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <div class="grid grid-cols-3 gap-2">
-              <select v-model="campaignForm.heroType" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
-                <option value="">No hero</option>
-                <option value="image">Image</option>
-                <option value="video">Video</option>
-              </select>
-              <input v-model="campaignForm.heroUrl" placeholder="Hero URL" class="col-span-2 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            </div>
-            <textarea v-model="campaignForm.bodyHtml" rows="4" placeholder="bodyHtml (sanitized on save)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-            <textarea v-model="campaignForm.buttonsJson" rows="3" placeholder='buttons JSON e.g. [{"id":"dismiss","label":"Got it","action":"dismiss"}]' class="w-full font-mono text-xs rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white" />
-            <div class="grid grid-cols-2 gap-2">
+              <input v-model="campaignForm.activeFrom" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <input v-model="campaignForm.activeTo" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <input v-model="campaignForm.headerTitle" placeholder="Header title" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <input v-model="campaignForm.headerSubtitle" placeholder="Header subtitle" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <div class="flex gap-2 lg:col-span-2">
+                <select v-model="campaignForm.heroType" class="w-36 shrink-0 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
+                  <option value="">No hero</option>
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+                <input v-model="campaignForm.heroUrl" placeholder="Hero URL (HTTPS)" class="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              </div>
               <input v-model="campaignForm.minVersion" placeholder="minVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
               <input v-model="campaignForm.maxVersion" placeholder="maxVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
             </div>
+
+            <div class="lg:col-span-2">
+              <label class="mb-2 block text-sm font-medium text-zinc-300">Campaign body</label>
+              <TiptapEditor v-model="campaignForm.bodyHtml" compact :enable-images="true" class="min-h-[280px]" />
+            </div>
+
+            <AdminBsplusCampaignButtonEditor
+              v-model="campaignForm.buttons"
+              :action-options="catalog?.campaign?.buttonActions"
+            />
+
             <div class="flex flex-wrap gap-3">
               <label class="flex items-center gap-2 text-sm text-zinc-200">
                 <input v-model="campaignForm.requireAcknowledge" type="checkbox" /> Require acknowledge
@@ -362,7 +369,11 @@
             <label class="flex items-center gap-2 text-sm text-zinc-200">
               <input v-model="packageForm.enabled" type="checkbox" class="rounded border-zinc-600" /> Enabled
             </label>
-            <textarea v-model="packageForm.themeJson" rows="8" placeholder='ThemeContent JSON (id, name, CustomCSS, …)' class="w-full font-mono text-xs rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white" />
+            <AdminBsplusRemoteThemeUpload
+              v-model:model-theme-json="packageForm.themeJson"
+              @update:theme="parsedPackageTheme = $event"
+              @suggest-package-id="onSuggestPackageId"
+            />
             <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" :disabled="packageSaving">
               {{ packageSaving ? 'Saving…' : 'Save package' }}
             </button>
@@ -441,7 +452,7 @@ const campaignForm = reactive({
   heroType: '' as '' | 'image' | 'video',
   heroUrl: '',
   bodyHtml: '',
-  buttonsJson: '[{"id":"dismiss","label":"Got it","action":"dismiss"}]',
+  buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }] as Array<Record<string, unknown>>,
   minVersion: '',
   maxVersion: '',
   requireAcknowledge: false,
@@ -466,6 +477,14 @@ const packageForm = reactive({
   enabled: true,
   themeJson: '',
 });
+
+const parsedPackageTheme = ref<Record<string, unknown> | null>(null);
+
+function onSuggestPackageId(id: string) {
+  if (!packageForm.packageId.trim()) {
+    packageForm.packageId = id;
+  }
+}
 
 function needsMessage(mode: string) {
   return mode === 'banner' || mode === 'block' || mode === 'greyout';
@@ -654,7 +673,7 @@ function resetCampaignForm() {
     heroType: '',
     heroUrl: '',
     bodyHtml: '',
-    buttonsJson: '[{"id":"dismiss","label":"Got it","action":"dismiss"}]',
+    buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }],
     minVersion: '',
     maxVersion: '',
     requireAcknowledge: false,
@@ -674,7 +693,9 @@ function loadCampaignIntoForm(c: any) {
   campaignForm.heroType = c.hero?.type ?? '';
   campaignForm.heroUrl = c.hero?.url ?? '';
   campaignForm.bodyHtml = c.bodyHtml ?? '';
-  campaignForm.buttonsJson = JSON.stringify(c.buttons ?? [], null, 2);
+  campaignForm.buttons = Array.isArray(c.buttons) && c.buttons.length
+    ? c.buttons.map((b: Record<string, unknown>) => ({ ...b }))
+    : [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }];
   campaignForm.minVersion = c.minVersion ?? '';
   campaignForm.maxVersion = c.maxVersion ?? '';
   campaignForm.requireAcknowledge = !!c.requireAcknowledge;
@@ -685,12 +706,6 @@ async function saveCampaign() {
   campaignSaving.value = true;
   errorMessage.value = '';
   try {
-    let buttons: unknown[] = [];
-    try {
-      buttons = JSON.parse(campaignForm.buttonsJson || '[]');
-    } catch {
-      throw new Error('Invalid buttons JSON');
-    }
     const payload = {
       id: campaignForm.id.trim() || undefined,
       priority: campaignForm.priority,
@@ -706,7 +721,7 @@ async function saveCampaign() {
           ? { type: campaignForm.heroType, url: campaignForm.heroUrl.trim() }
           : null,
       bodyHtml: campaignForm.bodyHtml,
-      buttons,
+      buttons: campaignForm.buttons,
       minVersion: campaignForm.minVersion.trim() || null,
       maxVersion: campaignForm.maxVersion.trim() || null,
       requireAcknowledge: campaignForm.requireAcknowledge,
@@ -809,6 +824,11 @@ async function loadRemoteThemePackage(packageId: string) {
     packageForm.version = p.version;
     packageForm.enabled = p.enabled !== false;
     packageForm.themeJson = p.themeJson || '';
+    try {
+      parsedPackageTheme.value = p.themeJson ? JSON.parse(p.themeJson) : null;
+    } catch {
+      parsedPackageTheme.value = null;
+    }
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || 'Failed to load package';
   }
@@ -818,9 +838,12 @@ async function saveRemoteThemePackage() {
   packageSaving.value = true;
   errorMessage.value = '';
   try {
-    let theme: unknown;
-    if (packageForm.themeJson.trim()) {
+    let theme: unknown = parsedPackageTheme.value;
+    if (!theme && packageForm.themeJson.trim()) {
       theme = JSON.parse(packageForm.themeJson);
+    }
+    if (!theme) {
+      throw new Error('Upload or paste a valid BetterSEQTA theme first');
     }
     await $fetch('/api/bsplus/admin/remote-theme-packages', {
       method: 'POST',
