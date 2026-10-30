@@ -40,12 +40,16 @@ export type RemoteConfigGlobal = {
   mode: GlobalMode;
   allowLocalOverride: boolean;
   statusMessage: string | null;
-  maintenance: Record<string, unknown> | null;
+  maintenance: { title?: string; body?: string } | null;
   minExtensionVersion: string | null;
   forceUpdateUrl: string | null;
   disableCloudSync: boolean;
   disableThemeStore: boolean;
   disableFeedbackSubmit: boolean;
+  hostnamePolicy: {
+    mode?: 'allowlist' | 'denylist';
+    suffixes?: string[];
+  } | null;
 };
 
 export type RemoteConfigFeatureMessage = {
@@ -69,6 +73,8 @@ export type RemoteConfigCampaign = {
   bodyHtml: string;
   buttons: Array<Record<string, unknown>>;
   requireAcknowledge: boolean;
+  minVersion?: string | null;
+  maxVersion?: string | null;
 };
 
 export type RemoteConfigSnapshotData = {
@@ -231,12 +237,30 @@ export async function computeConfigEtag(canonicalJson: string): Promise<string> 
   return `W/"${hex.slice(0, 16)}"`;
 }
 
+function parseHostnamePolicy(value: unknown): RemoteConfigGlobal['hostnamePolicy'] {
+  const obj = parseJsonObject(value);
+  if (!obj) return null;
+  const mode = obj.mode;
+  if (mode !== 'allowlist' && mode !== 'denylist') return null;
+  const suffixes = Array.isArray(obj.suffixes)
+    ? obj.suffixes.filter((s): s is string => typeof s === 'string' && s.trim().length > 0).map((s) => s.trim().toLowerCase())
+    : [];
+  if (!suffixes.length) return null;
+  return { mode, suffixes };
+}
+
 function rowToGlobal(row: Record<string, unknown>): RemoteConfigGlobal {
+  const maintenance = parseJsonObject(row.maintenance_json);
   return {
     mode: (row.mode === 'off' ? 'off' : 'on') as GlobalMode,
     allowLocalOverride: boolFromDb(row.allow_local_override, true),
     statusMessage: row.status_message ? String(row.status_message) : null,
-    maintenance: parseJsonObject(row.maintenance_json),
+    maintenance: maintenance
+      ? {
+          title: typeof maintenance.title === 'string' ? maintenance.title : undefined,
+          body: typeof maintenance.body === 'string' ? maintenance.body : undefined,
+        }
+      : null,
     minExtensionVersion: row.min_extension_version
       ? String(row.min_extension_version)
       : null,
@@ -244,6 +268,9 @@ function rowToGlobal(row: Record<string, unknown>): RemoteConfigGlobal {
     disableCloudSync: boolFromDb(row.disable_cloud_sync),
     disableThemeStore: boolFromDb(row.disable_theme_store),
     disableFeedbackSubmit: boolFromDb(row.disable_feedback_submit),
+    hostnamePolicy:
+      parseHostnamePolicy(row.hostname_policy_json) ??
+      parseHostnamePolicy(row.hostnamePolicy),
   };
 }
 
@@ -291,6 +318,9 @@ function campaignRowToPublic(
     requireAcknowledge: boolFromDb(row.require_acknowledge),
   };
 
+  if (row.min_version) campaign.minVersion = String(row.min_version);
+  if (row.max_version) campaign.maxVersion = String(row.max_version);
+
   if (hero && typeof hero.type === 'string' && typeof hero.url === 'string') {
     campaign.hero = {
       type: hero.type,
@@ -324,6 +354,7 @@ export async function loadDraftGlobal(db: any): Promise<RemoteConfigGlobal> {
       disableCloudSync: false,
       disableThemeStore: false,
       disableFeedbackSubmit: false,
+      hostnamePolicy: null,
     };
   }
   return rowToGlobal(row);
@@ -806,8 +837,21 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
         : String(body.statusMessage).slice(0, 500);
   }
   if (body.maintenance !== undefined) {
-    next.maintenance =
-      body.maintenance === null ? null : parseJsonObject(body.maintenance);
+    if (body.maintenance === null) {
+      next.maintenance = null;
+    } else {
+      const m = parseJsonObject(body.maintenance);
+      next.maintenance = m
+        ? {
+            title: typeof m.title === 'string' ? m.title.slice(0, 200) : undefined,
+            body: typeof m.body === 'string' ? m.body.slice(0, 2000) : undefined,
+          }
+        : null;
+    }
+  }
+  if (body.hostnamePolicy !== undefined) {
+    next.hostnamePolicy =
+      body.hostnamePolicy === null ? null : parseHostnamePolicy(body.hostnamePolicy);
   }
   if (body.minExtensionVersion !== undefined) {
     next.minExtensionVersion =
@@ -840,6 +884,7 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
          disable_cloud_sync = ?,
          disable_theme_store = ?,
          disable_feedback_submit = ?,
+         hostname_policy_json = ?,
          updated_at = ?
        WHERE id = 1`
     )
@@ -853,6 +898,7 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
       next.disableCloudSync ? 1 : 0,
       next.disableThemeStore ? 1 : 0,
       next.disableFeedbackSubmit ? 1 : 0,
+      next.hostnamePolicy ? JSON.stringify(next.hostnamePolicy) : null,
       updatedAt
     )
     .run();
@@ -933,14 +979,27 @@ export async function createCampaign(db: any, body: Record<string, unknown>) {
   const requireAcknowledge = body.requireAcknowledge === true || body.require_acknowledge === true;
   const omitBody = body.omitBodyFromSnapshot === true || body.omit_body_from_snapshot === true;
   const enabled = body.enabled !== false;
+  const minVersion =
+    typeof body.minVersion === 'string' && body.minVersion.trim()
+      ? body.minVersion.trim().slice(0, 32)
+      : typeof body.min_version === 'string' && body.min_version.trim()
+        ? body.min_version.trim().slice(0, 32)
+        : null;
+  const maxVersion =
+    typeof body.maxVersion === 'string' && body.maxVersion.trim()
+      ? body.maxVersion.trim().slice(0, 32)
+      : typeof body.max_version === 'string' && body.max_version.trim()
+        ? body.max_version.trim().slice(0, 32)
+        : null;
   const now = nowUnix();
 
   await db
     .prepare(
       `INSERT INTO bsplus_remote_config_campaigns (
          id, priority, active_from, active_to, header_json, hero_json, body_html, buttons_json,
-         require_acknowledge, omit_body_from_snapshot, enabled, created_at, updated_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         require_acknowledge, omit_body_from_snapshot, enabled, min_version, max_version,
+         created_at, updated_at
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       idRaw,
@@ -954,6 +1013,8 @@ export async function createCampaign(db: any, body: Record<string, unknown>) {
       requireAcknowledge ? 1 : 0,
       omitBody ? 1 : 0,
       enabled ? 1 : 0,
+      minVersion,
+      maxVersion,
       now,
       now
     )
@@ -1023,6 +1084,26 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       ? body.omitBodyFromSnapshot === true
       : boolFromDb(existing.omit_body_from_snapshot);
   const enabled = body.enabled !== undefined ? body.enabled !== false : boolFromDb(existing.enabled, true);
+  const minVersion =
+    body.minVersion !== undefined || body.min_version !== undefined
+      ? typeof body.minVersion === 'string' && body.minVersion.trim()
+        ? body.minVersion.trim().slice(0, 32)
+        : typeof body.min_version === 'string' && body.min_version.trim()
+          ? body.min_version.trim().slice(0, 32)
+          : null
+      : existing.min_version
+        ? String(existing.min_version)
+        : null;
+  const maxVersion =
+    body.maxVersion !== undefined || body.max_version !== undefined
+      ? typeof body.maxVersion === 'string' && body.maxVersion.trim()
+        ? body.maxVersion.trim().slice(0, 32)
+        : typeof body.max_version === 'string' && body.max_version.trim()
+          ? body.max_version.trim().slice(0, 32)
+          : null
+      : existing.max_version
+        ? String(existing.max_version)
+        : null;
   const updatedAt = nowUnix();
 
   await db
@@ -1030,7 +1111,7 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       `UPDATE bsplus_remote_config_campaigns SET
          priority = ?, active_from = ?, active_to = ?, header_json = ?, hero_json = ?,
          body_html = ?, buttons_json = ?, require_acknowledge = ?, omit_body_from_snapshot = ?,
-         enabled = ?, updated_at = ?
+         enabled = ?, min_version = ?, max_version = ?, updated_at = ?
        WHERE id = ?`
     )
     .bind(
@@ -1044,6 +1125,8 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       requireAcknowledge ? 1 : 0,
       omitBody ? 1 : 0,
       enabled ? 1 : 0,
+      minVersion,
+      maxVersion,
       updatedAt,
       id
     )

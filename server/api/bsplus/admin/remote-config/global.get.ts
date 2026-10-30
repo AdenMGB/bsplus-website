@@ -6,6 +6,7 @@ import {
   loadDraftFeatures,
   loadDraftGlobal,
 } from '../../../../utils/bsplusRemoteConfig';
+import { getBsplusRemoteConfigCatalog } from '../../../../utils/bsplusRemoteConfigCatalog';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
@@ -16,7 +17,9 @@ export default defineEventHandler(async (event) => {
 
   return createApiEnvelope({
     global,
+    features,
     feature_count: Object.keys(features).length,
+    catalog: getBsplusRemoteConfigCatalog(),
     published: published
       ? {
           configVersion: published.config_version,

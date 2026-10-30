@@ -56,17 +56,30 @@ Draft edits do **not** affect extensions until **publish**.
 
 ### Global `PATCH` body (partial)
 
-`mode` (`on` \| `off`), `allowLocalOverride`, `statusMessage`, `maintenance`, `minExtensionVersion`, `forceUpdateUrl`, `disableCloudSync`, `disableThemeStore`, `disableFeedbackSubmit`.
+| Field | Extension effect |
+|-------|------------------|
+| `mode` | `on` \| `off` — kill switch |
+| `allowLocalOverride` | “Run locally anyway” when off or hostname blocked |
+| `statusMessage` | Settings strip when kill switch off |
+| `maintenance` | `{ title?, body? }` — status strip (title/body) |
+| `minExtensionVersion` | Semver — blocks plugins / shows update strip |
+| `forceUpdateUrl` | Appended to min-version message |
+| `hostnamePolicy` | `{ mode: "allowlist"\|"denylist", suffixes: string[] }` — per-SEQTA-site enablement |
+| `disableCloudSync` | Stops cloud settings sync |
+| `disableThemeStore` | Hides/disables theme store |
+| `disableFeedbackSubmit` | Blocks feedback API from extension |
 
-### Feature gate body
+### Feature catalog
 
-`feature_key` (or path key): `page.*`, `plugin.*`, or `settings.*`.  
-`mode`: `allow` \| `hide` \| `banner` \| `block` \| `greyout` \| `temp_hide`.  
-Optional `message`: `{ title?, body, severity? }`.
+**`GET /api/bsplus/admin/remote-config/catalog`** — all known `page.*`, `plugin.*`, and `settings.*` keys from BetterSEQTA+ (also included on global GET as `catalog`).
 
-### Campaign body
+Built-in plugin keys: `plugin.themes`, `plugin.global-search`, `plugin.grade-analytics`, … (see catalog response).
 
-`header` (`title`, optional `subtitle`), `activeFrom` / `activeTo` (ISO-8601), `bodyHtml` (sanitized server-side), optional `hero`, `buttons`, `priority`, `requireAcknowledge`, `omitBodyFromSnapshot`, `enabled`.
+Settings keys include `settings.nav.cloud`, `settings.section.*`, `settings.control.onoff`.
+
+### Campaign fields
+
+Includes `minVersion` / `maxVersion` (semver window), `requireAcknowledge`, `omitBodyFromSnapshot`, hero `image`|`video`, button actions `dismiss` \| `url` \| `openSettingsSection`.
 
 ---
 
@@ -79,6 +92,8 @@ Apply locally:
 ```bash
 pnpm db:migrate:local
 ```
+
+Includes **`022_bsplus_remote_config.sql`** and **`023_bsplus_remote_config_extension_fields.sql`** (hostname policy + campaign version bounds).
 
 Production:
 
