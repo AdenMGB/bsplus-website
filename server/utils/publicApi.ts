@@ -28,5 +28,5 @@ export function getPublicApiUrl(event?: H3Event | null): string {
     return fromEnv.replace(/\/$/, '');
   }
 
-  return 'https://api.betterseqta.org';
+  return 'https://betterseqta.org';
 }

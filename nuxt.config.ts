@@ -51,10 +51,14 @@ export default defineNuxtConfig({
         isLocalDev && process.env.DEV_BSPLUS_URL
           ? process.env.DEV_BSPLUS_URL.replace(/\/$/, '')
           : (process.env.NUXT_PUBLIC_SITE_URL ?? 'https://betterseqta.org'),
+      /** Extension API base; defaults to site host (`https://betterseqta.org/api/...`). */
       apiUrl:
         isLocalDev && process.env.DEV_API_URL
           ? process.env.DEV_API_URL.replace(/\/$/, '')
-          : (process.env.NUXT_PUBLIC_API_URL ?? 'https://api.betterseqta.org'),
+          : (process.env.NUXT_PUBLIC_API_URL ??
+            (isLocalDev && process.env.DEV_BSPLUS_URL
+              ? process.env.DEV_BSPLUS_URL.replace(/\/$/, '')
+              : (process.env.NUXT_PUBLIC_SITE_URL ?? 'https://betterseqta.org'))),
     },
   },
   app: {

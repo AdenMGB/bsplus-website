@@ -2,7 +2,9 @@
 
 Operator-controlled configuration for extension installs: kill switch, feature gates, campaigns, and optional **remote theme packages**. The extension reads a **snapshot** from the primary API (preferred) or a **GitHub mirror** when the API is unavailable.
 
-**Base URL (production):** `https://api.betterseqta.org` — same host family as accounts. Dev builds may use `DEV_API_URL` / `api.dev.betterseqta.org`. The marketing site (`betterseqta.org`) serves the admin UI; extension traffic should target the API host.
+**Base URL (production):** `https://betterseqta.org` — extension routes under `/api/bsplus/…`.
+
+Overlay mode (`applicationMode`, `overlayLayers`): see **[Remote theme overlay API](./bsplus-remote-theme-overlay-api.md)**.
 
 ---
 
@@ -126,7 +128,7 @@ pnpm db:migrate:remote  # production
 
 | Var | Default |
 |-----|---------|
-| `NUXT_PUBLIC_API_URL` | `https://api.betterseqta.org` |
+| `NUXT_PUBLIC_API_URL` | `https://betterseqta.org` (same as site) |
 | `GITHUB_BS_STATUS_OWNER` | `BetterSEQTA` |
 | `GITHUB_BS_STATUS_REPO` | `BS-Status` |
 | `GITHUB_BS_STATUS_PATH` | `config` |

@@ -240,11 +240,38 @@ export const CAMPAIGN_BUTTON_ACTIONS = [
 
 export const CAMPAIGN_HERO_TYPES = ['image', 'video'] as const;
 
+export const REMOTE_THEME_APPLICATION_MODE_DOCS = [
+  {
+    value: 'replace',
+    label: 'Replace',
+    description: 'Remote package replaces the user theme while active (default).',
+  },
+  {
+    value: 'overlay',
+    label: 'Overlay',
+    description: 'User theme stays selected; remote CSS/DOM layers stack on top.',
+  },
+] as const;
+
 export function getBsplusRemoteConfigCatalog() {
   return {
     globalFields: GLOBAL_FIELD_DOCS,
     featureModes: FEATURE_MODE_DOCS,
     featureGroups: BSPLUS_REMOTE_FEATURE_GROUPS,
+    remoteTheme: {
+      applicationModes: REMOTE_THEME_APPLICATION_MODE_DOCS,
+      maxOverlayLayers: 5,
+      directiveFields: [
+        'packageId',
+        'packageVersion',
+        'mode',
+        'applicationMode',
+        'activeFrom',
+        'activeTo',
+        'message',
+        'allowUserOptOut',
+      ],
+    },
     campaign: {
       buttonActions: CAMPAIGN_BUTTON_ACTIONS,
       heroTypes: CAMPAIGN_HERO_TYPES,

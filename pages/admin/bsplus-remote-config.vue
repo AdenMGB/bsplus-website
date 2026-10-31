@@ -323,18 +323,37 @@
           <form class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="saveRemoteThemeDirective">
             <h2 class="text-lg font-semibold text-white">Remote theme directive</h2>
             <p class="text-sm text-zinc-500">
-              Published in the config snapshot as <code class="text-zinc-400">remoteTheme</code>. Theme binaries are served from
-              <code class="text-zinc-400">api.betterseqta.org</code>, not the theme store.
+              Published in the config snapshot as <code class="text-zinc-400">remoteTheme</code>. Packages are served from
+              <code class="text-zinc-400">https://betterseqta.org/api/bsplus/…</code>.
             </p>
             <label class="flex flex-col gap-2 text-sm text-zinc-200">
-              Mode
+              Policy mode
               <select v-model="remoteThemeForm.mode" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white">
                 <option value="">Inactive (omit from snapshot)</option>
                 <option value="off">off — end remote theme</option>
                 <option value="optional">optional — user may turn off</option>
-                <option value="forced">forced — lock theme picker</option>
+                <option value="forced">forced — enforce remote policy</option>
               </select>
             </label>
+            <label class="flex flex-col gap-2 text-sm text-zinc-200">
+              Application mode
+              <select v-model="remoteThemeForm.applicationMode" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white">
+                <option value="replace">replace — remote theme replaces user theme</option>
+                <option value="overlay">overlay — layer on top of user theme</option>
+              </select>
+            </label>
+            <p
+              v-if="remoteThemeForm.mode === 'forced' && remoteThemeForm.applicationMode === 'replace'"
+              class="rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-xs text-amber-100"
+            >
+              Forced + replace locks the theme picker and swaps to the remote package only.
+            </p>
+            <p
+              v-else-if="remoteThemeForm.mode === 'forced' && remoteThemeForm.applicationMode === 'overlay'"
+              class="rounded-lg border border-blue-500/30 bg-blue-950/30 px-3 py-2 text-xs text-blue-100"
+            >
+              Forced + overlay keeps the theme picker for the base theme; remote layers stay until the directive ends.
+            </p>
             <input v-model="remoteThemeForm.packageId" placeholder="packageId (e.g. school-brand-2026)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
             <input v-model="remoteThemeForm.packageVersion" placeholder="packageVersion (optional, defaults to package row)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
             <input v-model="remoteThemeForm.activeFrom" type="datetime-local" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
@@ -366,13 +385,32 @@
             </ul>
             <input v-model="packageForm.packageId" placeholder="packageId" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
             <input v-model="packageForm.version" placeholder="version" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <label class="flex flex-col gap-2 text-sm text-zinc-200">
+              Package application mode
+              <select v-model="packageForm.applicationMode" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white">
+                <option value="replace">replace</option>
+                <option value="overlay">overlay</option>
+              </select>
+            </label>
+            <label class="flex flex-col gap-2 text-sm text-zinc-200">
+              Content type
+              <select v-model="packageForm.contentMode" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white">
+                <option value="theme">Single theme (theme.json / ZIP)</option>
+                <option value="layers">Overlay layers (stacked CSS)</option>
+              </select>
+            </label>
             <label class="flex items-center gap-2 text-sm text-zinc-200">
               <input v-model="packageForm.enabled" type="checkbox" class="rounded border-zinc-600" /> Enabled
             </label>
             <AdminBsplusRemoteThemeUpload
+              v-if="packageForm.contentMode === 'theme'"
               v-model:model-theme-json="packageForm.themeJson"
               @update:theme="parsedPackageTheme = $event"
               @suggest-package-id="onSuggestPackageId"
+            />
+            <AdminBsplusOverlayLayersEditor
+              v-else
+              v-model="packageForm.overlayLayers"
             />
             <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" :disabled="packageSaving">
               {{ packageSaving ? 'Saving…' : 'Save package' }}
@@ -462,6 +500,7 @@ const campaignForm = reactive({
 const remoteThemePackages = ref<any[]>([]);
 const remoteThemeForm = reactive({
   mode: '' as '' | 'off' | 'optional' | 'forced',
+  applicationMode: 'replace' as 'replace' | 'overlay',
   packageId: '',
   packageVersion: '',
   activeFrom: '',
@@ -475,7 +514,10 @@ const packageForm = reactive({
   packageId: '',
   version: '1',
   enabled: true,
+  applicationMode: 'replace' as 'replace' | 'overlay',
+  contentMode: 'theme' as 'theme' | 'layers',
   themeJson: '',
+  overlayLayers: [] as Array<Record<string, unknown>>,
 });
 
 const parsedPackageTheme = ref<Record<string, unknown> | null>(null);
@@ -561,6 +603,7 @@ async function loadAll() {
     const rt = globalRes.data?.remoteTheme;
     if (rt?.mode) {
       remoteThemeForm.mode = rt.mode;
+      remoteThemeForm.applicationMode = rt.applicationMode === 'overlay' ? 'overlay' : 'replace';
       remoteThemeForm.packageId = rt.packageId ?? '';
       remoteThemeForm.packageVersion = rt.packageVersion ?? '';
       remoteThemeForm.activeFrom = rt.activeFrom ? fromIsoToDatetimeLocal(rt.activeFrom) : '';
@@ -788,6 +831,9 @@ async function saveRemoteThemeDirective() {
         if (remoteThemeForm.mode === 'optional' && remoteThemeForm.allowUserOptOut) {
           remoteTheme.allowUserOptOut = true;
         }
+        if (remoteThemeForm.applicationMode === 'overlay') {
+          remoteTheme.applicationMode = 'overlay';
+        }
       }
     }
     await $fetch('/api/bsplus/admin/remote-config/global', {
@@ -804,6 +850,7 @@ async function saveRemoteThemeDirective() {
 
 async function clearRemoteThemeDirective() {
   remoteThemeForm.mode = '';
+  remoteThemeForm.applicationMode = 'replace';
   remoteThemeForm.packageId = '';
   remoteThemeForm.packageVersion = '';
   remoteThemeForm.activeFrom = '';
@@ -823,6 +870,9 @@ async function loadRemoteThemePackage(packageId: string) {
     packageForm.packageId = p.packageId;
     packageForm.version = p.version;
     packageForm.enabled = p.enabled !== false;
+    packageForm.applicationMode = p.applicationMode === 'overlay' ? 'overlay' : 'replace';
+    packageForm.contentMode = p.overlayLayers?.length ? 'layers' : 'theme';
+    packageForm.overlayLayers = Array.isArray(p.overlayLayers) ? p.overlayLayers.map((l: Record<string, unknown>) => ({ ...l })) : [];
     packageForm.themeJson = p.themeJson || '';
     try {
       parsedPackageTheme.value = p.themeJson ? JSON.parse(p.themeJson) : null;
@@ -839,20 +889,31 @@ async function saveRemoteThemePackage() {
   errorMessage.value = '';
   try {
     let theme: unknown = parsedPackageTheme.value;
-    if (!theme && packageForm.themeJson.trim()) {
-      theme = JSON.parse(packageForm.themeJson);
+    const body: Record<string, unknown> = {
+      packageId: packageForm.packageId.trim(),
+      version: packageForm.version.trim(),
+      enabled: packageForm.enabled,
+      applicationMode: packageForm.applicationMode,
+    };
+
+    if (packageForm.contentMode === 'layers') {
+      if (!packageForm.overlayLayers.length) {
+        throw new Error('Add at least one overlay layer');
+      }
+      body.overlayLayers = packageForm.overlayLayers;
+    } else {
+      if (!theme && packageForm.themeJson.trim()) {
+        theme = JSON.parse(packageForm.themeJson);
+      }
+      if (!theme) {
+        throw new Error('Upload or paste a valid BetterSEQTA theme first');
+      }
+      body.theme = theme;
     }
-    if (!theme) {
-      throw new Error('Upload or paste a valid BetterSEQTA theme first');
-    }
+
     await $fetch('/api/bsplus/admin/remote-theme-packages', {
       method: 'POST',
-      body: {
-        packageId: packageForm.packageId.trim(),
-        version: packageForm.version.trim(),
-        enabled: packageForm.enabled,
-        ...(theme ? { theme } : {}),
-      },
+      body,
     });
     const list = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-theme-packages');
     remoteThemePackages.value = list.data?.packages ?? [];
