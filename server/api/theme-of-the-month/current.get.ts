@@ -1,4 +1,5 @@
 import { getDB } from '../../utils/db';
+import { maybeRecordThemeCatalogEvent } from '../../utils/bsplusThemeAnalytics';
 
 function getCurrentMonth(): string {
   const now = new Date();
@@ -26,6 +27,13 @@ export default defineEventHandler(async (event) => {
     `).bind(month).first();
 
     if (!entry) return null;
+
+    maybeRecordThemeCatalogEvent(event, db, {
+      query: getQuery(event) as Record<string, unknown>,
+      eventType: 'totm',
+      themeId: entry.theme_id ? String(entry.theme_id) : null,
+      route: '/api/theme-of-the-month/current',
+    });
 
     let theme: { id: string; name: string; slug: string } | null = null;
     if (entry.theme_id) {

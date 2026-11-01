@@ -6,6 +6,12 @@ import {
   sendRemoteConfigError,
   validateRemoteConfigQuery,
 } from '../../utils/bsplusRemoteConfig';
+import { resolveBsplusClientUserId } from '../../utils/bsplusExtensionClientContext';
+import {
+  computePersonalizedEtag,
+  getPersonalizationRevision,
+  personalizeRemoteConfigForClient,
+} from '../../utils/bsplusRemoteConfigTargeting';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -28,17 +34,36 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    const snapshot = await ensurePublishedSnapshot(db);
+    const resolvedUserId = await resolveBsplusClientUserId(event, validated.userId);
+    const clientContext = {
+      installId: validated.installId,
+      extensionVersion: validated.extensionVersion,
+      channel: validated.channel,
+      hostname: validated.hostname,
+      userId: resolvedUserId,
+    };
+
+    const baseSnapshot = await ensurePublishedSnapshot(db);
+    const snapshot = await personalizeRemoteConfigForClient(db, baseSnapshot, clientContext);
+    const revision = await getPersonalizationRevision(
+      db,
+      clientContext.installId,
+      clientContext.userId
+    );
+    const etag = await computePersonalizedEtag(baseSnapshot.etag, clientContext, revision);
+
     const ifNoneMatch = getHeader(event, 'if-none-match')?.trim();
-    if (ifNoneMatch && ifNoneMatch === snapshot.etag) {
+    if (ifNoneMatch && ifNoneMatch === etag) {
       setResponseStatus(event, 304);
-      setHeader(event, 'ETag', snapshot.etag);
-      setHeader(event, 'Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+      setHeader(event, 'ETag', etag);
+      setHeader(event, 'Cache-Control', 'private, max-age=60, stale-while-revalidate=300');
+      setHeader(event, 'Vary', 'Authorization');
       return null;
     }
 
-    setHeader(event, 'ETag', snapshot.etag);
-    setHeader(event, 'Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    setHeader(event, 'ETag', etag);
+    setHeader(event, 'Cache-Control', 'private, max-age=60, stale-while-revalidate=300');
+    setHeader(event, 'Vary', 'Authorization');
 
     return createApiEnvelope(snapshot);
   } catch (e: unknown) {

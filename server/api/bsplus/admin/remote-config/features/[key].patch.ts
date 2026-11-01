@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = getDB(event);
-  await upsertFeatureGate(db, validated.featureKey, validated.mode, validated.message);
+  await upsertFeatureGate(db, validated.featureKey, validated.mode, validated.message, merged);
 
   return createApiEnvelope({
     feature_key: validated.featureKey,

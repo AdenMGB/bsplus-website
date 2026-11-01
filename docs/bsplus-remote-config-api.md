@@ -18,8 +18,11 @@ Overlay mode (`applicationMode`, `overlayLayers`): see **[Remote theme overlay A
 | `extensionVersion` | yes | Manifest version (max 32 chars) |
 | `channel` | yes | `stable`, `dev`, `nightly`, or `unknown` |
 | `hostname` | no | Last SEQTA page hostname (no path) |
+| `userId` | no | Cloud user UUID when signed in (optional targeting) |
 
-**Headers:** `Accept: application/json`, `If-None-Match: <etag>` → **304** when unchanged.
+**Headers:** `Accept: application/json`, `If-None-Match: <etag>` → **304** when unchanged. **`Cache-Control: private`** — etag is **personalized** per install/user/channel/version/hostname and live targeting overrides (not the same as the published global etag).
+
+**Personalization:** After loading the published snapshot, the server filters campaigns, feature gates, and `remoteTheme` using optional **`targeting`** rules on draft rows, then applies **`bsplus_remote_config_overrides`** for matching `installId` / cloud `userId` (Bearer wins over query `userId`).
 
 **Response:** Standard envelope (`success`, `data`, …). `data` includes `configVersion`, `etag`, `source: "api"`, `global`, `features`, `campaigns`, `remoteTheme` (directive or `null`).
 
@@ -44,7 +47,7 @@ Response `data`:
   "packageId": "school-brand-2026",
   "version": "3",
   "contentType": "application/json",
-  "downloadUrl": "https://api.betterseqta.org/api/bsplus/remote-theme-packages/school-brand-2026/bundle.json",
+  "downloadUrl": "https://betterseqta.org/api/bsplus/remote-theme-packages/school-brand-2026/bundle.json",
   "sha256": "…",
   "theme": { "id": "…", "name": "…", "CustomCSS": "…" }
 }
@@ -86,7 +89,7 @@ Directive identity: `{ configVersion, packageId, packageVersion, mode }`.
 
 Fallback: `https://raw.githubusercontent.com/BetterSEQTA/BS-Status/main/config/manifest.json`
 
-Manifest includes `configVersion`, `updatedAt`, and files: `global.json`, `features.json`, `campaigns.json`, `remoteTheme.json`. Schemas match API snapshot slices; theme **binaries** stay on `api.betterseqta.org`.
+Manifest includes `configVersion`, `updatedAt`, and files: `global.json`, `features.json`, `campaigns.json`, `remoteTheme.json`. Schemas match API snapshot slices; theme **binaries** stay on `betterseqta.org`.
 
 ---
 
@@ -109,13 +112,15 @@ Draft edits apply only after **Publish** (`POST /api/bsplus/admin/remote-config/
 | CRUD | `/api/bsplus/admin/remote-config/campaigns` | Campaigns |
 | GET/POST | `/api/bsplus/admin/remote-theme-packages` | List / create packages |
 | GET/PATCH/DELETE | `/api/bsplus/admin/remote-theme-packages/{packageId}` | Package detail |
+| GET/PATCH/DELETE | `/api/bsplus/admin/remote-config/overrides` | Per-install / per-user overrides |
+| GET | `/api/bsplus/admin/theme-analytics/summary?days=30` | Theme download + catalog event aggregates |
 | POST | `/api/bsplus/admin/remote-config/sync-github` | Force GitHub mirror (draft tables) |
 
 ---
 
 ## Database
 
-Migrations **`022_bsplus_remote_config.sql`**, **`023_bsplus_remote_config_extension_fields.sql`**, **`024_bsplus_remote_theme.sql`**.
+Migrations **`022_bsplus_remote_config.sql`**, **`023_bsplus_remote_config_extension_fields.sql`**, **`024_bsplus_remote_theme.sql`**, **`025_bsplus_remote_theme_overlay.sql`**, **`026_bsplus_targeting_and_theme_analytics.sql`**.
 
 ```bash
 pnpm db:migrate:local   # dev
@@ -150,4 +155,5 @@ Excluded from cloud settings upload.
 
 ## Related
 
+- [BetterSEQTA+ extension API](./bsplus-extension-api.md) — install register, client query params, theme routes
 - [BetterSEQTA+ Admin Theme Preview API](./bsplus-admin-themes-api.md)
