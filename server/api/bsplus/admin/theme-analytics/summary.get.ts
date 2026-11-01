@@ -1,10 +1,10 @@
-import { requireAdmin } from '../../../../../utils/auth';
-import { getDB } from '../../../../../utils/db';
-import { createApiEnvelope } from '../../../../../utils/customThemes';
+import { requireAdmin } from '../../../../utils/auth';
+import { getDB } from '../../../../utils/db';
+import { createApiEnvelope } from '../../../../utils/customThemes';
 import {
   getThemeCatalogAnalyticsSummary,
   getThemeDownloadAnalyticsSummary,
-} from '../../../../../utils/bsplusThemeAnalytics';
+} from '../../../../utils/bsplusThemeAnalytics';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
