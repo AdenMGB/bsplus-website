@@ -282,6 +282,15 @@
               </div>
               <input v-model="campaignForm.minVersion" placeholder="minVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
               <input v-model="campaignForm.maxVersion" placeholder="maxVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <label class="block text-sm text-zinc-200 lg:col-span-2">
+                Audience targeting (JSON, optional)
+                <textarea
+                  v-model="campaignForm.targetingJson"
+                  rows="4"
+                  placeholder='{"channels":["stable"],"percentage":25}'
+                  class="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-white"
+                />
+              </label>
             </div>
 
             <div class="lg:col-span-2">
@@ -417,6 +426,69 @@
             </button>
           </form>
         </div>
+
+        <!-- Per install / user overrides -->
+        <div v-show="activeTab === 'overrides'" class="grid gap-6 lg:grid-cols-[minmax(280px,360px)_1fr]">
+          <form class="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="submitOverride">
+            <h2 class="text-lg font-semibold text-white">New override</h2>
+            <select v-model="overrideForm.scope" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
+              <option value="install">install</option>
+              <option value="user">user</option>
+            </select>
+            <input v-model="overrideForm.scopeId" placeholder="scope UUID" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <select v-model="overrideForm.kind" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
+              <option value="feature">feature</option>
+              <option value="feature_allow">feature_allow</option>
+              <option value="campaign_force_include">campaign_force_include</option>
+              <option value="campaign_force_exclude">campaign_force_exclude</option>
+              <option value="global">global</option>
+              <option value="remote_theme">remote_theme</option>
+            </select>
+            <input v-model="overrideForm.targetKey" placeholder="target key (feature/campaign id)" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <textarea v-model="overrideForm.valueJson" rows="6" required placeholder='{"mode":"block","message":{"body":"…"}}' class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-white" />
+            <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white" :disabled="overrideSaving">
+              {{ overrideSaving ? 'Saving…' : 'Add override' }}
+            </button>
+          </form>
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+            <div class="mb-4 flex flex-wrap items-end gap-2">
+              <input v-model="overrideFilterScopeId" placeholder="Filter scope UUID" class="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+              <button type="button" class="rounded-lg border border-zinc-600 px-3 py-2 text-sm text-zinc-200" @click="loadOverrides">Refresh</button>
+            </div>
+            <ul class="space-y-3 text-sm">
+              <li v-for="o in overrides" :key="o.id" class="rounded-lg border border-zinc-800 p-3">
+                <div class="font-mono text-xs text-orange-300">{{ o.scope }} / {{ o.scopeId }}</div>
+                <div class="text-zinc-300">{{ o.kind }} {{ o.targetKey ? `→ ${o.targetKey}` : '' }}</div>
+                <pre class="mt-2 max-h-24 overflow-auto text-xs text-zinc-500">{{ JSON.stringify(o.value, null, 2) }}</pre>
+                <button type="button" class="mt-2 text-red-400 hover:text-red-300" @click="removeOverride(o.id)">Delete</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Theme analytics -->
+        <div v-show="activeTab === 'analytics'" class="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+          <div class="flex flex-wrap items-center gap-3">
+            <h2 class="text-lg font-semibold text-white">Extension theme analytics</h2>
+            <select v-model.number="analyticsDays" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" @change="loadThemeAnalytics">
+              <option :value="7">7 days</option>
+              <option :value="30">30 days</option>
+              <option :value="90">90 days</option>
+            </select>
+            <button type="button" class="rounded-lg border border-zinc-600 px-3 py-2 text-sm text-zinc-200" @click="loadThemeAnalytics">Refresh</button>
+          </div>
+          <div v-if="themeAnalytics" class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-xl border border-zinc-800 p-4">
+              <p class="text-xs text-zinc-500">Download events</p>
+              <p class="text-2xl font-bold text-white">{{ themeAnalytics.downloads?.total_downloads ?? 0 }}</p>
+            </div>
+            <div class="rounded-xl border border-zinc-800 p-4">
+              <p class="text-xs text-zinc-500">Catalog events</p>
+              <p class="text-2xl font-bold text-white">{{ themeAnalytics.catalog?.total_events ?? 0 }}</p>
+            </div>
+          </div>
+          <pre v-if="themeAnalytics" class="max-h-96 overflow-auto rounded-lg bg-zinc-950 p-4 text-xs text-zinc-400">{{ JSON.stringify(themeAnalytics, null, 2) }}</pre>
+        </div>
       </template>
     </div>
   </div>
@@ -437,6 +509,8 @@ const tabs = [
   { id: 'features', label: 'Feature gates' },
   { id: 'campaigns', label: 'Campaigns' },
   { id: 'remoteTheme', label: 'Remote theme' },
+  { id: 'overrides', label: 'Overrides' },
+  { id: 'analytics', label: 'Theme analytics' },
 ] as const;
 
 type TabId = (typeof tabs)[number]['id'];
@@ -493,6 +567,7 @@ const campaignForm = reactive({
   buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }] as Array<Record<string, unknown>>,
   minVersion: '',
   maxVersion: '',
+  targetingJson: '',
   requireAcknowledge: false,
   omitBodyFromSnapshot: false,
 });
@@ -521,6 +596,20 @@ const packageForm = reactive({
 });
 
 const parsedPackageTheme = ref<Record<string, unknown> | null>(null);
+
+const overrides = ref<any[]>([]);
+const overrideFilterScopeId = ref('');
+const overrideSaving = ref(false);
+const overrideForm = reactive({
+  scope: 'install' as 'install' | 'user',
+  scopeId: '',
+  kind: 'feature',
+  targetKey: '',
+  valueJson: '{"mode":"block","message":{"body":"Override message"}}',
+});
+
+const analyticsDays = ref(30);
+const themeAnalytics = ref<any>(null);
 
 function onSuggestPackageId(id: string) {
   if (!packageForm.packageId.trim()) {
@@ -719,6 +808,7 @@ function resetCampaignForm() {
     buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }],
     minVersion: '',
     maxVersion: '',
+    targetingJson: '',
     requireAcknowledge: false,
     omitBodyFromSnapshot: false,
   });
@@ -741,6 +831,7 @@ function loadCampaignIntoForm(c: any) {
     : [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }];
   campaignForm.minVersion = c.minVersion ?? '';
   campaignForm.maxVersion = c.maxVersion ?? '';
+  campaignForm.targetingJson = c.targeting ? JSON.stringify(c.targeting, null, 2) : '';
   campaignForm.requireAcknowledge = !!c.requireAcknowledge;
   campaignForm.omitBodyFromSnapshot = !!c.omitBodyFromSnapshot;
 }
@@ -767,6 +858,9 @@ async function saveCampaign() {
       buttons: campaignForm.buttons,
       minVersion: campaignForm.minVersion.trim() || null,
       maxVersion: campaignForm.maxVersion.trim() || null,
+      targeting: campaignForm.targetingJson.trim()
+        ? JSON.parse(campaignForm.targetingJson)
+        : null,
       requireAcknowledge: campaignForm.requireAcknowledge,
       omitBodyFromSnapshot: campaignForm.omitBodyFromSnapshot,
     };
@@ -977,4 +1071,66 @@ async function forceGithubSync() {
 }
 
 onMounted(loadAll);
+
+watch(activeTab, (tab) => {
+  if (tab === 'overrides') loadOverrides();
+  if (tab === 'analytics') loadThemeAnalytics();
+});
+
+async function loadOverrides() {
+  try {
+    const res = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/remote-config/overrides', {
+      query: overrideFilterScopeId.value.trim() ? { scopeId: overrideFilterScopeId.value.trim() } : {},
+    });
+    overrides.value = res.data?.overrides ?? [];
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'Failed to load overrides';
+  }
+}
+
+async function submitOverride() {
+  overrideSaving.value = true;
+  errorMessage.value = '';
+  try {
+    let value: unknown;
+    try {
+      value = JSON.parse(overrideForm.valueJson);
+    } catch {
+      throw new Error('value JSON is invalid');
+    }
+    await $fetch('/api/bsplus/admin/remote-config/overrides', {
+      method: 'POST',
+      body: {
+        scope: overrideForm.scope,
+        scopeId: overrideForm.scopeId.trim(),
+        kind: overrideForm.kind,
+        targetKey: overrideForm.targetKey.trim() || null,
+        value,
+      },
+    });
+    successMessage.value = 'Override saved (publish to apply to extensions)';
+    await loadOverrides();
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'Override save failed';
+  } finally {
+    overrideSaving.value = false;
+  }
+}
+
+async function removeOverride(id: string) {
+  if (!confirm('Delete this override?')) return;
+  await $fetch(`/api/bsplus/admin/remote-config/overrides/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  await loadOverrides();
+}
+
+async function loadThemeAnalytics() {
+  try {
+    const res = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/theme-analytics/summary', {
+      query: { days: String(analyticsDays.value) },
+    });
+    themeAnalytics.value = res.data;
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message || e?.message || 'Failed to load theme analytics';
+  }
+}
 </script>

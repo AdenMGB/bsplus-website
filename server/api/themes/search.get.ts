@@ -1,5 +1,7 @@
 import { getDB } from '../../utils/db';
 import { getOptionalUser } from '../../utils/auth';
+import { parseOptionalBsplusExtensionQuery } from '../../utils/bsplusExtensionClientContext';
+import { maybeRecordThemeCatalogEvent } from '../../utils/bsplusThemeAnalytics';
 import {
   type ThemeFlavourEntry,
   loadFlavoursForMasters,
@@ -26,6 +28,7 @@ interface SearchFilters {
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
   const query = getQuery<SearchQuery>(event);
+  const clientContext = parseOptionalBsplusExtensionQuery(query as Record<string, unknown>);
   const user = await getOptionalUser(event);
 
   if (!query.q) {
@@ -83,9 +86,10 @@ export default defineEventHandler(async (event) => {
     params.push(filters.min_rating);
   }
 
-  if (filters.compatible_version) {
+  const compatibleVersion = clientContext.extensionVersion ?? filters.compatible_version;
+  if (compatibleVersion) {
     conditions.push('compatibility_min <= ?');
-    params.push(filters.compatible_version);
+    params.push(compatibleVersion);
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -206,6 +210,12 @@ export default defineEventHandler(async (event) => {
     }
 
     return { ...base, theme_type: theme.theme_type || 'desqta' };
+  });
+
+  maybeRecordThemeCatalogEvent(event, db, {
+    query: query as Record<string, unknown>,
+    eventType: 'search',
+    route: '/api/themes/search',
   });
 
   return {

@@ -1,5 +1,7 @@
 import { getDB } from '../../utils/db';
 import { getOptionalUser } from '../../utils/auth';
+import { parseOptionalBsplusExtensionQuery } from '../../utils/bsplusExtensionClientContext';
+import { maybeRecordThemeCatalogEvent } from '../../utils/bsplusThemeAnalytics';
 import {
   type ThemeFlavourEntry,
   loadFlavoursForMasters,
@@ -22,6 +24,7 @@ interface ThemeQuery {
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
   const query = getQuery<ThemeQuery>(event);
+  const clientContext = parseOptionalBsplusExtensionQuery(query as Record<string, unknown>);
   const user = await getOptionalUser(event);
 
   // Parse query parameters
@@ -34,7 +37,7 @@ export default defineEventHandler(async (event) => {
   const search = query.search;
   const featured = query.featured === 'true';
   const minRating = query.min_rating ? parseFloat(query.min_rating) : undefined;
-  const compatibleVersion = query.compatible_version;
+  const compatibleVersion = clientContext.extensionVersion ?? query.compatible_version;
   const themeType = query.type; // 'betterseqta' | 'desqta'
 
   // Build WHERE clause — hide BS+ slave/flavour variants from top-level listing
@@ -195,6 +198,12 @@ export default defineEventHandler(async (event) => {
       };
     }
     return { ...base, theme_type: theme.theme_type || 'desqta' };
+  });
+
+  maybeRecordThemeCatalogEvent(event, db, {
+    query: query as Record<string, unknown>,
+    eventType: 'list',
+    route: '/api/themes',
   });
 
   return {

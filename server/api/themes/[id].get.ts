@@ -2,11 +2,13 @@ import { getDB } from '../../utils/db';
 import { getOptionalUser } from '../../utils/auth';
 import { formatPublicThemeResponse } from '../../utils/formatPublicTheme';
 import { loadFlavoursForMasters } from '../../utils/themeFlavours';
+import { maybeRecordThemeCatalogEvent } from '../../utils/bsplusThemeAnalytics';
 
 export default defineEventHandler(async (event) => {
   const db = getDB(event);
   const id = getRouterParam(event, 'id');
   const user = await getOptionalUser(event);
+  const query = getQuery(event) as Record<string, unknown>;
 
   if (!id) {
     throw createError({
@@ -42,6 +44,13 @@ export default defineEventHandler(async (event) => {
           flavours: (await loadFlavoursForMasters(db, [id as string])).get(id) ?? []
         }
       : undefined;
+
+  maybeRecordThemeCatalogEvent(event, db, {
+    query,
+    eventType: 'detail',
+    themeId: id,
+    route: '/api/themes/:id',
+  });
 
   return formatPublicThemeResponse(theme, isFavorited, flavoursOpts);
 });

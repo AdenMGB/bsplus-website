@@ -15,6 +15,8 @@ import {
   resolveSnapshotRemoteTheme,
   type RemoteThemeDirective,
 } from './bsplusRemoteThemePackages';
+import { parseAudienceRule, serializeAudienceRule } from './bsplusRemoteConfigTargeting';
+import { parseTargetingFromBody } from './bsplusRemoteConfigOverrides';
 
 export type { RemoteThemeDirective };
 
@@ -341,7 +343,7 @@ export function campaignRowToPublic(
   return campaign;
 }
 
-function isCampaignActiveNow(campaign: RemoteConfigCampaign, nowMs = Date.now()): boolean {
+export function isCampaignActiveNow(campaign: RemoteConfigCampaign, nowMs = Date.now()): boolean {
   const from = Date.parse(campaign.activeFrom);
   const to = Date.parse(campaign.activeTo);
   if (Number.isNaN(from) || Number.isNaN(to)) return false;
@@ -693,6 +695,7 @@ export function validateRemoteConfigQuery(query: Record<string, unknown>): {
   extensionVersion: string;
   channel: string;
   hostname: string | null;
+  userId: string | null;
 } | { ok: false; error: string } {
   const installIdRaw = typeof query.installId === 'string' ? query.installId.trim() : '';
   if (!isValidInstallId(installIdRaw)) {
@@ -718,12 +721,21 @@ export function validateRemoteConfigQuery(query: Record<string, unknown>): {
     hostname = query.hostname.trim().toLowerCase();
   }
 
+  let userId: string | null = null;
+  if (typeof query.userId === 'string' && query.userId.trim()) {
+    if (!isValidInstallId(query.userId)) {
+      return { ok: false, error: 'userId must be a valid UUID when provided' };
+    }
+    userId = query.userId.trim().toLowerCase();
+  }
+
   return {
     ok: true,
     installId: installIdRaw.toLowerCase(),
     extensionVersion,
     channel,
     hostname,
+    userId,
   };
 }
 
@@ -975,6 +987,35 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
     next.disableFeedbackSubmit = body.disableFeedbackSubmit;
   }
 
+  let remoteThemeTargetingUpdate: string | null | undefined = undefined;
+  if (
+    'remoteThemeTargeting' in body ||
+    'remote_theme_targeting_json' in body ||
+    'remoteThemeTargetingJson' in body
+  ) {
+    const raw =
+      body.remoteThemeTargeting ??
+      body.remoteThemeTargetingJson ??
+      body.remote_theme_targeting_json;
+    if (raw === null) {
+      remoteThemeTargetingUpdate = null;
+    } else {
+      const rule = parseAudienceRule(raw);
+      if (!rule) {
+        throw createError({ statusCode: 422, statusMessage: 'Invalid remoteThemeTargeting rule' });
+      }
+      remoteThemeTargetingUpdate = serializeAudienceRule(rule);
+    }
+  }
+
+  const globalRow = await db
+    .prepare('SELECT remote_theme_targeting_json FROM bsplus_remote_config_global WHERE id = 1')
+    .first<{ remote_theme_targeting_json?: string | null }>();
+  const remoteThemeTargetingJson =
+    remoteThemeTargetingUpdate !== undefined
+      ? remoteThemeTargetingUpdate
+      : (globalRow?.remote_theme_targeting_json ?? null);
+
   const updatedAt = nowUnix();
   await db
     .prepare(
@@ -989,6 +1030,7 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
          disable_theme_store = ?,
          disable_feedback_submit = ?,
          hostname_policy_json = ?,
+         remote_theme_targeting_json = ?,
          updated_at = ?
        WHERE id = 1`
     )
@@ -1003,6 +1045,7 @@ export async function patchGlobalSettings(db: any, body: Record<string, unknown>
       next.disableThemeStore ? 1 : 0,
       next.disableFeedbackSubmit ? 1 : 0,
       next.hostnamePolicy ? JSON.stringify(next.hostnamePolicy) : null,
+      remoteThemeTargetingJson,
       updatedAt
     )
     .run();
@@ -1014,24 +1057,35 @@ export async function upsertFeatureGate(
   db: any,
   featureKey: string,
   mode: FeatureMode,
-  message: RemoteConfigFeatureMessage | null
+  message: RemoteConfigFeatureMessage | null,
+  body?: Record<string, unknown>
 ) {
   if (mode === 'allow') {
     await deleteFeatureGate(db, featureKey);
     return;
   }
 
+  let targetingJson: string | null | undefined = body ? parseTargetingFromBody(body) : undefined;
+  if (targetingJson === undefined) {
+    const existing = await db
+      .prepare('SELECT targeting_json FROM bsplus_remote_config_features WHERE feature_key = ?')
+      .bind(featureKey)
+      .first<{ targeting_json?: string | null }>();
+    targetingJson = existing?.targeting_json ?? null;
+  }
+
   const updatedAt = nowUnix();
   await db
     .prepare(
-      `INSERT INTO bsplus_remote_config_features (feature_key, mode, message_json, updated_at)
-       VALUES (?, ?, ?, ?)
+      `INSERT INTO bsplus_remote_config_features (feature_key, mode, message_json, targeting_json, updated_at)
+       VALUES (?, ?, ?, ?, ?)
        ON CONFLICT(feature_key) DO UPDATE SET
          mode = excluded.mode,
          message_json = excluded.message_json,
+         targeting_json = excluded.targeting_json,
          updated_at = excluded.updated_at`
     )
-    .bind(featureKey, mode, message ? JSON.stringify(message) : null, updatedAt)
+    .bind(featureKey, mode, message ? JSON.stringify(message) : null, targetingJson, updatedAt)
     .run();
 }
 
@@ -1052,8 +1106,14 @@ export async function listAdminCampaignRows(db: any) {
 
 export function mapAdminCampaignRow(row: Record<string, unknown>) {
   const campaign = campaignRowToPublic(row, { includeBody: true });
+  const targetingRaw = row.targeting_json;
+  let targeting = null;
+  if (typeof targetingRaw === 'string' && targetingRaw.trim()) {
+    targeting = parseAudienceRule(targetingRaw);
+  }
   return {
     ...campaign,
+    targeting,
     enabled: boolFromDb(row.enabled, true),
     omitBodyFromSnapshot: boolFromDb(row.omit_body_from_snapshot),
     created_at: row.created_at,
@@ -1100,15 +1160,16 @@ export async function createCampaign(db: any, body: Record<string, unknown>) {
       : typeof body.max_version === 'string' && body.max_version.trim()
         ? body.max_version.trim().slice(0, 32)
         : null;
+  const targetingJson = parseTargetingFromBody(body);
   const now = nowUnix();
 
   await db
     .prepare(
       `INSERT INTO bsplus_remote_config_campaigns (
          id, priority, active_from, active_to, header_json, hero_json, body_html, buttons_json,
-         require_acknowledge, omit_body_from_snapshot, enabled, min_version, max_version,
+         require_acknowledge, omit_body_from_snapshot, enabled, min_version, max_version, targeting_json,
          created_at, updated_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       idRaw,
@@ -1124,6 +1185,7 @@ export async function createCampaign(db: any, body: Record<string, unknown>) {
       enabled ? 1 : 0,
       minVersion,
       maxVersion,
+      targetingJson === undefined ? null : targetingJson,
       now,
       now
     )
@@ -1213,6 +1275,11 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       : existing.max_version
         ? String(existing.max_version)
         : null;
+  const targetingParsed = parseTargetingFromBody(body);
+  const targetingJson =
+    targetingParsed === undefined
+      ? (existing.targeting_json as string | null | undefined) ?? null
+      : targetingParsed;
   const updatedAt = nowUnix();
 
   await db
@@ -1220,7 +1287,7 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       `UPDATE bsplus_remote_config_campaigns SET
          priority = ?, active_from = ?, active_to = ?, header_json = ?, hero_json = ?,
          body_html = ?, buttons_json = ?, require_acknowledge = ?, omit_body_from_snapshot = ?,
-         enabled = ?, min_version = ?, max_version = ?, updated_at = ?
+         enabled = ?, min_version = ?, max_version = ?, targeting_json = ?, updated_at = ?
        WHERE id = ?`
     )
     .bind(
@@ -1236,6 +1303,7 @@ export async function updateCampaign(db: any, id: string, body: Record<string, u
       enabled ? 1 : 0,
       minVersion,
       maxVersion,
+      targetingJson,
       updatedAt,
       id
     )

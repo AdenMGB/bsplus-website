@@ -9,6 +9,8 @@ This document describes the API for BetterSEQTA extension themes, including admi
 
 The store supports both types. Admin uploads detect the type automatically.
 
+For **BetterSEQTA+ extension** query params (`extensionVersion`, `channel`, `installId`, `userId`) and install/register behaviour, see **[BetterSEQTA+ extension API](./bsplus-extension-api.md)**.
+
 ### Response envelope
 
 Successful JSON responses generally follow this shape:
