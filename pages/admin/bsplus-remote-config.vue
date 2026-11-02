@@ -1,7 +1,7 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-6xl px-6 lg:px-8">
-      <AdminPageHeader title="BS+ remote config" description="Kill switch, feature gates, campaigns, targeting, and extension install telemetry." />
+      <AdminPageHeader title="BS+ remote config" description="Per-client controls, kill switch, feature gates, campaigns, and extension telemetry." />
 
       <p v-if="errorMessage" class="mb-4 rounded-lg border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
         {{ errorMessage }}
