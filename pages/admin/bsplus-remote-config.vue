@@ -242,7 +242,7 @@
         </div>
 
         <!-- Campaigns -->
-        <div v-show="activeTab === 'campaigns'" class="grid gap-6 xl:grid-cols-[minmax(240px,320px)_1fr]">
+        <div v-if="activeTab === 'campaigns'" class="grid gap-6 xl:grid-cols-[minmax(240px,320px)_1fr]">
           <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
             <h2 class="mb-4 text-lg font-semibold text-white">Campaigns</h2>
             <ul class="space-y-2">
@@ -887,7 +887,7 @@ function loadCampaignIntoForm(c: any) {
     : [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }];
   campaignForm.minVersion = c.minVersion ?? '';
   campaignForm.maxVersion = c.maxVersion ?? '';
-  campaignAudience.value = c.targeting ?? null;
+  campaignAudience.value = c.targeting ? structuredClone(c.targeting) : null;
   campaignForm.requireAcknowledge = !!c.requireAcknowledge;
   campaignForm.omitBodyFromSnapshot = !!c.omitBodyFromSnapshot;
 }

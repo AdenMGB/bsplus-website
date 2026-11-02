@@ -107,10 +107,17 @@ function newKey() {
   return `btn_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-function rowToDraft(row: Record<string, unknown>): CampaignButtonDraft {
+function stableDraftKey(row: Record<string, unknown>, index: number): string {
+  const id = typeof row.id === 'string' && row.id.trim() ? row.id.trim() : `btn_${index + 1}`;
+  const action =
+    row.action === 'url' || row.action === 'openSettingsSection' ? row.action : 'dismiss';
+  return `${id}:${action}`;
+}
+
+function rowToDraft(row: Record<string, unknown>, index: number, existingKey?: string): CampaignButtonDraft {
   const action = row.action === 'url' || row.action === 'openSettingsSection' ? row.action : 'dismiss';
   return {
-    _key: newKey(),
+    _key: existingKey ?? stableDraftKey(row, index),
     id: typeof row.id === 'string' ? row.id : 'dismiss',
     label: typeof row.label === 'string' ? row.label : 'OK',
     action,
@@ -142,31 +149,48 @@ function draftToRow(btn: CampaignButtonDraft): Record<string, unknown> {
 const buttons = ref<CampaignButtonDraft[]>([]);
 let syncingFromParent = false;
 
+function serializeRows(rows: Array<Record<string, unknown>>): string {
+  return JSON.stringify(rows);
+}
+
 watch(
   () => props.modelValue,
   (rows) => {
+    const incoming = rows ?? [];
+    const incomingSerialized = serializeRows(incoming);
+    const currentSerialized = serializeRows(buttons.value.map((b) => draftToRow(b)));
+    if (incomingSerialized === currentSerialized && buttons.value.length) {
+      return;
+    }
+
     syncingFromParent = true;
-    buttons.value = (rows ?? []).map((r) => rowToDraft(r));
+    const prevByKey = new Map(buttons.value.map((b) => [b._key, b]));
+    buttons.value = incoming.map((r, index) => {
+      const stable = stableDraftKey(r, index);
+      const existingKey = prevByKey.has(stable) ? stable : undefined;
+      return rowToDraft(r, index, existingKey);
+    });
     if (!buttons.value.length) {
       buttons.value = [
-        { _key: newKey(), id: 'dismiss', label: 'Got it', action: 'dismiss' },
+        { _key: 'dismiss:dismiss', id: 'dismiss', label: 'Got it', action: 'dismiss' },
       ];
     }
-    syncingFromParent = false;
+    nextTick(() => {
+      syncingFromParent = false;
+    });
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 watch(
   buttons,
   () => {
     if (syncingFromParent) return;
-    emit(
-      'update:modelValue',
-      buttons.value.map((b) => draftToRow(b))
-    );
+    const next = buttons.value.map((b) => draftToRow(b));
+    if (serializeRows(next) === serializeRows(props.modelValue ?? [])) return;
+    emit('update:modelValue', next);
   },
-  { deep: true }
+  { deep: true },
 );
 
 function addButton() {
