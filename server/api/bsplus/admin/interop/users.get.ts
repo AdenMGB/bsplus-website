@@ -1,6 +1,6 @@
-import { requireAdmin } from '../../../utils/auth';
-import { searchAccountsUsersInterop } from '../../../utils/accountsInterop';
-import { createApiEnvelope } from '../../../utils/customThemes';
+import { requireAdmin } from '../../../../utils/auth';
+import { searchAccountsUsersInterop } from '../../../../utils/accountsInterop';
+import { createApiEnvelope } from '../../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
