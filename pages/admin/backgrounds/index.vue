@@ -1,20 +1,10 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex flex-col gap-6 mb-12 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">CSS Backgrounds</h2>
-          <p class="mt-2 text-lg text-zinc-400">
-            Upload images for the random theme background API. Images are stored in R2 as WebP.
-          </p>
-        </div>
-        <NuxtLink
-          to="/admin"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2 text-sm font-medium text-zinc-300 transition-all duration-200 hover:scale-105 hover:bg-zinc-800"
-        >
-          Back to dashboard
-        </NuxtLink>
-      </div>
+      <AdminPageHeader
+        title="CSS backgrounds"
+        description="Upload images for the random theme background API (stored as WebP in R2)."
+      />
 
       <div class="mb-10 rounded-2xl border border-cyan-500/20 bg-cyan-950/20 p-6">
         <h3 class="text-sm font-semibold uppercase tracking-wider text-cyan-400">Public CSS URL</h3>

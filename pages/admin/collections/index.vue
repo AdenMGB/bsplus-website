@@ -1,18 +1,25 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
-        <div>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Collections</h2>
-          <p class="mt-2 text-lg text-zinc-400">Manage theme collections</p>
-        </div>
-        <NuxtLink to="/admin/collections/new" class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Create Collection
-        </NuxtLink>
-      </div>
+      <AdminPageHeader title="Collections" description="Curated groups of themes for the store and marketing.">
+        <template #actions>
+          <NuxtLink
+            to="/admin/collections/new"
+            class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-blue-500"
+          >
+            Create collection
+          </NuxtLink>
+        </template>
+      </AdminPageHeader>
+
+      <AdminStatCards
+        :columns="3"
+        :cards="[
+          { label: 'Collections', value: collections.length, borderClass: 'border-blue-500/20', valueClass: 'text-blue-300' },
+          { label: 'Themes in collections', value: totalThemesInCollections, hint: 'Sum of linked themes' },
+          { label: 'Featured', value: featuredCount, hint: 'Marked featured on store' },
+        ]"
+      />
 
       <!-- Collections Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,6 +77,12 @@ definePageMeta({
 const { data: collectionsData, refresh } = await useFetch<any>('/api/admin/collections');
 
 const collections = computed(() => collectionsData.value?.data?.collections || []);
+
+const totalThemesInCollections = computed(() =>
+  collections.value.reduce((sum: number, c: { theme_count?: number }) => sum + (c.theme_count || 0), 0),
+);
+
+const featuredCount = computed(() => collections.value.filter((c: { featured?: boolean }) => c.featured).length);
 
 async function deleteCollection(id: string) {
   if (!confirm('Are you sure you want to delete this collection?')) return;

@@ -1,21 +1,16 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
-        <div>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Daily Questions</h2>
-          <p class="mt-2 text-lg text-zinc-400">Manage daily voting questions</p>
-        </div>
-        <NuxtLink 
-          to="/admin/questionnaire/create" 
-          class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Create Question
-        </NuxtLink>
-      </div>
+      <AdminPageHeader title="Daily questions" description="Poll queue, vote sync, and AI-assisted question generation.">
+        <template #actions>
+          <NuxtLink
+            to="/admin/questionnaire/create"
+            class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-green-500"
+          >
+            Create question
+          </NuxtLink>
+        </template>
+      </AdminPageHeader>
 
       <div class="mb-8">
         <QuestionnaireAiGenerator mode="bulk" @added-to-queue="refresh" />

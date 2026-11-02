@@ -1,21 +1,16 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
-        <div>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Theme of the Month</h2>
-          <p class="mt-2 text-lg text-zinc-400">Highlight one theme per calendar month</p>
-        </div>
-        <NuxtLink
-          to="/admin/theme-of-the-month/create"
-          class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          New Entry
-        </NuxtLink>
-      </div>
+      <AdminPageHeader title="Theme of the month" description="Highlight one theme per calendar month on the store.">
+        <template #actions>
+          <NuxtLink
+            to="/admin/theme-of-the-month/create"
+            class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-green-500"
+          >
+            New entry
+          </NuxtLink>
+        </template>
+      </AdminPageHeader>
 
       <div v-if="current" class="mb-8">
         <h3 class="text-lg font-semibold text-white mb-4">Current Month</h3>

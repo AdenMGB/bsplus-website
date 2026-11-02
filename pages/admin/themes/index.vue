@@ -1,18 +1,21 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
-        <div>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Theme Management</h2>
-          <p class="mt-2 text-lg text-zinc-400">Manage themes in the marketplace</p>
-        </div>
-        <NuxtLink to="/admin/themes/upload" class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Upload Theme
-        </NuxtLink>
-      </div>
+      <AdminPageHeader
+        title="Theme management"
+        description="Moderate official marketplace themes — approvals, metadata, and downloads."
+      >
+        <template #actions>
+          <NuxtLink
+            to="/admin/themes/upload"
+            class="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-105 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            Upload theme
+          </NuxtLink>
+        </template>
+      </AdminPageHeader>
+
+      <AdminStatCards :columns="4" :cards="themeStatCards" />
 
       <!-- Filters -->
       <div class="mb-8 flex flex-wrap items-center gap-4">
@@ -239,6 +242,37 @@ const pagination = computed(() => themesData.value?.data?.pagination || {
 
 // Server handles filtering via query params; themes are already filtered
 const filteredThemes = computed(() => themes.value);
+
+const { data: themeAnalytics } = useLazyFetch<any>('/api/analytics/stats');
+
+const themeStatCards = computed(() => {
+  const t = themeAnalytics.value?.themes;
+  return [
+    {
+      label: 'Catalog total',
+      value: t?.total ?? pagination.value.total ?? 0,
+      borderClass: 'border-purple-500/20',
+      valueClass: 'text-purple-300',
+    },
+    {
+      label: 'Pending review',
+      value: t?.pending ?? 0,
+      borderClass: 'border-amber-500/20',
+      valueClass: 'text-amber-300',
+    },
+    {
+      label: 'Approved',
+      value: t?.approved ?? 0,
+      borderClass: 'border-emerald-500/20',
+      valueClass: 'text-emerald-300',
+    },
+    {
+      label: 'This page',
+      value: filteredThemes.value.length,
+      hint: `${pagination.value.total ?? 0} matching filters`,
+    },
+  ];
+});
 
 // Reset to page 1 when filters or sort change
 watch([statusFilter, typeFilter, categoryFilter, sortBy, sortOrder, searchQuery], () => {

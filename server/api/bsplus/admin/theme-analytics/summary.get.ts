@@ -13,16 +13,23 @@ export default defineEventHandler(async (event) => {
   const days = Number.isFinite(daysRaw) ? Math.min(Math.max(daysRaw, 1), 365) : 30;
   const sinceUnix = Math.floor(Date.now() / 1000) - days * 86400;
   const themeId = typeof query.theme_id === 'string' ? query.theme_id.trim() : null;
+  const userId = typeof query.user_id === 'string' ? query.user_id.trim() : null;
+  const installId = typeof query.install_id === 'string' ? query.install_id.trim() : null;
 
   const db = getDB(event);
   const [downloads, catalog] = await Promise.all([
-    getThemeDownloadAnalyticsSummary(db, { sinceUnix, themeId, limit: 50 }),
-    getThemeCatalogAnalyticsSummary(db, { sinceUnix, limit: 20 }),
+    getThemeDownloadAnalyticsSummary(db, { sinceUnix, themeId, userId, installId, limit: 50 }),
+    getThemeCatalogAnalyticsSummary(db, { sinceUnix, userId, installId, limit: 20 }),
   ]);
 
   return createApiEnvelope({
     period_days: days,
     since_unix: sinceUnix,
+    filters: {
+      theme_id: themeId,
+      user_id: userId,
+      install_id: installId,
+    },
     downloads,
     catalog,
   });

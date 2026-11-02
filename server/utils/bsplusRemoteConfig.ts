@@ -15,7 +15,11 @@ import {
   resolveSnapshotRemoteTheme,
   type RemoteThemeDirective,
 } from './bsplusRemoteThemePackages';
-import { parseAudienceRule, serializeAudienceRule } from './bsplusRemoteConfigTargeting';
+import {
+  parseAudienceRule,
+  serializeAudienceRule,
+  type RemoteConfigAudienceRule,
+} from './bsplusRemoteConfigTargeting';
 import { parseTargetingFromBody } from './bsplusRemoteConfigOverrides';
 
 export type { RemoteThemeDirective };
@@ -71,6 +75,7 @@ export type RemoteConfigFeatureMessage = {
 export type RemoteConfigFeature = {
   mode: FeatureMode;
   message?: RemoteConfigFeatureMessage;
+  targeting?: RemoteConfigAudienceRule | null;
 };
 
 export type RemoteConfigCampaign = {
@@ -301,6 +306,10 @@ function rowToFeature(row: Record<string, unknown>): RemoteConfigFeature {
             ? 'info'
             : undefined,
     };
+  }
+  const targetingRaw = row.targeting_json;
+  if (typeof targetingRaw === 'string' && targetingRaw.trim()) {
+    feature.targeting = parseAudienceRule(targetingRaw);
   }
   return feature;
 }
@@ -761,7 +770,12 @@ export function validateRegisterPayload(body: unknown): { ok: true; data: Regist
     return { ok: false, error: 'extension object is required' };
   }
   const ext = record.extension as Record<string, unknown>;
-  const version = typeof ext.version === 'string' ? ext.version.trim() : '';
+  let version =
+    typeof ext.version === 'string'
+      ? ext.version.trim()
+      : typeof record.extensionVersion === 'string'
+        ? record.extensionVersion.trim()
+        : '';
   if (!version || version.length > 32) {
     return { ok: false, error: 'extension.version is required (max 32 characters)' };
   }

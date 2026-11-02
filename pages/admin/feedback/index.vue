@@ -1,20 +1,11 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <NuxtLink
-            to="/admin"
-            class="mb-4 inline-block text-sm font-semibold leading-6 text-zinc-400 transition-colors duration-200 hover:text-white"
-          >
-            &larr; Back to Dashboard
-          </NuxtLink>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Extension Feedback</h2>
-          <p class="mt-2 text-lg text-zinc-400">
-            Triage BetterSEQTA+ bug reports, feature requests, and questions
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-2">
+      <AdminPageHeader
+        title="Extension feedback"
+        description="Triage BetterSEQTA+ bug reports, feature requests, and questions."
+      >
+        <template #actions>
           <button
             type="button"
             class="inline-flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-600/10 px-4 py-2 text-sm font-medium text-amber-300 transition-all duration-200 hover:scale-105 hover:bg-amber-600/20 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50"
@@ -46,8 +37,8 @@
             </svg>
             Refresh
           </button>
-        </div>
-      </div>
+        </template>
+      </AdminPageHeader>
 
       <!-- Summary cards -->
       <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">

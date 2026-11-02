@@ -1,6 +1,7 @@
 <template>
   <div class="relative min-h-screen w-full flex flex-col">
     <Header />
+    <AdminSiteChrome />
     <main class="grow">
       <slot />
     </main>

@@ -1,19 +1,7 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-6xl px-6 lg:px-8">
-      <NuxtLink
-        to="/admin"
-        class="mb-4 inline-block text-sm font-semibold text-zinc-400 transition-colors duration-200 hover:text-white"
-      >
-        &larr; Back to Dashboard
-      </NuxtLink>
-
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">BS+ Remote Config</h1>
-        <p class="mt-2 text-lg text-zinc-400">
-          Matches BetterSEQTA+ remote control: kill switch, hostname policy, feature gates, and campaigns.
-        </p>
-      </div>
+      <AdminPageHeader title="BS+ remote config" description="Kill switch, feature gates, campaigns, targeting, and extension install telemetry." />
 
       <p v-if="errorMessage" class="mb-4 rounded-lg border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
         {{ errorMessage }}
@@ -224,6 +212,12 @@
                     <option value="error">error</option>
                   </select>
                 </div>
+                <AdminBsplusAudienceEditor
+                  v-if="featureDraft[item.key]?.mode && featureDraft[item.key].mode !== 'allow'"
+                  v-model="featureTargeting[item.key]"
+                  title="Feature audience (optional)"
+                  class="mt-4"
+                />
               </div>
             </div>
           </section>
@@ -282,16 +276,9 @@
               </div>
               <input v-model="campaignForm.minVersion" placeholder="minVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
               <input v-model="campaignForm.maxVersion" placeholder="maxVersion (semver)" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-              <label class="block text-sm text-zinc-200 lg:col-span-2">
-                Audience targeting (JSON, optional)
-                <textarea
-                  v-model="campaignForm.targetingJson"
-                  rows="4"
-                  placeholder='{"channels":["stable"],"percentage":25}'
-                  class="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-white"
-                />
-              </label>
             </div>
+
+            <AdminBsplusAudienceEditor v-model="campaignAudience" title="Campaign audience" class="lg:col-span-2" />
 
             <div class="lg:col-span-2">
               <label class="mb-2 block text-sm font-medium text-zinc-300">Campaign body</label>
@@ -373,6 +360,7 @@
               <input v-model="remoteThemeForm.allowUserOptOut" type="checkbox" class="rounded border-zinc-600" />
               Allow user opt-out
             </label>
+            <AdminBsplusAudienceEditor v-model="remoteThemeAudience" title="Remote theme audience (optional)" />
             <div class="flex flex-wrap gap-2">
               <button type="submit" class="rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" :disabled="remoteThemeSaving">
                 {{ remoteThemeSaving ? 'Saving…' : 'Save directive draft' }}
@@ -435,7 +423,12 @@
               <option value="install">install</option>
               <option value="user">user</option>
             </select>
-            <input v-model="overrideForm.scopeId" placeholder="scope UUID" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
+            <AdminBsplusScopeSearch
+              v-model="overrideForm.scopeId"
+              :mode="overrideForm.scope"
+              :label="overrideForm.scope === 'user' ? 'Target user' : 'Target install'"
+              :placeholder="overrideForm.scope === 'user' ? 'Search accounts…' : 'Search install ID…'"
+            />
             <select v-model="overrideForm.kind" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
               <option value="feature">feature</option>
               <option value="feature_allow">feature_allow</option>
@@ -468,16 +461,30 @@
 
         <!-- Theme analytics -->
         <div v-show="activeTab === 'analytics'" class="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="flex flex-wrap items-end gap-3">
             <h2 class="text-lg font-semibold text-white">Extension theme analytics</h2>
-            <select v-model.number="analyticsDays" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" @change="loadThemeAnalytics">
+            <select v-model.number="analyticsDays" class="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">
               <option :value="7">7 days</option>
               <option :value="30">30 days</option>
               <option :value="90">90 days</option>
             </select>
+            <AdminBsplusScopeSearch
+              v-model="analyticsFilterUserId"
+              mode="user"
+              label=""
+              placeholder="Filter by user…"
+              class="min-w-[240px] flex-1"
+            />
+            <AdminBsplusScopeSearch
+              v-model="analyticsFilterInstallId"
+              mode="install"
+              label=""
+              placeholder="Filter by install…"
+              class="min-w-[240px] flex-1"
+            />
             <button type="button" class="rounded-lg border border-zinc-600 px-3 py-2 text-sm text-zinc-200" @click="loadThemeAnalytics">Refresh</button>
           </div>
-          <div v-if="themeAnalytics" class="grid gap-4 sm:grid-cols-2">
+          <div v-if="themeAnalytics" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl border border-zinc-800 p-4">
               <p class="text-xs text-zinc-500">Download events</p>
               <p class="text-2xl font-bold text-white">{{ themeAnalytics.downloads?.total_downloads ?? 0 }}</p>
@@ -486,8 +493,39 @@
               <p class="text-xs text-zinc-500">Catalog events</p>
               <p class="text-2xl font-bold text-white">{{ themeAnalytics.catalog?.total_events ?? 0 }}</p>
             </div>
+            <div class="rounded-xl border border-zinc-800 p-4 lg:col-span-2">
+              <p class="mb-2 text-xs text-zinc-500">Binding (downloads)</p>
+              <ul class="space-y-1 text-sm text-zinc-300">
+                <li v-for="row in themeAnalytics.downloads?.by_binding ?? []" :key="row.binding">
+                  {{ row.binding }}: <strong class="text-white">{{ row.count }}</strong>
+                </li>
+              </ul>
+            </div>
           </div>
-          <pre v-if="themeAnalytics" class="max-h-96 overflow-auto rounded-lg bg-zinc-950 p-4 text-xs text-zinc-400">{{ JSON.stringify(themeAnalytics, null, 2) }}</pre>
+          <div v-if="themeAnalytics?.downloads?.recent?.length" class="overflow-x-auto rounded-lg border border-zinc-800">
+            <table class="min-w-full text-left text-xs text-zinc-300">
+              <thead class="bg-zinc-950 text-zinc-500">
+                <tr>
+                  <th class="px-3 py-2">When</th>
+                  <th class="px-3 py-2">Theme</th>
+                  <th class="px-3 py-2">User</th>
+                  <th class="px-3 py-2">Install</th>
+                  <th class="px-3 py-2">Ext</th>
+                  <th class="px-3 py-2">Auth</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in themeAnalytics.downloads.recent" :key="String(row.id)" class="border-t border-zinc-800">
+                  <td class="px-3 py-2 font-mono">{{ formatAnalyticsTime(row.occurred_at) }}</td>
+                  <td class="px-3 py-2">{{ row.theme_id }}</td>
+                  <td class="px-3 py-2 font-mono">{{ shortId(row.user_id) }}</td>
+                  <td class="px-3 py-2 font-mono">{{ shortId(row.install_id) }}</td>
+                  <td class="px-3 py-2">{{ row.extension_version || '—' }}</td>
+                  <td class="px-3 py-2">{{ row.auth_method }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </template>
     </div>
@@ -548,6 +586,7 @@ const form = reactive({
 
 const featureModeOptions = ['allow', 'hide', 'banner', 'block', 'greyout', 'temp_hide'];
 const featureDraft = reactive<Record<string, FeatureDraft>>({});
+const featureTargeting = reactive<Record<string, Record<string, unknown> | null>>({});
 const customFeatureKey = ref('');
 const customFeatureMode = ref('hide');
 
@@ -567,10 +606,11 @@ const campaignForm = reactive({
   buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }] as Array<Record<string, unknown>>,
   minVersion: '',
   maxVersion: '',
-  targetingJson: '',
   requireAcknowledge: false,
   omitBodyFromSnapshot: false,
 });
+
+const campaignAudience = ref<Record<string, unknown> | null>(null);
 
 const remoteThemePackages = ref<any[]>([]);
 const remoteThemeForm = reactive({
@@ -584,6 +624,8 @@ const remoteThemeForm = reactive({
   messageBody: '',
   allowUserOptOut: true,
 });
+
+const remoteThemeAudience = ref<Record<string, unknown> | null>(null);
 
 const packageForm = reactive({
   packageId: '',
@@ -609,6 +651,8 @@ const overrideForm = reactive({
 });
 
 const analyticsDays = ref(30);
+const analyticsFilterUserId = ref('');
+const analyticsFilterInstallId = ref('');
 const themeAnalytics = ref<any>(null);
 
 function onSuggestPackageId(id: string) {
@@ -629,6 +673,9 @@ function ensureFeatureDraft(key: string, existing?: any) {
     messageBody: existing?.message?.body ?? '',
     messageSeverity: existing?.message?.severity ?? 'info',
   };
+  if (!(key in featureTargeting)) {
+    featureTargeting[key] = existing?.targeting ?? null;
+  }
 }
 
 function initFeatureDraftFromCatalog(features: Record<string, any>) {
@@ -701,6 +748,7 @@ async function loadAll() {
       remoteThemeForm.messageBody = rt.message?.body ?? '';
       remoteThemeForm.allowUserOptOut = rt.allowUserOptOut !== false;
     }
+    remoteThemeAudience.value = globalRes.data?.remoteThemeTargeting ?? null;
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || 'Failed to load';
   } finally {
@@ -774,7 +822,7 @@ async function saveFeature(key: string) {
       : undefined;
     await $fetch(`/api/bsplus/admin/remote-config/features/${encodeURIComponent(key)}`, {
       method: 'PATCH',
-      body: { mode: draft.mode, message },
+      body: { mode: draft.mode, message, targeting: featureTargeting[key] ?? null },
     });
     successMessage.value = `Saved ${key}`;
   } catch (e: any) {
@@ -808,10 +856,10 @@ function resetCampaignForm() {
     buttons: [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }],
     minVersion: '',
     maxVersion: '',
-    targetingJson: '',
     requireAcknowledge: false,
     omitBodyFromSnapshot: false,
   });
+  campaignAudience.value = null;
 }
 
 function loadCampaignIntoForm(c: any) {
@@ -831,7 +879,7 @@ function loadCampaignIntoForm(c: any) {
     : [{ id: 'dismiss', label: 'Got it', action: 'dismiss' }];
   campaignForm.minVersion = c.minVersion ?? '';
   campaignForm.maxVersion = c.maxVersion ?? '';
-  campaignForm.targetingJson = c.targeting ? JSON.stringify(c.targeting, null, 2) : '';
+  campaignAudience.value = c.targeting ?? null;
   campaignForm.requireAcknowledge = !!c.requireAcknowledge;
   campaignForm.omitBodyFromSnapshot = !!c.omitBodyFromSnapshot;
 }
@@ -858,9 +906,7 @@ async function saveCampaign() {
       buttons: campaignForm.buttons,
       minVersion: campaignForm.minVersion.trim() || null,
       maxVersion: campaignForm.maxVersion.trim() || null,
-      targeting: campaignForm.targetingJson.trim()
-        ? JSON.parse(campaignForm.targetingJson)
-        : null,
+      targeting: campaignAudience.value,
       requireAcknowledge: campaignForm.requireAcknowledge,
       omitBodyFromSnapshot: campaignForm.omitBodyFromSnapshot,
     };
@@ -932,7 +978,7 @@ async function saveRemoteThemeDirective() {
     }
     await $fetch('/api/bsplus/admin/remote-config/global', {
       method: 'PATCH',
-      body: { remoteTheme },
+      body: { remoteTheme, remoteThemeTargeting: remoteThemeAudience.value },
     });
     successMessage.value = 'Remote theme directive saved.';
   } catch (e: any) {
@@ -1125,12 +1171,27 @@ async function removeOverride(id: string) {
 
 async function loadThemeAnalytics() {
   try {
+    const query: Record<string, string> = { days: String(analyticsDays.value) };
+    if (analyticsFilterUserId.value.trim()) query.user_id = analyticsFilterUserId.value.trim();
+    if (analyticsFilterInstallId.value.trim()) query.install_id = analyticsFilterInstallId.value.trim();
     const res = await $fetch<{ success: boolean; data: any }>('/api/bsplus/admin/theme-analytics/summary', {
-      query: { days: String(analyticsDays.value) },
+      query,
     });
     themeAnalytics.value = res.data;
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || 'Failed to load theme analytics';
   }
+}
+
+function formatAnalyticsTime(unix: unknown) {
+  const n = Number(unix);
+  if (!Number.isFinite(n)) return '—';
+  return new Date(n * 1000).toLocaleString();
+}
+
+function shortId(value: unknown) {
+  if (value == null || value === '') return '—';
+  const s = String(value);
+  return s.length > 12 ? `${s.slice(0, 8)}…` : s;
 }
 </script>

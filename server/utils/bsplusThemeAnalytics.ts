@@ -184,21 +184,44 @@ export async function resolveAnalyticsUserId(
 
 export async function getThemeDownloadAnalyticsSummary(
   db: any,
-  options: { sinceUnix: number; themeId?: string | null; limit?: number }
+  options: {
+    sinceUnix: number;
+    themeId?: string | null;
+    userId?: string | null;
+    installId?: string | null;
+    limit?: number;
+  }
 ): Promise<{
   total_downloads: number;
   by_theme: Array<{ theme_id: string; theme_source: string; count: number }>;
   by_channel: Array<{ channel: string; count: number }>;
   by_auth: Array<{ auth_method: string; count: number }>;
+  by_binding: Array<{ binding: string; count: number }>;
+  by_user: Array<{ user_id: string; count: number }>;
+  by_install: Array<{ install_id: string; count: number }>;
   recent: Array<Record<string, unknown>>;
 }> {
   const limit = Math.min(options.limit ?? 50, 200);
-  const themeFilter = options.themeId ? ' AND theme_id = ?' : '';
+  const filters: string[] = ['occurred_at >= ?'];
   const baseParams: unknown[] = [options.sinceUnix];
-  if (options.themeId) baseParams.push(options.themeId);
+
+  if (options.themeId) {
+    filters.push('theme_id = ?');
+    baseParams.push(options.themeId);
+  }
+  if (options.userId) {
+    filters.push('(user_id = ? OR query_user_id = ?)');
+    baseParams.push(options.userId, options.userId);
+  }
+  if (options.installId) {
+    filters.push('install_id = ?');
+    baseParams.push(options.installId);
+  }
+
+  const whereSql = filters.join(' AND ');
 
   const total = await db
-    .prepare(`SELECT COUNT(*) AS count FROM bsplus_theme_download_events WHERE occurred_at >= ?${themeFilter}`)
+    .prepare(`SELECT COUNT(*) AS count FROM bsplus_theme_download_events WHERE ${whereSql}`)
     .bind(...baseParams)
     .first<{ count: number }>();
 
@@ -206,7 +229,7 @@ export async function getThemeDownloadAnalyticsSummary(
     .prepare(
       `SELECT theme_id, theme_source, COUNT(*) AS count
        FROM bsplus_theme_download_events
-       WHERE occurred_at >= ?${themeFilter}
+       WHERE ${whereSql}
        GROUP BY theme_id, theme_source
        ORDER BY count DESC
        LIMIT ?`
@@ -218,7 +241,7 @@ export async function getThemeDownloadAnalyticsSummary(
     .prepare(
       `SELECT COALESCE(channel, 'unknown') AS channel, COUNT(*) AS count
        FROM bsplus_theme_download_events
-       WHERE occurred_at >= ?${themeFilter}
+       WHERE ${whereSql}
        GROUP BY channel
        ORDER BY count DESC`
     )
@@ -229,17 +252,62 @@ export async function getThemeDownloadAnalyticsSummary(
     .prepare(
       `SELECT auth_method, COUNT(*) AS count
        FROM bsplus_theme_download_events
-       WHERE occurred_at >= ?${themeFilter}
+       WHERE ${whereSql}
        GROUP BY auth_method`
     )
     .bind(...baseParams)
     .all();
 
+  const byBinding = await db
+    .prepare(
+      `SELECT
+         CASE
+           WHEN user_id IS NOT NULL AND install_id IS NOT NULL AND user_id = query_user_id THEN 'linked_consistent'
+           WHEN user_id IS NOT NULL AND install_id IS NOT NULL AND query_user_id IS NOT NULL AND user_id != query_user_id THEN 'linked_mismatch'
+           WHEN user_id IS NOT NULL AND install_id IS NOT NULL THEN 'linked_install'
+           WHEN user_id IS NOT NULL THEN 'user_only'
+           WHEN install_id IS NOT NULL THEN 'install_only'
+           ELSE 'anonymous'
+         END AS binding,
+         COUNT(*) AS count
+       FROM bsplus_theme_download_events
+       WHERE ${whereSql}
+       GROUP BY binding
+       ORDER BY count DESC`
+    )
+    .bind(...baseParams)
+    .all();
+
+  const byUser = await db
+    .prepare(
+      `SELECT user_id, COUNT(*) AS count
+       FROM bsplus_theme_download_events
+       WHERE ${whereSql} AND user_id IS NOT NULL
+       GROUP BY user_id
+       ORDER BY count DESC
+       LIMIT ?`
+    )
+    .bind(...baseParams, Math.min(limit, 25))
+    .all();
+
+  const byInstall = await db
+    .prepare(
+      `SELECT install_id, COUNT(*) AS count
+       FROM bsplus_theme_download_events
+       WHERE ${whereSql} AND install_id IS NOT NULL
+       GROUP BY install_id
+       ORDER BY count DESC
+       LIMIT ?`
+    )
+    .bind(...baseParams, Math.min(limit, 25))
+    .all();
+
   const recent = await db
     .prepare(
-      `SELECT id, occurred_at, theme_id, theme_source, install_id, user_id, channel, auth_method, route
+      `SELECT id, occurred_at, theme_id, theme_source, install_id, user_id, query_user_id,
+              extension_version, channel, auth_method, route
        FROM bsplus_theme_download_events
-       WHERE occurred_at >= ?${themeFilter}
+       WHERE ${whereSql}
        ORDER BY occurred_at DESC
        LIMIT ?`
     )
@@ -251,37 +319,71 @@ export async function getThemeDownloadAnalyticsSummary(
     by_theme: (byTheme.results || []) as Array<{ theme_id: string; theme_source: string; count: number }>,
     by_channel: (byChannel.results || []) as Array<{ channel: string; count: number }>,
     by_auth: (byAuth.results || []) as Array<{ auth_method: string; count: number }>,
+    by_binding: (byBinding.results || []) as Array<{ binding: string; count: number }>,
+    by_user: (byUser.results || []) as Array<{ user_id: string; count: number }>,
+    by_install: (byInstall.results || []) as Array<{ install_id: string; count: number }>,
     recent: (recent.results || []) as Array<Record<string, unknown>>,
   };
 }
 
 export async function getThemeCatalogAnalyticsSummary(
   db: any,
-  options: { sinceUnix: number; limit?: number }
+  options: { sinceUnix: number; userId?: string | null; installId?: string | null; limit?: number }
 ): Promise<{
   total_events: number;
   by_type: Array<{ event_type: string; count: number }>;
+  by_binding: Array<{ binding: string; count: number }>;
 }> {
   const limit = Math.min(options.limit ?? 20, 100);
+  const filters: string[] = ['occurred_at >= ?'];
+  const baseParams: unknown[] = [options.sinceUnix];
+  if (options.userId) {
+    filters.push('user_id = ?');
+    baseParams.push(options.userId);
+  }
+  if (options.installId) {
+    filters.push('install_id = ?');
+    baseParams.push(options.installId);
+  }
+  const whereSql = filters.join(' AND ');
+
   const total = await db
-    .prepare('SELECT COUNT(*) AS count FROM bsplus_theme_catalog_events WHERE occurred_at >= ?')
-    .bind(options.sinceUnix)
+    .prepare(`SELECT COUNT(*) AS count FROM bsplus_theme_catalog_events WHERE ${whereSql}`)
+    .bind(...baseParams)
     .first<{ count: number }>();
 
   const byType = await db
     .prepare(
       `SELECT event_type, COUNT(*) AS count
        FROM bsplus_theme_catalog_events
-       WHERE occurred_at >= ?
+       WHERE ${whereSql}
        GROUP BY event_type
        ORDER BY count DESC
        LIMIT ?`
     )
-    .bind(options.sinceUnix, limit)
+    .bind(...baseParams, limit)
+    .all();
+
+  const byBinding = await db
+    .prepare(
+      `SELECT
+         CASE
+           WHEN user_id IS NOT NULL AND install_id IS NOT NULL THEN 'linked'
+           WHEN user_id IS NOT NULL THEN 'user_only'
+           WHEN install_id IS NOT NULL THEN 'install_only'
+           ELSE 'anonymous'
+         END AS binding,
+         COUNT(*) AS count
+       FROM bsplus_theme_catalog_events
+       WHERE ${whereSql}
+       GROUP BY binding`
+    )
+    .bind(...baseParams)
     .all();
 
   return {
     total_events: total?.count ?? 0,
     by_type: (byType.results || []) as Array<{ event_type: string; count: number }>,
+    by_binding: (byBinding.results || []) as Array<{ binding: string; count: number }>,
   };
 }
