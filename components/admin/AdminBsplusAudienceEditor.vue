@@ -56,13 +56,13 @@
 
     <div v-if="local.userIds?.length" class="mt-3 flex flex-wrap gap-2">
       <span v-for="id in local.userIds" :key="'u-' + id" class="inline-flex items-center gap-1 rounded-full bg-zinc-800 px-2 py-1 text-xs text-zinc-200">
-        user {{ id.slice(0, 8) }}…
+        user {{ String(id).slice(0, 8) }}…
         <button type="button" class="text-red-400" @click="removeFromList('userIds', id)">×</button>
       </span>
     </div>
     <div v-if="local.installIds?.length" class="mt-2 flex flex-wrap gap-2">
       <span v-for="id in local.installIds" :key="'i-' + id" class="inline-flex items-center gap-1 rounded-full bg-zinc-800 px-2 py-1 text-xs text-zinc-200">
-        install {{ id.slice(0, 8) }}…
+        install {{ String(id).slice(0, 8) }}…
         <button type="button" class="text-red-400" @click="removeFromList('installIds', id)">×</button>
       </span>
     </div>
@@ -107,22 +107,19 @@ const emit = defineEmits<{
 const local = reactive<AudienceRule>({});
 const pickedUserId = ref('');
 const pickedInstallId = ref('');
+let syncingFromModel = false;
 
-function syncFromModel(value: AudienceRule | null) {
-  const next = value ? { ...value } : {};
-  Object.keys(local).forEach((k) => delete (local as Record<string, unknown>)[k]);
-  Object.assign(local, next);
-  if (!local.userIds) local.userIds = [];
-  if (!local.installIds) local.installIds = [];
+function normalizeIdList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .map((entry) => entry.trim());
+  }
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  return [];
 }
 
-watch(
-  () => props.modelValue,
-  (value) => syncFromModel(value),
-  { immediate: true, deep: true },
-);
-
-function emitRule() {
+function buildRuleFromLocal(): AudienceRule | null {
   const rule: AudienceRule = {};
   if (local.channels?.length) rule.channels = [...local.channels];
   if (local.minExtensionVersion?.trim()) rule.minExtensionVersion = local.minExtensionVersion.trim();
@@ -133,8 +130,65 @@ function emitRule() {
   if (typeof local.percentage === 'number' && local.percentage >= 0 && local.percentage <= 100) {
     rule.percentage = local.percentage;
   }
-  const hasKeys = Object.keys(rule).length > 0;
-  emit('update:modelValue', hasKeys ? rule : null);
+  return Object.keys(rule).length > 0 ? rule : null;
+}
+
+function serializeAudienceRuleForCompare(rule: AudienceRule | null): string {
+  if (!rule) return '';
+  const keys = [
+    'channels',
+    'minExtensionVersion',
+    'maxExtensionVersion',
+    'hostnameSuffixes',
+    'installIds',
+    'userIds',
+    'denyInstallIds',
+    'denyUserIds',
+    'percentage',
+  ] as const;
+  const out: Record<string, unknown> = {};
+  for (const key of keys) {
+    const val = rule[key];
+    if (val === undefined || val === null) continue;
+    if (Array.isArray(val)) {
+      if (!val.length) continue;
+      out[key] = [...val].map(String).sort();
+      continue;
+    }
+    out[key] = val;
+  }
+  return JSON.stringify(out);
+}
+
+function rulesEqual(a: AudienceRule | null, b: AudienceRule | null): boolean {
+  return serializeAudienceRuleForCompare(a) === serializeAudienceRuleForCompare(b);
+}
+
+function syncFromModel(value: AudienceRule | null) {
+  syncingFromModel = true;
+  const next = value ? { ...value } : {};
+  Object.keys(local).forEach((k) => delete (local as Record<string, unknown>)[k]);
+  Object.assign(local, next);
+  local.userIds = normalizeIdList(local.userIds);
+  local.installIds = normalizeIdList(local.installIds);
+  if (!local.channels) local.channels = [];
+  if (!local.hostnameSuffixes) local.hostnameSuffixes = [];
+  nextTick(() => {
+    syncingFromModel = false;
+  });
+}
+
+watch(
+  () => props.modelValue,
+  (value) => syncFromModel(value),
+  { immediate: true, deep: true },
+);
+
+function emitRule() {
+  if (syncingFromModel) return;
+  const next = buildRuleFromLocal();
+  if (rulesEqual(next, props.modelValue)) return;
+  emit('update:modelValue', next);
 }
 
 watch(local, () => emitRule(), { deep: true });
