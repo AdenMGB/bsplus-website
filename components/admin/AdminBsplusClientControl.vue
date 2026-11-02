@@ -250,6 +250,7 @@ const props = defineProps<{
       items: Array<{ key: string; label: string; description?: string }>;
     }>;
     featureModeDocs?: Record<string, { label: string; description: string }>;
+    featureModes?: Record<string, { label: string; description: string }>;
   } | null;
   campaigns: Array<{ id: string; title?: string }>;
 }>();
@@ -283,7 +284,10 @@ const actionBusy = ref('');
 const campaignBusy = ref(false);
 
 const featureModeDocs = computed(
-  () => props.catalog?.featureModeDocs ?? { greyout: { label: 'Grey out', description: '' } },
+  () =>
+    props.catalog?.featureModes ??
+    props.catalog?.featureModeDocs ??
+    { greyout: { label: 'Grey out', description: '' } },
 );
 
 const flatFeatureItems = computed(() => {

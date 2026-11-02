@@ -1,7 +1,7 @@
-import { requireAdmin } from '../../../../../utils/auth';
-import { getDB } from '../../../../../utils/db';
-import { buildClientControlProfile } from '../../../../../utils/bsplusClientControlProfile';
-import { createApiEnvelope } from '../../../../../utils/customThemes';
+import { requireAdmin } from '../../../../utils/auth';
+import { getDB } from '../../../../utils/db';
+import { buildClientControlProfile } from '../../../../utils/bsplusClientControlProfile';
+import { createApiEnvelope } from '../../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
