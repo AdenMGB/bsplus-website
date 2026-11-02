@@ -127,7 +127,9 @@ function buildRuleFromLocal(): AudienceRule | null {
   if (local.hostnameSuffixes?.length) rule.hostnameSuffixes = [...local.hostnameSuffixes];
   if (local.userIds?.length) rule.userIds = [...local.userIds];
   if (local.installIds?.length) rule.installIds = [...local.installIds];
-  if (typeof local.percentage === 'number' && local.percentage >= 0 && local.percentage <= 100) {
+  if (local.denyUserIds?.length) rule.denyUserIds = [...local.denyUserIds];
+  if (local.denyInstallIds?.length) rule.denyInstallIds = [...local.denyInstallIds];
+  if (typeof local.percentage === 'number' && Number.isFinite(local.percentage) && local.percentage >= 0 && local.percentage <= 100) {
     rule.percentage = local.percentage;
   }
   return Object.keys(rule).length > 0 ? rule : null;
@@ -171,6 +173,8 @@ function syncFromModel(value: AudienceRule | null) {
   Object.assign(local, next);
   local.userIds = normalizeIdList(local.userIds);
   local.installIds = normalizeIdList(local.installIds);
+  local.denyUserIds = normalizeIdList(local.denyUserIds);
+  local.denyInstallIds = normalizeIdList(local.denyInstallIds);
   if (!local.channels) local.channels = [];
   if (!local.hostnameSuffixes) local.hostnameSuffixes = [];
   nextTick(() => {
