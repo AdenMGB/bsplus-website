@@ -63,6 +63,13 @@
           </div>
         </div>
 
+        <AdminBsplusClientControl
+          v-show="activeTab === 'client'"
+          :catalog="catalog"
+          :campaigns="campaigns"
+          @notify="onClientControlNotify"
+        />
+
         <!-- Global -->
         <form v-show="activeTab === 'global'" class="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6" @submit.prevent="saveGlobal">
           <h2 class="text-lg font-semibold text-white">Global controls</h2>
@@ -543,6 +550,7 @@ type FeatureDraft = {
 };
 
 const tabs = [
+  { id: 'client', label: 'Client control' },
   { id: 'global', label: 'Global' },
   { id: 'features', label: 'Feature gates' },
   { id: 'campaigns', label: 'Campaigns' },
@@ -553,7 +561,7 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]['id'];
 
-const activeTab = ref<TabId>('global');
+const activeTab = ref<TabId>('client');
 const loading = ref(true);
 const saving = ref(false);
 const publishing = ref(false);
@@ -1113,6 +1121,16 @@ async function forceGithubSync() {
     errorMessage.value = e?.data?.message || e?.message || 'GitHub sync failed';
   } finally {
     githubSyncing.value = false;
+  }
+}
+
+function onClientControlNotify(payload: { type: 'success' | 'error'; message: string }) {
+  if (payload.type === 'success') {
+    successMessage.value = payload.message;
+    errorMessage.value = '';
+  } else {
+    errorMessage.value = payload.message;
+    successMessage.value = '';
   }
 }
 

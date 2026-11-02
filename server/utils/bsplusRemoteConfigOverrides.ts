@@ -83,6 +83,34 @@ export async function listOverrides(
   return ((result.results || []) as RemoteConfigOverrideRow[]).map(mapOverrideRow);
 }
 
+/** Overrides for a cloud user and their install IDs (user-scoped + per-install). */
+export async function listOverridesForClient(
+  db: any,
+  input: { userId: string; installIds: string[]; limit?: number },
+) {
+  const limit = Math.min(input.limit ?? 200, 500);
+  const userId = input.userId.trim().toLowerCase();
+  const installIds = [...new Set(input.installIds.map((id) => id.trim().toLowerCase()).filter(Boolean))];
+
+  if (!installIds.length) {
+    return listOverrides(db, { scope: 'user', scopeId: userId, limit });
+  }
+
+  const installPlaceholders = installIds.map(() => '?').join(', ');
+  const result = await db
+    .prepare(
+      `SELECT * FROM bsplus_remote_config_overrides
+       WHERE (scope = 'user' AND scope_id = ?)
+          OR (scope = 'install' AND scope_id IN (${installPlaceholders}))
+       ORDER BY updated_at DESC
+       LIMIT ?`,
+    )
+    .bind(userId, ...installIds, limit)
+    .all();
+
+  return ((result.results || []) as RemoteConfigOverrideRow[]).map(mapOverrideRow);
+}
+
 export async function createOverride(db: any, body: Record<string, unknown>) {
   const scope = typeof body.scope === 'string' ? body.scope.trim() : '';
   if (scope !== 'install' && scope !== 'user') {
