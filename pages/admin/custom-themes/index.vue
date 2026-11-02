@@ -1,43 +1,21 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <NuxtLink
-            to="/admin"
-            class="mb-4 inline-block text-sm font-semibold leading-6 text-zinc-400 transition-colors duration-200 hover:text-white"
+      <AdminPageHeader
+        title="Custom themes"
+        description="Review and moderate user-uploaded themes (separate from the official marketplace)."
+      >
+        <template #actions>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            :disabled="pending"
+            @click="refresh()"
           >
-            &larr; Back to Dashboard
-          </NuxtLink>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Custom Themes</h2>
-          <p class="mt-2 text-lg text-zinc-400">
-            Review and moderate user-uploaded themes (separate from the official marketplace)
-          </p>
-        </div>
-        <button
-          type="button"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-          :disabled="pending"
-          @click="refresh()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-5 w-5"
-            :class="pending ? 'animate-spin' : ''"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-          Refresh
-        </button>
-      </div>
+            Refresh
+          </button>
+        </template>
+      </AdminPageHeader>
 
       <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
         <div class="rounded-2xl border border-amber-500/20 bg-zinc-900/50 p-5 transition-all duration-200 hover:scale-[1.02]">

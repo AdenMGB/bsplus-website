@@ -5,17 +5,11 @@ export default defineNuxtRouteMiddleware(async () => {
 
   const { user, loading, fetchUser } = useAuth();
 
-  if (loading.value) {
-    return;
-  }
-
-  if (user.value) {
-    return;
-  }
-
-  try {
-    await fetchUser();
-  } catch {
-    return;
+  if (loading.value || !user.value) {
+    try {
+      await fetchUser();
+    } catch {
+      return;
+    }
   }
 });

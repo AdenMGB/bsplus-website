@@ -1,21 +1,25 @@
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-16">
-        <div>
-          <NuxtLink to="/admin" class="text-sm font-semibold leading-6 text-zinc-400 hover:text-white mb-4 inline-block transition-colors duration-200">
-            &larr; Back to Dashboard
+      <AdminPageHeader title="News" description="Announcements and changelog posts on the public site.">
+        <template #actions>
+          <NuxtLink
+            to="/admin/news/create"
+            class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-green-500"
+          >
+            Create post
           </NuxtLink>
-          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">News</h2>
-          <p class="mt-2 text-lg text-zinc-400">Manage news posts</p>
-        </div>
-        <NuxtLink to="/admin/news/create" class="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-all hover:scale-105">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Create Post
-        </NuxtLink>
-      </div>
+        </template>
+      </AdminPageHeader>
+
+      <AdminStatCards
+        :columns="3"
+        :cards="[
+          { label: 'Total posts', value: posts?.length ?? 0 },
+          { label: 'Published', value: publishedCount, borderClass: 'border-emerald-500/20', valueClass: 'text-emerald-300' },
+          { label: 'Drafts', value: draftCount, borderClass: 'border-amber-500/20', valueClass: 'text-amber-300' },
+        ]"
+      />
 
       <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
         <div class="flow-root">
@@ -75,6 +79,9 @@ definePageMeta({
 });
 
 const { data: posts, refresh } = await useFetch<any[]>('/api/news?admin=true');
+
+const publishedCount = computed(() => posts.value?.filter((p) => p.published).length ?? 0);
+const draftCount = computed(() => (posts.value?.length ?? 0) - publishedCount.value);
 
 function formatDate(timestamp: number) {
   return new Date(timestamp * 1000).toLocaleDateString('en-US', {

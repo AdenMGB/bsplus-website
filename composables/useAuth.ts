@@ -28,6 +28,7 @@ export const useAuth = () => {
   const user = useState<AuthUser>('auth_user', () => null);
   const loading = useState<boolean>('auth_loading', () => true);
   const accessToken = useState<string | null>('auth_access_token', () => null);
+  const inflightFetch = useState<Promise<AuthUser | null> | null>('auth_fetch_inflight', () => null);
 
   const bootstrapAccessToken = (headers?: Record<string, string>) => {
     if (accessToken.value) return accessToken.value;
@@ -73,46 +74,59 @@ export const useAuth = () => {
   };
 
   const fetchUser = async (headers?: Record<string, string>) => {
-    loading.value = true;
+    if (inflightFetch.value) {
+      return inflightFetch.value;
+    }
 
-    const fetchMe = async () => {
-      const data = await $fetch('/api/auth/me', {
-        headers: getAuthHeaders(headers),
-        credentials: 'include',
-      });
-      user.value = data;
-      return data;
-    };
+    const run = (async () => {
+      loading.value = true;
 
-    try {
-      bootstrapAccessToken(headers);
-
-      if (accessToken.value) {
-        const { isJwtExpired } = await import('~/utils/auth-session');
-        if (isJwtExpired(accessToken.value)) {
-          await refreshAccessToken(headers);
-        }
-      }
+      const fetchMe = async () => {
+        const data = await $fetch('/api/auth/me', {
+          headers: getAuthHeaders(headers),
+          credentials: 'include',
+        });
+        user.value = data;
+        return data;
+      };
 
       try {
-        return await fetchMe();
-      } catch (error: any) {
-        const statusCode = error?.statusCode || error?.response?.status;
-        if (statusCode !== 401) {
-          throw error;
+        bootstrapAccessToken(headers);
+
+        if (accessToken.value) {
+          const { isJwtExpired } = await import('~/utils/auth-session');
+          if (isJwtExpired(accessToken.value)) {
+            await refreshAccessToken(headers);
+          }
         }
-        await refreshAccessToken(headers);
-        return await fetchMe();
+
+        try {
+          return await fetchMe();
+        } catch (error: any) {
+          const statusCode = error?.statusCode || error?.response?.status;
+          if (statusCode !== 401) {
+            throw error;
+          }
+          await refreshAccessToken(headers);
+          return await fetchMe();
+        }
+      } catch (refreshError: any) {
+        const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
+        if (refreshStatus === 401 || refreshStatus === 400) {
+          clearAuthState();
+          return null;
+        }
+        throw refreshError;
+      } finally {
+        loading.value = false;
       }
-    } catch (refreshError: any) {
-      const refreshStatus = refreshError?.statusCode || refreshError?.response?.status;
-      if (refreshStatus === 401 || refreshStatus === 400) {
-        clearAuthState();
-        return null;
-      }
-      throw refreshError;
+    })();
+
+    inflightFetch.value = run;
+    try {
+      return await run;
     } finally {
-      loading.value = false;
+      inflightFetch.value = null;
     }
   };
 

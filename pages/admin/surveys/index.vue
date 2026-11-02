@@ -2,24 +2,35 @@
 definePageMeta({ middleware: ['admin'] });
 
 const { data, pending, refresh } = await useFetch<{ surveys: any[] }>('/api/admin/surveys');
+
+const surveyCount = computed(() => data.value?.surveys?.length ?? 0);
+const activeSurveys = computed(() => (data.value?.surveys ?? []).filter((s) => s.status === 'active').length);
+const closedSurveys = computed(() => (data.value?.surveys ?? []).filter((s) => s.status === 'closed').length);
+const surveyStatCards = computed(() => [
+  { label: 'Programs', value: surveyCount.value },
+  { label: 'Active', value: activeSurveys.value, borderClass: 'border-emerald-500/20', valueClass: 'text-emerald-300' },
+  { label: 'Closed', value: closedSurveys.value, hint: 'Completed or archived' },
+]);
 </script>
 
 <template>
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <NuxtLink to="/admin" class="mb-4 inline-block text-sm text-zinc-400 hover:text-white">&larr; Dashboard</NuxtLink>
-          <h2 class="text-3xl font-bold text-white sm:text-4xl">Milestone Surveys</h2>
-          <p class="mt-2 text-zinc-400">Track founding-member surveys and email campaigns.</p>
-        </div>
-        <NuxtLink
-          to="/admin/api-keys"
-          class="inline-flex rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-500"
-        >
-          Service API Keys
-        </NuxtLink>
-      </div>
+      <AdminPageHeader
+        title="Milestone surveys"
+        description="Track founding-member surveys and email campaigns."
+      >
+        <template #actions>
+          <NuxtLink
+            to="/admin/api-keys"
+            class="inline-flex rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-500"
+          >
+            Service API keys
+          </NuxtLink>
+        </template>
+      </AdminPageHeader>
+
+      <AdminStatCards :columns="3" :cards="surveyStatCards" />
 
       <div v-if="pending" class="text-zinc-500">Loading surveys...</div>
 
