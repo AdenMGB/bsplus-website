@@ -78,6 +78,7 @@ export interface BsplusAdminThemeListQuery {
   status?: string;
   search?: string;
   source?: string;
+  all_versions?: string;
 }
 
 export async function listBsplusAdminThemes(event: H3Event, query: BsplusAdminThemeListQuery) {
@@ -95,6 +96,7 @@ export async function listBsplusAdminThemes(event: H3Event, query: BsplusAdminTh
 
   const includeMarketplace = !sourceFilter || sourceFilter === 'marketplace';
   const includeCommunity = !sourceFilter || sourceFilter === 'community';
+  const allVersions = ['1', 'true', 'yes'].includes((query.all_versions ?? '').toLowerCase());
 
   const parts: string[] = [];
   const params: unknown[] = [];
@@ -121,6 +123,9 @@ export async function listBsplusAdminThemes(event: H3Event, query: BsplusAdminTh
 
   if (includeCommunity) {
     const cond: string[] = ["theme_type = 'betterseqta'"];
+    if (!allVersions) {
+      cond.push('is_current_version = 1');
+    }
     if (status) {
       cond.push('status = ?');
       params.push(status);
@@ -132,6 +137,7 @@ export async function listBsplusAdminThemes(event: H3Event, query: BsplusAdminTh
     }
     parts.push(`
       SELECT id, name, slug, description, author, status, created_at, updated_at,
+             version_index, is_current_version, version_group_id,
              cover_image_url, preview_thumbnail_url, preview_screenshots,
              'community' AS source
       FROM custom_themes
@@ -169,6 +175,9 @@ export async function listBsplusAdminThemes(event: H3Event, query: BsplusAdminTh
       theme_type: 'betterseqta' as const,
       created_at: row.created_at,
       updated_at: row.updated_at,
+      version_index: row.version_index ?? 1,
+      is_current_version: Number(row.is_current_version ?? 1) === 1,
+      version_group_id: row.version_group_id ?? row.id,
       preview: {
         thumbnail: listPreviewThumbnail(row),
         screenshots: parseJsonArray(row.preview_screenshots)

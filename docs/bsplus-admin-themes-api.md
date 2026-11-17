@@ -94,6 +94,9 @@ Authorization: Bearer <access_token>
 | `status` | `pending`, `approved`, or `rejected` |
 | `search` | Matches name, description, author, slug |
 | `source` | `marketplace`, `community`, or omit for both |
+| `all_versions` | `1` / `true` to include superseded community uploads (default: latest per author+name only) |
+
+Community re-uploads with the same **author + theme name** are grouped into a version chain. List endpoints return only `is_current_version = 1` unless `all_versions` is set. Each row includes `version_index` and `version_group_id`.
 
 **Example — pending community themes:**
 

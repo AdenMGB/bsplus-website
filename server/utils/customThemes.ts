@@ -17,6 +17,13 @@ import {
   type ThemeFileIndexEntry,
   type ThemeValidationResult
 } from './themes';
+import {
+  applyCustomThemeVersionSupersede,
+  formatThemeVersionLabel,
+  planCustomThemeVersionUpload,
+  versionPlanFromExistingTheme,
+  type CustomThemeVersionPlan
+} from './customThemeVersions';
 
 export const CUSTOM_THEMES_R2_PREFIX = 'custom-themes';
 export const MAX_PENDING_PER_USER = 5;
@@ -166,7 +173,10 @@ export function formatCustomThemePublic(theme: Record<string, unknown>) {
     },
     created_at: theme.created_at,
     updated_at: theme.updated_at,
-    published_at: theme.published_at
+    published_at: theme.published_at,
+    version_group_id: theme.version_group_id ?? theme.id,
+    version_index: Number(theme.version_index ?? 1),
+    is_current_version: Number(theme.is_current_version ?? 1) === 1
   };
 
   if (themeType === 'betterseqta') {
@@ -261,7 +271,8 @@ export async function replaceCustomThemeFileIndex(
 async function uploadResult(
   db: any,
   themeId: string,
-  validation: ThemeValidationResult
+  validation: ThemeValidationResult,
+  versionMeta?: { is_duplicate_upload: boolean; version_index: number; prior_version_count: number }
 ) {
   const theme = (await db
     .prepare('SELECT * FROM custom_themes WHERE id = ?')
@@ -270,8 +281,42 @@ async function uploadResult(
 
   return createApiEnvelope({
     theme: formatCustomThemeOwner(theme),
-    validation: { valid: true, warnings: validation.warnings, errors: [] }
+    validation: { valid: true, warnings: validation.warnings, errors: [] },
+    ...(versionMeta ? { version: versionMeta } : {})
   });
+}
+
+async function resolveUploadVersionPlan(
+  db: any,
+  params: {
+    authorId: string;
+    themeName: string;
+    preferredSlug: string;
+    newThemeId: string;
+    replaceThemeId?: string;
+  }
+): Promise<CustomThemeVersionPlan> {
+  if (params.replaceThemeId) {
+    const existing = await getCustomThemeById(db, params.replaceThemeId);
+    if (!existing) {
+      throw createError({ statusCode: 404, statusMessage: 'Theme not found' });
+    }
+    return versionPlanFromExistingTheme(existing, params.preferredSlug);
+  }
+  return planCustomThemeVersionUpload(db, {
+    authorId: params.authorId,
+    themeName: params.themeName,
+    preferredSlug: params.preferredSlug,
+    newThemeId: params.newThemeId
+  });
+}
+
+function versionMetaFromPlan(plan: CustomThemeVersionPlan) {
+  return {
+    is_duplicate_upload: plan.isDuplicateUpload,
+    version_index: plan.versionIndex,
+    prior_version_count: plan.priorVersionCount
+  };
 }
 
 async function saveBetterSeqtaCustomTheme(
@@ -285,6 +330,7 @@ async function saveBetterSeqtaCustomTheme(
     slug: string;
     bsTheme: Awaited<ReturnType<typeof parseBetterSeqtaTheme>>;
     assets: Awaited<ReturnType<typeof uploadBetterSeqtaThemeAssets>>;
+    versionPlan: CustomThemeVersionPlan;
   }
 ) {
   const now = nowUnixSeconds();
@@ -296,8 +342,10 @@ async function saveBetterSeqtaCustomTheme(
     submissionNotes,
     slug,
     bsTheme,
-    assets
+    assets,
+    versionPlan
   } = params;
+  const versionLabel = formatThemeVersionLabel(versionPlan.versionIndex);
 
   if (replaceThemeId) {
     await db
@@ -314,7 +362,7 @@ async function saveBetterSeqtaCustomTheme(
       .bind(
         bsTheme.name,
         slug,
-        '1.0.0',
+        versionLabel,
         bsTheme.description,
         authorName,
         'other',
@@ -337,14 +385,15 @@ async function saveBetterSeqtaCustomTheme(
         id, name, slug, version, description, author, author_id, license,
         category, tags, status, theme_type, theme_json_url,
         cover_image_url, marquee_image_url, submission_notes,
+        version_group_id, version_index, is_current_version,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       themeId,
       bsTheme.name,
       slug,
-      '1.0.0',
+      versionLabel,
       bsTheme.description,
       authorName,
       authorId,
@@ -357,6 +406,9 @@ async function saveBetterSeqtaCustomTheme(
       assets.coverImageUrl,
       assets.marqueeImageUrl,
       submissionNotes ?? null,
+      versionPlan.versionGroupId,
+      versionPlan.versionIndex,
+      1,
       now,
       now
     )
@@ -374,11 +426,25 @@ async function saveDesqtaCustomTheme(
     slug: string;
     manifest: Awaited<ReturnType<typeof parseManifest>>;
     assets: Awaited<ReturnType<typeof uploadDesqtaThemeAssets>>;
+    versionPlan: CustomThemeVersionPlan;
   }
 ) {
   const now = nowUnixSeconds();
-  const { themeId, replaceThemeId, authorId, authorName, submissionNotes, slug, manifest, assets } =
-    params;
+  const {
+    themeId,
+    replaceThemeId,
+    authorId,
+    authorName,
+    submissionNotes,
+    slug,
+    manifest,
+    assets,
+    versionPlan
+  } = params;
+  const versionLabel =
+    versionPlan.isDuplicateUpload || versionPlan.versionIndex > 1
+      ? formatThemeVersionLabel(versionPlan.versionIndex)
+      : manifest.version;
   const category = manifest.category || inferCategory(manifest);
   const tagsJson = JSON.stringify(manifest.tags || []);
   const screenshotsJson = JSON.stringify(assets.screenshotUrls);
@@ -427,14 +493,15 @@ async function saveDesqtaCustomTheme(
         id, name, slug, version, description, author, author_id, license,
         category, tags, status, preview_thumbnail_url, preview_screenshots,
         zip_download_url, file_size, checksum, compatibility_min, compatibility_max,
-        theme_type, submission_notes, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        theme_type, submission_notes, version_group_id, version_index, is_current_version,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       themeId,
       manifest.name,
       slug,
-      manifest.version,
+      versionLabel,
       manifest.description,
       authorName,
       authorId,
@@ -451,6 +518,9 @@ async function saveDesqtaCustomTheme(
       manifest.compatibility.maxVersion || null,
       'desqta',
       submissionNotes ?? null,
+      versionPlan.versionGroupId,
+      versionPlan.versionIndex,
+      1,
       now,
       now
     )
@@ -503,7 +573,18 @@ export async function processCustomThemeUpload(
     const themeJsonContent = new TextDecoder().decode(themeFiles.get(themeJsonPath)!);
     const bsTheme = await parseBetterSeqtaTheme(themeJsonContent);
     const themeId = options.replaceThemeId ?? generateUUID();
-    const themeSlug = await ensureUniqueSlug(db, slugify(bsTheme.name), options.replaceThemeId);
+    const baseSlug = slugify(bsTheme.name);
+    const versionPlan = await resolveUploadVersionPlan(db, {
+      authorId: options.author.id,
+      themeName: bsTheme.name,
+      preferredSlug: baseSlug,
+      newThemeId: themeId,
+      replaceThemeId: options.replaceThemeId
+    });
+    const themeSlug = versionPlan.isDuplicateUpload
+      ? versionPlan.canonicalSlug
+      : await ensureUniqueSlug(db, baseSlug, options.replaceThemeId);
+
     const assets = await uploadBetterSeqtaThemeAssets(
       bucket,
       themeId,
@@ -511,6 +592,10 @@ export async function processCustomThemeUpload(
       storageLayout(themeId),
       { themeJsonContent }
     );
+
+    if (!options.replaceThemeId && versionPlan.isDuplicateUpload) {
+      await applyCustomThemeVersionSupersede(db, versionPlan, themeId, nowUnixSeconds());
+    }
 
     await saveBetterSeqtaCustomTheme(db, {
       themeId,
@@ -520,11 +605,12 @@ export async function processCustomThemeUpload(
       submissionNotes: options.submissionNotes,
       slug: themeSlug,
       bsTheme,
-      assets
+      assets,
+      versionPlan
     });
     await replaceCustomThemeFileIndex(db, themeId, assets.r2Keys);
 
-    return uploadResult(db, themeId, validation);
+    return uploadResult(db, themeId, validation, versionMetaFromPlan(versionPlan));
   }
 
   const validation = validateThemeStructure(themeFiles);
@@ -544,7 +630,18 @@ export async function processCustomThemeUpload(
 
   const manifest = await parseManifest(new TextDecoder().decode(manifestEntry[1]));
   const themeId = options.replaceThemeId ?? generateUUID();
-  const themeSlug = await ensureUniqueSlug(db, slugify(manifest.name), options.replaceThemeId);
+  const baseSlug = slugify(manifest.name);
+  const versionPlan = await resolveUploadVersionPlan(db, {
+    authorId: options.author.id,
+    themeName: manifest.name,
+    preferredSlug: baseSlug,
+    newThemeId: themeId,
+    replaceThemeId: options.replaceThemeId
+  });
+  const themeSlug = versionPlan.isDuplicateUpload
+    ? versionPlan.canonicalSlug
+    : await ensureUniqueSlug(db, baseSlug, options.replaceThemeId);
+
   const assets = await uploadDesqtaThemeAssets(
     bucket,
     themeId,
@@ -552,6 +649,10 @@ export async function processCustomThemeUpload(
     themeFiles,
     storageLayout(themeId)
   );
+
+  if (!options.replaceThemeId && versionPlan.isDuplicateUpload) {
+    await applyCustomThemeVersionSupersede(db, versionPlan, themeId, nowUnixSeconds());
+  }
 
   await saveDesqtaCustomTheme(db, {
     themeId,
@@ -561,11 +662,12 @@ export async function processCustomThemeUpload(
     submissionNotes: options.submissionNotes,
     slug: themeSlug,
     manifest,
-    assets
+    assets,
+    versionPlan
   });
   await replaceCustomThemeFileIndex(db, themeId, assets.r2Keys);
 
-  return uploadResult(db, themeId, validation);
+  return uploadResult(db, themeId, validation, versionMetaFromPlan(versionPlan));
 }
 
 export async function incrementCustomThemeDownloadCount(db: any, id: string): Promise<number> {
@@ -693,11 +795,15 @@ export async function listCustomThemes(
     sort?: string;
     page: number;
     limit: number;
+    allVersions?: boolean;
   },
   format: (theme: Record<string, unknown>) => unknown
 ) {
   const conditions: string[] = [];
   const bindings: unknown[] = [];
+  if (!params.allVersions) {
+    conditions.push('is_current_version = 1');
+  }
   if (params.status) {
     conditions.push('status = ?');
     bindings.push(params.status);
@@ -754,7 +860,8 @@ export async function getCustomThemeStatusCounts(db: any) {
         SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
         SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
-       FROM custom_themes`
+       FROM custom_themes
+       WHERE is_current_version = 1`
     )
     .first<{ pending: number; approved: number; rejected: number }>();
 
