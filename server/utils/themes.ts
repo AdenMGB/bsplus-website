@@ -501,7 +501,10 @@ export async function uploadBetterSeqtaThemeAssets(
   let marqueeImageUrl: string | null = null;
 
   const bannerEntry = Array.from(themeFiles.entries()).find(
-    ([p]) => p.includes('images/banner.webp') || p.includes('banner.webp')
+    ([p]) =>
+      p.includes('images/banner.webp') ||
+      p.endsWith('banner.webp') ||
+      /(^|\/)images\/(banner|cover)\.webp$/i.test(p)
   );
   if (bannerEntry) {
     const bannerKey = `${layout.r2BaseKey}/images/banner.webp`;
@@ -519,7 +522,10 @@ export async function uploadBetterSeqtaThemeAssets(
   }
 
   const marqueeEntry = Array.from(themeFiles.entries()).find(
-    ([p]) => p.includes('images/marquee.webp') || p.includes('marquee.webp')
+    ([p]) =>
+      p.includes('images/marquee.webp') ||
+      p.endsWith('marquee.webp') ||
+      /(^|\/)images\/marquee\.webp$/i.test(p)
   );
   if (marqueeEntry) {
     const marqueeKey = `${layout.r2BaseKey}/images/marquee.webp`;

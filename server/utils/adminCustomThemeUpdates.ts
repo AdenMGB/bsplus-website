@@ -23,6 +23,7 @@ import {
   themeStorageLayout,
   type ThemeFileIndexEntry
 } from './themes';
+import { normalizeBetterSeqtaThemeRasterImages } from './betterseqtaThemeRaster';
 
 function findThemeJsonPath(files: Map<string, ArrayBuffer>): string | null {
   const keys = Array.from(files.keys());
@@ -30,14 +31,20 @@ function findThemeJsonPath(files: Map<string, ArrayBuffer>): string | null {
 }
 
 function findBannerEntry(files: Map<string, ArrayBuffer>) {
-  return Array.from(files.entries()).find(([p]) =>
-    p.includes('images/banner.webp') || p.endsWith('banner.webp')
+  return Array.from(files.entries()).find(
+    ([p]) =>
+      p.includes('images/banner.webp') ||
+      p.endsWith('banner.webp') ||
+      /(^|\/)images\/(banner|cover)\.(png|jpe?g|webp)$/i.test(p)
   );
 }
 
 function findMarqueeEntry(files: Map<string, ArrayBuffer>) {
-  return Array.from(files.entries()).find(([p]) =>
-    p.includes('images/marquee.webp') || p.endsWith('marquee.webp')
+  return Array.from(files.entries()).find(
+    ([p]) =>
+      p.includes('images/marquee.webp') ||
+      p.endsWith('marquee.webp') ||
+      /(^|\/)images\/marquee\.(png|jpe?g|webp)$/i.test(p)
   );
 }
 
@@ -251,6 +258,14 @@ export async function adminUpdateCustomThemeFiles(event: H3Event, id: string) {
       statusCode: 400,
       statusMessage: 'ZIP file or at least one file is required'
     });
+  }
+
+  if (existingTheme.theme_type === 'betterseqta') {
+    const normalized = await normalizeBetterSeqtaThemeRasterImages(themeFiles);
+    themeFiles.clear();
+    for (const [key, value] of normalized) {
+      themeFiles.set(key, value);
+    }
   }
 
   const layout = themeStorageLayout('custom-themes', id, siteUrl, 'custom-themes');

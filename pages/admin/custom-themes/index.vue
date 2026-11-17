@@ -76,6 +76,15 @@
         >
           Clear
         </button>
+        <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+          <input
+            v-model="showAllVersions"
+            type="checkbox"
+            class="rounded border-zinc-600 bg-zinc-900 text-green-500 focus:ring-green-500"
+            @change="applyFilters"
+          />
+          Show all versions
+        </label>
       </div>
 
       <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
@@ -88,6 +97,7 @@
                 <th scope="col" class="px-6 py-3 font-semibold">Submitter</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Type</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Status</th>
+                <th scope="col" class="px-6 py-3 font-semibold">Version</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Downloads</th>
                 <th scope="col" class="px-6 py-3 font-semibold">Submitted</th>
                 <th scope="col" class="px-6 py-3 text-right font-semibold">Actions</th>
@@ -145,6 +155,15 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 text-zinc-400">
+                  <div class="font-mono text-xs text-zinc-300">v{{ theme.version_index ?? 1 }}</div>
+                  <div
+                    v-if="theme.is_current_version === false"
+                    class="mt-1 text-xs text-amber-400"
+                  >
+                    older version
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-zinc-400">
                   {{ theme.download_count ?? 0 }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-zinc-400">
@@ -185,10 +204,10 @@
                 </td>
               </tr>
               <tr v-if="pending">
-                <td colspan="7" class="px-6 py-12 text-center text-zinc-500">Loading submissions...</td>
+                <td colspan="9" class="px-6 py-12 text-center text-zinc-500">Loading submissions...</td>
               </tr>
               <tr v-else-if="!themes.length">
-                <td colspan="7" class="px-6 py-12 text-center italic text-zinc-500">
+                <td colspan="9" class="px-6 py-12 text-center italic text-zinc-500">
                   No custom theme submissions match these filters.
                 </td>
               </tr>
@@ -244,6 +263,8 @@ interface CustomThemeItem {
   status: string;
   theme_type: string;
   created_at: number;
+  version_index?: number;
+  is_current_version?: boolean;
   coverImage?: string;
   preview?: { thumbnail?: string };
 }
@@ -251,6 +272,7 @@ interface CustomThemeItem {
 const searchQuery = ref('');
 const statusFilter = ref('pending');
 const typeFilter = ref('');
+const showAllVersions = ref(false);
 const appliedSearch = ref('');
 const appliedStatus = ref('pending');
 const appliedType = ref('');
@@ -265,6 +287,7 @@ const { data, pending, refresh } = await useFetch<any>('/api/admin/custom-themes
     type: appliedType.value || undefined,
     search: appliedSearch.value || undefined,
     include_counts: '1',
+    all_versions: showAllVersions.value ? '1' : undefined,
   })),
 });
 

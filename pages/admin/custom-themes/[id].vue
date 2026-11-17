@@ -477,6 +477,8 @@ definePageMeta({
 });
 
 const route = useRoute();
+import { prepareBetterSeqtaThemeZipUpload, appendThemeCoverLooseFiles } from '~/utils/prepareBetterSeqtaThemeZipUpload';
+
 const themeId = route.params.id as string;
 
 useHead({
@@ -679,6 +681,29 @@ function handleFileSelect(event: Event) {
   if (target.files?.length) handleUpdateFile(target.files[0]!);
 }
 
+async function buildCustomThemeUpdateFormData(file: File): Promise<FormData> {
+  const formData = new FormData();
+  const lower = file.name.toLowerCase();
+  const isBetterseqta = theme.value?.theme_type === 'betterseqta';
+
+  if (lower.endsWith('.zip') && isBetterseqta) {
+    formData.append('theme_zip', await prepareBetterSeqtaThemeZipUpload(file));
+    return formData;
+  }
+
+  if (isBetterseqta && /\.(png|jpe?g)$/i.test(file.name)) {
+    await appendThemeCoverLooseFiles(formData, file);
+    return formData;
+  }
+
+  if (lower.endsWith('.zip')) {
+    formData.append('theme_zip', file);
+  } else {
+    formData.append(file.name, file);
+  }
+  return formData;
+}
+
 async function handleUpdateFile(file: File) {
   if (!/\.(zip|json|webp|css|png|jpg|jpeg)$/i.test(file.name)) {
     alert('Please upload a .zip, .json, .webp, .css, or image file');
@@ -687,12 +712,7 @@ async function handleUpdateFile(file: File) {
   selectedUpdateFile.value = file;
   updateManifestPreview.value = null;
   try {
-    const formData = new FormData();
-    if (file.name.toLowerCase().endsWith('.zip')) {
-      formData.append('theme_zip', file);
-    } else {
-      formData.append(file.name, file);
-    }
+    const formData = await buildCustomThemeUpdateFormData(file);
     const response = await $fetch<any>('/api/admin/themes/manifest-preview', {
       method: 'POST',
       body: formData,
@@ -701,7 +721,7 @@ async function handleUpdateFile(file: File) {
       updateManifestPreview.value = response.data;
       return;
     }
-    if (theme.value?.theme_type === 'betterseqta' && /\.webp$/i.test(file.name)) {
+    if (theme.value?.theme_type === 'betterseqta' && /\.(webp|png|jpe?g)$/i.test(file.name)) {
       updateManifestPreview.value = {
         theme_type: 'betterseqta',
         validation: { valid: true, warnings: [], errors: [] },
@@ -735,13 +755,7 @@ async function updateThemeFiles() {
   if (!selectedUpdateFile.value) return;
   updatingFiles.value = true;
   try {
-    const formData = new FormData();
-    const file = selectedUpdateFile.value;
-    if (file.name.toLowerCase().endsWith('.zip')) {
-      formData.append('theme_zip', file);
-    } else {
-      formData.append(file.name, file);
-    }
+    const formData = await buildCustomThemeUpdateFormData(selectedUpdateFile.value);
     const response = await $fetch<any>(`/api/admin/custom-themes/${themeId}/update-files`, {
       method: 'POST',
       body: formData,

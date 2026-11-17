@@ -1,4 +1,10 @@
 import { getDB } from '../../utils/db';
+import {
+  formatTotmEntry,
+  parseTotmThemeSource,
+  resolveTotmLinkedTheme,
+  validateTotmThemeLink
+} from '../../utils/themeOfTheMonth';
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -14,7 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { month, title, description, cover_image, theme_id } = body || {};
+  const { month, title, description, cover_image, theme_id, theme_source } = body || {};
 
   if (!month || !title || !description) {
     throw createError({ statusCode: 400, message: 'Missing required fields: month, title, description' });
@@ -25,17 +31,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = getDB(event);
+  const linkedSource = theme_id ? parseTotmThemeSource(theme_source) : 'marketplace';
 
   try {
     if (theme_id) {
-      const linkedTheme = await db.prepare('SELECT id, theme_type FROM themes WHERE id = ? LIMIT 1')
-        .bind(theme_id).first() as { id: string; theme_type?: string } | null;
-      if (!linkedTheme) {
-        throw createError({ statusCode: 400, message: 'Linked theme does not exist' });
-      }
-      if (linkedTheme.theme_type !== 'betterseqta') {
-        throw createError({ statusCode: 400, message: 'Theme of the month can only link to BetterSEQTA+ themes' });
-      }
+      await validateTotmThemeLink(db, theme_id, linkedSource);
     }
 
     const existing = await db.prepare('SELECT id FROM theme_of_the_month WHERE month = ? LIMIT 1')
@@ -49,9 +49,10 @@ export default defineEventHandler(async (event) => {
 
     await db.prepare(`
       INSERT INTO theme_of_the_month (
-        id, month, title, description, cover_image, cover_image_uploaded_at, theme_id, created_at, updated_at
+        id, month, title, description, cover_image, cover_image_uploaded_at,
+        theme_id, theme_source, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), unixepoch())
     `).bind(
       id,
       month,
@@ -59,28 +60,18 @@ export default defineEventHandler(async (event) => {
       description,
       cover_image || null,
       coverImageUploadedAt,
-      theme_id || null
+      theme_id || null,
+      theme_id ? linkedSource : 'marketplace'
     ).run();
 
-    const created = await db.prepare(`
-      SELECT t.*, th.name AS theme_name, th.slug AS theme_slug
-      FROM theme_of_the_month t
-      LEFT JOIN themes th ON th.id = t.theme_id
-      WHERE t.id = ?
-    `).bind(id).first();
+    const created = await db.prepare('SELECT * FROM theme_of_the_month WHERE id = ?').bind(id).first();
+    const theme = await resolveTotmLinkedTheme(
+      db,
+      created.theme_id as string | null,
+      created.theme_source
+    );
 
-    return {
-      id: created.id,
-      month: created.month,
-      title: created.title,
-      description: created.description,
-      cover_image: created.cover_image,
-      cover_image_uploaded_at: created.cover_image_uploaded_at,
-      theme_id: created.theme_id,
-      theme: created.theme_id ? { id: created.theme_id, name: created.theme_name, slug: created.theme_slug } : null,
-      created_at: created.created_at,
-      updated_at: created.updated_at
-    };
+    return formatTotmEntry(created as Record<string, unknown>, theme);
   } catch (e: any) {
     if (e.statusCode) throw e;
     console.error('[ThemeOfTheMonth] Failed to create entry:', e);

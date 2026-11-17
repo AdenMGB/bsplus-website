@@ -1,4 +1,5 @@
 import { getDB } from '../../utils/db';
+import { formatTotmEntry, resolveTotmLinkedTheme } from '../../utils/themeOfTheMonth';
 
 function getCurrentMonth(): string {
   const now = new Date();
@@ -27,31 +28,13 @@ export default defineEventHandler(async (event) => {
 
     if (!entry) return null;
 
-    let theme: { id: string; name: string; slug: string } | null = null;
-    if (entry.theme_id) {
-      const themeRow = await db.prepare(`
-        SELECT id, name, slug FROM themes WHERE id = ? LIMIT 1
-      `).bind(entry.theme_id).first();
-      if (themeRow) {
-        theme = {
-          id: themeRow.id,
-          name: themeRow.name,
-          slug: themeRow.slug
-        };
-      }
-    }
+    const theme = await resolveTotmLinkedTheme(
+      db,
+      entry.theme_id as string | null,
+      entry.theme_source
+    );
 
-    return {
-      id: entry.id,
-      month: entry.month,
-      title: entry.title,
-      description: entry.description,
-      cover_image: entry.cover_image,
-      theme_id: entry.theme_id,
-      theme,
-      created_at: entry.created_at,
-      updated_at: entry.updated_at
-    };
+    return formatTotmEntry(entry as Record<string, unknown>, theme);
   } catch (e: any) {
     console.error('[ThemeOfTheMonth] Failed to get current entry:', e);
     throw createError({ statusCode: 500, message: 'Failed to get current theme of the month', cause: e });

@@ -16,6 +16,7 @@ interface AdminQuery {
   search?: string;
   type?: string;
   include_counts?: string;
+  all_versions?: string;
 }
 
 export default defineEventHandler(async (event) => {
@@ -32,6 +33,8 @@ export default defineEventHandler(async (event) => {
       ? (query.status as CustomThemeStatus)
       : undefined;
 
+  const allVersions = ['1', 'true', 'yes'].includes((query.all_versions ?? '').toLowerCase());
+
   const listed = await listCustomThemes(
     db,
     {
@@ -41,7 +44,8 @@ export default defineEventHandler(async (event) => {
       search: query.search,
       sort: 'newest',
       page,
-      limit
+      limit,
+      allVersions
     },
     formatCustomThemeOwner
   );

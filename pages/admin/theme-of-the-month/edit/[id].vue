@@ -70,7 +70,11 @@
           ></textarea>
         </div>
 
-        <ThemeOfTheMonthThemePicker v-model="form.theme_id" :initial-theme="initialTheme" />
+        <ThemeOfTheMonthThemePicker
+          v-model="form.theme_id"
+          v-model:theme-source="form.theme_source"
+          :initial-theme="initialTheme"
+        />
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-zinc-400">Cover Image</label>
@@ -130,10 +134,16 @@ interface FormState {
   description: string;
   cover_image: string;
   theme_id: string;
+  theme_source: 'marketplace' | 'community';
 }
 
 const form = ref<FormState | null>(null);
-const initialTheme = ref<{ id: string; name: string; slug: string } | null>(null);
+const initialTheme = ref<{
+  id: string;
+  name: string;
+  slug: string;
+  theme_source?: 'marketplace' | 'community';
+} | null>(null);
 const loadingEntry = ref(true);
 const loading = ref(false);
 const deleting = ref(false);
@@ -175,9 +185,12 @@ onMounted(async () => {
       title: data.title,
       description: data.description,
       cover_image: data.cover_image || '',
-      theme_id: data.theme_id || ''
+      theme_id: data.theme_id || '',
+      theme_source: data.theme_source || data.theme?.theme_source || 'marketplace'
     };
-    initialTheme.value = data.theme || null;
+    initialTheme.value = data.theme
+      ? { ...data.theme, theme_source: data.theme_source || data.theme.theme_source }
+      : null;
   } catch (e: any) {
     alert(e.data?.message || 'Failed to load entry');
     router.push('/admin/theme-of-the-month');
@@ -223,7 +236,8 @@ async function save() {
         title: form.value.title.trim(),
         description: form.value.description.trim(),
         cover_image: form.value.cover_image || null,
-        theme_id: form.value.theme_id || null
+        theme_id: form.value.theme_id || null,
+        theme_source: form.value.theme_id ? form.value.theme_source : 'marketplace'
       }
     });
     router.push('/admin/theme-of-the-month');

@@ -26,7 +26,10 @@
             <p class="text-sm text-zinc-400 line-clamp-3 mb-4">{{ current.description }}</p>
             <div class="flex items-center gap-4">
               <NuxtLink :to="`/admin/theme-of-the-month/edit/${current.id}`" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Edit</NuxtLink>
-              <span v-if="current.theme" class="text-xs text-zinc-500">Linked: {{ current.theme.name }}</span>
+              <span v-if="current.theme" class="text-xs text-zinc-500">
+                Linked: {{ current.theme.name }}
+                <span v-if="current.theme_source === 'community'" class="text-amber-400">(community)</span>
+              </span>
             </div>
           </div>
         </div>
@@ -73,7 +76,10 @@
                     <div class="text-white max-w-md truncate">{{ entry.title }}</div>
                   </td>
                   <td class="px-6 py-4 text-zinc-400">
-                    <span v-if="entry.theme">{{ entry.theme.name }}</span>
+                    <span v-if="entry.theme">
+                      {{ entry.theme.name }}
+                      <span v-if="entry.theme_source === 'community'" class="ml-1 text-amber-400/90">(community)</span>
+                    </span>
                     <span v-else class="italic text-zinc-600">No theme linked</span>
                   </td>
                   <td class="px-6 py-4">
@@ -115,7 +121,8 @@ interface ThemeOfTheMonthEntry {
   description: string;
   cover_image: string | null;
   theme_id: string | null;
-  theme: { id: string; name: string; slug: string } | null;
+  theme_source?: 'marketplace' | 'community' | null;
+  theme: { id: string; name: string; slug: string; theme_source?: string } | null;
   created_at: number;
   updated_at: number;
 }

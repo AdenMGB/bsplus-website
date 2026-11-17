@@ -15,10 +15,30 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const theme = await db
-    .prepare("SELECT * FROM custom_themes WHERE slug = ? AND status = 'approved'")
+  let theme = await db
+    .prepare(
+      "SELECT * FROM custom_themes WHERE slug = ? AND status = 'approved' AND is_current_version = 1"
+    )
     .bind(slug)
     .first<Record<string, unknown>>();
+
+  if (!theme) {
+    const legacy = await db
+      .prepare("SELECT * FROM custom_themes WHERE slug = ? AND status = 'approved'")
+      .bind(slug)
+      .first<Record<string, unknown>>();
+    if (legacy?.version_group_id) {
+      theme = await db
+        .prepare(
+          `SELECT * FROM custom_themes
+           WHERE version_group_id = ? AND status = 'approved' AND is_current_version = 1`
+        )
+        .bind(legacy.version_group_id)
+        .first<Record<string, unknown>>();
+    } else {
+      theme = legacy;
+    }
+  }
 
   if (!theme) {
     throw createError({
