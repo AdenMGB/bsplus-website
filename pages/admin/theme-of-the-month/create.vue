@@ -60,7 +60,10 @@
         ></textarea>
       </div>
 
-      <ThemeOfTheMonthThemePicker v-model="form.theme_id" />
+      <ThemeOfTheMonthThemePicker
+        v-model="form.theme_id"
+        v-model:theme-source="form.theme_source"
+      />
 
       <div class="space-y-2">
         <label class="block text-sm font-medium text-zinc-400">Cover Image (Optional)</label>
@@ -123,7 +126,8 @@ const form = ref({
   title: '',
   description: '',
   cover_image: '',
-  theme_id: ''
+  theme_id: '',
+  theme_source: 'marketplace' as 'marketplace' | 'community'
 });
 
 const yearOptions = computed(() => {
@@ -196,7 +200,8 @@ async function save() {
         title: form.value.title.trim(),
         description: form.value.description.trim(),
         cover_image: form.value.cover_image || undefined,
-        theme_id: form.value.theme_id || undefined
+        theme_id: form.value.theme_id || undefined,
+        theme_source: form.value.theme_id ? form.value.theme_source : undefined
       }
     });
     router.push('/admin/theme-of-the-month');

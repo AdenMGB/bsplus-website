@@ -1,4 +1,5 @@
 import { getDB } from '../../utils/db';
+import { formatTotmEntry, resolveTotmLinkedTheme } from '../../utils/themeOfTheMonth';
 
 export default defineEventHandler(async (event) => {
   const user = await $fetch<any>('/api/auth/me', {
@@ -15,26 +16,22 @@ export default defineEventHandler(async (event) => {
 
   try {
     const entries = await db.prepare(`
-      SELECT t.*, th.name AS theme_name, th.slug AS theme_slug, th.theme_type AS theme_type
-      FROM theme_of_the_month t
-      LEFT JOIN themes th ON th.id = t.theme_id
-      ORDER BY t.month DESC
+      SELECT * FROM theme_of_the_month
+      ORDER BY month DESC
     `).all();
 
-    return entries.results.map((e: any) => ({
-      id: e.id,
-      month: e.month,
-      title: e.title,
-      description: e.description,
-      cover_image: e.cover_image,
-      cover_image_uploaded_at: e.cover_image_uploaded_at,
-      theme_id: e.theme_id,
-      theme: e.theme_id
-        ? { id: e.theme_id, name: e.theme_name, slug: e.theme_slug, theme_type: e.theme_type }
-        : null,
-      created_at: e.created_at,
-      updated_at: e.updated_at
-    }));
+    const rows = entries.results ?? [];
+    const formatted = [];
+    for (const entry of rows) {
+      const theme = await resolveTotmLinkedTheme(
+        db,
+        entry.theme_id as string | null,
+        entry.theme_source
+      );
+      formatted.push(formatTotmEntry(entry as Record<string, unknown>, theme));
+    }
+
+    return formatted;
   } catch (e: any) {
     console.error('[ThemeOfTheMonth] Failed to list entries:', e);
     throw createError({ statusCode: 500, message: 'Failed to list theme of the month entries', cause: e });

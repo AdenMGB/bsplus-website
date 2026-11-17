@@ -20,6 +20,10 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
+    "@jsquash/jpeg": "^1.6.0",
+    "@jsquash/png": "^3.1.1",
+    "@jsquash/resize": "^2.1.1",
+    "@jsquash/webp": "^1.5.0",
     "@nuxt/fonts": "0.11.1",
     "@nuxtjs/seo": "3.0.3",
     "@nuxtjs/tailwindcss": "^6.14.0",

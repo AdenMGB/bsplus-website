@@ -48,8 +48,8 @@ Where present, `created_at`, `updated_at`, and `published_at` are **Unix time in
 theme-folder/
   theme.json          # Required: id, name, description, CustomCSS
   images/
-    banner.webp       # Optional
-    marquee.webp      # Optional
+    banner.webp       # Optional (PNG/JPEG in upload is converted to WebP automatically)
+    marquee.webp      # Optional (if only one cover image is provided, both files use the same WebP)
 ```
 
 **theme.json schema (BetterSEQTA):**

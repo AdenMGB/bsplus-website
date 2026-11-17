@@ -24,6 +24,7 @@ import {
   versionPlanFromExistingTheme,
   type CustomThemeVersionPlan
 } from './customThemeVersions';
+import { normalizeBetterSeqtaThemeRasterImages } from './betterseqtaThemeRaster';
 
 export const CUSTOM_THEMES_R2_PREFIX = 'custom-themes';
 export const MAX_PENDING_PER_USER = 5;
@@ -560,6 +561,11 @@ export async function processCustomThemeUpload(
     themeStorageLayout('custom-themes', themeId, siteUrl, 'custom-themes');
 
   if (themeType === 'betterseqta') {
+    const normalizedRaster = await normalizeBetterSeqtaThemeRasterImages(themeFiles);
+    themeFiles.clear();
+    for (const [key, value] of normalizedRaster) {
+      themeFiles.set(key, value);
+    }
     const validation = validateBetterSeqtaStructure(themeFiles);
     if (!validation.valid) {
       return createApiError('INVALID_THEME_STRUCTURE', 'BetterSEQTA theme validation failed', {

@@ -1,5 +1,11 @@
 import { getDB } from '../../utils/db';
 import { getBucket } from '../../utils/r2';
+import {
+  formatTotmEntry,
+  parseTotmThemeSource,
+  resolveTotmLinkedTheme,
+  validateTotmThemeLink
+} from '../../utils/themeOfTheMonth';
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -69,19 +75,26 @@ export default defineEventHandler(async (event) => {
       values.push(body.cover_image || null, body.cover_image ? Math.floor(Date.now() / 1000) : null);
     }
 
-    if (body.theme_id !== undefined) {
-      if (body.theme_id) {
-        const linkedTheme = await db.prepare('SELECT id, theme_type FROM themes WHERE id = ? LIMIT 1')
-          .bind(body.theme_id).first() as { id: string; theme_type?: string } | null;
-        if (!linkedTheme) {
-          throw createError({ statusCode: 400, message: 'Linked theme does not exist' });
-        }
-        if (linkedTheme.theme_type !== 'betterseqta') {
-          throw createError({ statusCode: 400, message: 'Theme of the month can only link to BetterSEQTA+ themes' });
-        }
+    if (body.theme_id !== undefined || body.theme_source !== undefined) {
+      const nextThemeId =
+        body.theme_id !== undefined ? body.theme_id || null : (existing.theme_id as string | null);
+      const nextSource =
+        body.theme_source !== undefined
+          ? parseTotmThemeSource(body.theme_source)
+          : parseTotmThemeSource(existing.theme_source);
+
+      if (nextThemeId) {
+        await validateTotmThemeLink(db, nextThemeId, nextSource);
       }
-      updates.push('theme_id = ?');
-      values.push(body.theme_id || null);
+
+      if (body.theme_id !== undefined) {
+        updates.push('theme_id = ?');
+        values.push(nextThemeId);
+      }
+      if (body.theme_id !== undefined || body.theme_source !== undefined) {
+        updates.push('theme_source = ?');
+        values.push(nextThemeId ? nextSource : 'marketplace');
+      }
     }
 
     if (updates.length === 0) {
@@ -108,25 +121,14 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const updated = await db.prepare(`
-      SELECT t.*, th.name AS theme_name, th.slug AS theme_slug
-      FROM theme_of_the_month t
-      LEFT JOIN themes th ON th.id = t.theme_id
-      WHERE t.id = ?
-    `).bind(id).first();
+    const updated = await db.prepare('SELECT * FROM theme_of_the_month WHERE id = ?').bind(id).first();
+    const theme = await resolveTotmLinkedTheme(
+      db,
+      updated.theme_id as string | null,
+      updated.theme_source
+    );
 
-    return {
-      id: updated.id,
-      month: updated.month,
-      title: updated.title,
-      description: updated.description,
-      cover_image: updated.cover_image,
-      cover_image_uploaded_at: updated.cover_image_uploaded_at,
-      theme_id: updated.theme_id,
-      theme: updated.theme_id ? { id: updated.theme_id, name: updated.theme_name, slug: updated.theme_slug } : null,
-      created_at: updated.created_at,
-      updated_at: updated.updated_at
-    };
+    return formatTotmEntry(updated as Record<string, unknown>, theme);
   } catch (e: any) {
     if (e.statusCode) throw e;
     console.error('[ThemeOfTheMonth] Failed to update entry:', e);
