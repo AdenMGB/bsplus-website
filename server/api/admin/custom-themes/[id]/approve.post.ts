@@ -1,6 +1,7 @@
 import { requireAdmin } from '../../../../utils/auth';
 import { getDB } from '../../../../utils/db';
 import { ensureThemeSubmitterBadge } from '../../../../utils/accounts-badges';
+import { notifyCustomThemeApproved } from '../../../../utils/custom-theme-approval-mail';
 import { createApiEnvelope, getCustomThemeById, nowUnixSeconds } from '../../../../utils/customThemes';
 
 export default defineEventHandler(async (event) => {
@@ -59,10 +60,13 @@ export default defineEventHandler(async (event) => {
 
   const badge = await ensureThemeSubmitterBadge(event, authorId);
 
+  const email = await notifyCustomThemeApproved(event, id, badge);
+
   return createApiEnvelope({
     message: 'Custom theme approved successfully',
     id,
     status: 'approved',
-    theme_submitter_badge: badge
+    theme_submitter_badge: badge,
+    approval_email: email
   });
 });
