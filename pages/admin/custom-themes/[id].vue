@@ -85,6 +85,15 @@
               >
                 Reject
               </button>
+              <button
+                v-if="theme.status === 'approved' && !theme.approval_emailed_at"
+                type="button"
+                class="rounded-md border border-sky-500/40 bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-sky-500 disabled:opacity-50"
+                :disabled="acting"
+                @click="sendApprovalEmail"
+              >
+                Send approval email
+              </button>
             </div>
           </div>
 
@@ -157,6 +166,13 @@
                 <div class="flex justify-between gap-4">
                   <dt class="text-zinc-500">Downloads</dt>
                   <dd class="text-right text-zinc-200">{{ theme.download_count ?? 0 }}</dd>
+                </div>
+                <div v-if="theme.status === 'approved'" class="flex justify-between gap-4">
+                  <dt class="text-zinc-500">Approval email</dt>
+                  <dd class="text-right text-zinc-200">
+                    <span v-if="theme.approval_emailed_at">{{ formatDate(theme.approval_emailed_at) }}</span>
+                    <span v-else class="text-amber-400/90">Not sent</span>
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -587,13 +603,32 @@ async function approve() {
   if (!confirm('Approve this theme for public distribution?')) return;
   acting.value = true;
   try {
-    await $fetch(`/api/admin/custom-themes/${themeId}/approve`, {
+    const res = await $fetch<any>(`/api/admin/custom-themes/${themeId}/approve`, {
+      method: 'POST',
+      body: {},
+    });
+    if (res?.data?.approval_email?.sent === false && res?.data?.approval_email?.reason) {
+      alert(`Approved, but approval email was not sent: ${res.data.approval_email.reason}`);
+    }
+    await refresh();
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to approve');
+  } finally {
+    acting.value = false;
+  }
+}
+
+async function sendApprovalEmail() {
+  if (!confirm('Send the approval notification email to this submitter’s Cloud account address?')) return;
+  acting.value = true;
+  try {
+    await $fetch(`/api/admin/custom-themes/${themeId}/send-approval-email`, {
       method: 'POST',
       body: {},
     });
     await refresh();
   } catch (e: any) {
-    alert(e?.data?.message || e?.statusMessage || 'Failed to approve');
+    alert(e?.data?.message || e?.statusMessage || 'Failed to send approval email');
   } finally {
     acting.value = false;
   }

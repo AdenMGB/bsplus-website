@@ -7,6 +7,15 @@
       >
         <template #actions>
           <button
+            v-if="missingApprovalEmails > 0"
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-sm font-semibold text-sky-200 transition-all duration-200 hover:scale-105 hover:bg-sky-500/20 disabled:opacity-50"
+            :disabled="pending || backfillSending"
+            @click="sendMissingApprovalEmails"
+          >
+            {{ backfillSending ? 'Sending…' : `Send approval emails (${missingApprovalEmails})` }}
+          </button>
+          <button
             type="button"
             class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:scale-105 hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
             :disabled="pending"
@@ -278,6 +287,7 @@ const appliedStatus = ref('pending');
 const appliedType = ref('');
 const currentPage = ref(1);
 const actingId = ref<string | null>(null);
+const backfillSending = ref(false);
 
 const { data, pending, refresh } = await useFetch<any>('/api/admin/custom-themes', {
   query: computed(() => ({
@@ -304,6 +314,7 @@ const pagination = computed(
 
 const pendingCount = computed(() => data.value?.data?.counts?.pending ?? 0);
 const approvedCount = computed(() => data.value?.data?.counts?.approved ?? 0);
+const missingApprovalEmails = computed(() => Number(data.value?.data?.missing_approval_emails ?? 0));
 
 const hasActiveFilters = computed(
   () => !!(appliedSearch.value || appliedStatus.value || appliedType.value)
@@ -338,12 +349,43 @@ async function approveTheme(id: string) {
   if (!confirm('Approve this custom theme for public distribution?')) return;
   actingId.value = id;
   try {
-    await $fetch(`/api/admin/custom-themes/${id}/approve`, { method: 'POST', body: {} });
+    const res = await $fetch<any>(`/api/admin/custom-themes/${id}/approve`, { method: 'POST', body: {} });
+    const emailed = res?.data?.approval_email?.sent;
+    if (emailed === false && res?.data?.approval_email?.reason) {
+      alert(`Approved, but approval email was not sent: ${res.data.approval_email.reason}`);
+    }
     await refresh();
   } catch (e: any) {
     alert(e?.data?.message || e?.statusMessage || 'Failed to approve theme');
   } finally {
     actingId.value = null;
+  }
+}
+
+async function sendMissingApprovalEmails() {
+  const n = missingApprovalEmails.value;
+  if (
+    !confirm(
+      `Send approval notification emails to up to 25 approved themes that have not been emailed yet? (${n} remaining)`
+    )
+  ) {
+    return;
+  }
+  backfillSending.value = true;
+  try {
+    const res = await $fetch<any>('/api/admin/custom-themes/send-missing-approval-emails', {
+      method: 'POST',
+      body: { limit: 25 },
+    });
+    const sent = res?.data?.sent ?? 0;
+    const failed = res?.data?.failed ?? 0;
+    const remaining = res?.data?.remaining_after ?? 0;
+    alert(`Sent ${sent} email(s). Failed: ${failed}. Remaining: ${remaining}.`);
+    await refresh();
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Backfill failed');
+  } finally {
+    backfillSending.value = false;
   }
 }
 

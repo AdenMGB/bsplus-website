@@ -203,13 +203,18 @@ export function formatCustomThemeOwner(theme: Record<string, unknown>) {
     typeof theme.promoted_marketplace_theme_id === 'string'
       ? theme.promoted_marketplace_theme_id.trim() || null
       : null;
+  const approvalEmailedAt =
+    theme.approval_emailed_at != null && Number(theme.approval_emailed_at) > 0
+      ? Number(theme.approval_emailed_at)
+      : null;
   return {
     ...formatCustomThemePublic(theme),
     status: theme.status,
     submission_notes: theme.submission_notes,
     rejection_reason: theme.rejection_reason,
     reviewed_at: theme.reviewed_at,
-    promoted_marketplace_theme_id: promotedId
+    promoted_marketplace_theme_id: promotedId,
+    approval_emailed_at: approvalEmailedAt
   };
 }
 

@@ -1,5 +1,6 @@
 import { requireAdmin } from '../../../utils/auth';
 import { getDB } from '../../../utils/db';
+import { countApprovedThemesMissingApprovalEmail } from '../../../utils/custom-theme-approval-mail';
 import {
   createApiEnvelope,
   formatCustomThemeOwner,
@@ -54,6 +55,7 @@ export default defineEventHandler(async (event) => {
   const data: Record<string, unknown> = { ...listed };
   if (includeCounts) {
     data.counts = await getCustomThemeStatusCounts(db);
+    data.missing_approval_emails = await countApprovedThemesMissingApprovalEmail(db);
   }
 
   return createApiEnvelope(data);
