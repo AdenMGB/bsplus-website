@@ -199,12 +199,17 @@ export function formatCustomThemePublic(theme: Record<string, unknown>) {
 }
 
 export function formatCustomThemeOwner(theme: Record<string, unknown>) {
+  const promotedId =
+    typeof theme.promoted_marketplace_theme_id === 'string'
+      ? theme.promoted_marketplace_theme_id.trim() || null
+      : null;
   return {
     ...formatCustomThemePublic(theme),
     status: theme.status,
     submission_notes: theme.submission_notes,
     rejection_reason: theme.rejection_reason,
-    reviewed_at: theme.reviewed_at
+    reviewed_at: theme.reviewed_at,
+    promoted_marketplace_theme_id: promotedId
   };
 }
 

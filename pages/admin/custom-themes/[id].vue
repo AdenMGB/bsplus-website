@@ -44,6 +44,22 @@
               >
                 View theme.json
               </a>
+              <NuxtLink
+                v-if="theme.promoted_marketplace_theme_id"
+                :to="`/admin/themes/${theme.promoted_marketplace_theme_id}`"
+                class="inline-flex items-center gap-2 rounded-md border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-semibold text-violet-200 shadow-sm transition-all hover:scale-105 hover:border-violet-400/60 hover:bg-violet-500/20"
+              >
+                View in theme store
+              </NuxtLink>
+              <button
+                v-else-if="theme.status === 'approved'"
+                type="button"
+                class="inline-flex items-center gap-2 rounded-md border border-violet-500/40 bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-violet-500 disabled:opacity-50"
+                :disabled="acting"
+                @click="promoteToStore"
+              >
+                Import to theme store
+              </button>
               <button
                 type="button"
                 class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-blue-500"
@@ -578,6 +594,32 @@ async function approve() {
     await refresh();
   } catch (e: any) {
     alert(e?.data?.message || e?.statusMessage || 'Failed to approve');
+  } finally {
+    acting.value = false;
+  }
+}
+
+async function promoteToStore() {
+  if (
+    !confirm(
+      'Import this community theme into the official theme store? Files, images, and download counts will be copied to a new marketplace listing; the community listing stays as-is.'
+    )
+  ) {
+    return;
+  }
+  acting.value = true;
+  try {
+    const res = await $fetch<any>(`/api/admin/custom-themes/${themeId}/promote-to-store`, {
+      method: 'POST',
+      body: {}
+    });
+    const id = res?.data?.marketplace_theme_id;
+    await refresh();
+    if (id) {
+      await navigateTo(`/admin/themes/${id}`);
+    }
+  } catch (e: any) {
+    alert(e?.data?.message || e?.statusMessage || 'Failed to import into theme store');
   } finally {
     acting.value = false;
   }
